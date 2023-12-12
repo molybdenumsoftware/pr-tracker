@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT 1 as pr from github_prs where number = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "pr",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "d0834c96a348ae04650d0ddf8fa71b076413cd144d6bace2744d6fd37827dfeb"
+}
