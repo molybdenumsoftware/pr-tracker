@@ -8,6 +8,6 @@ rustPlatform.buildRustPackage {
   cargoLock.lockFile = ./Cargo.lock;
   src = ./.;
   buildAndTestSubdir = "pr-tracker-api";
-  checkInputs = [postgresql];
+  nativeCheckInputs = [postgresql];
   inherit buildInputs;
 }
