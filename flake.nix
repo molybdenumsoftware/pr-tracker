@@ -32,6 +32,8 @@
       util = bin: pkgs.writeShellScriptBin "util-${bin}" "cargo run --package util --bin ${bin}";
       packages.api = pkgs.callPackage ./api.nix {inherit buildInputs;};
     in {
+      inherit packages;
+
       devShells.default = pkgs.mkShell {
         inputsFrom = attrValues packages;
         packages = with pkgs; [rustfmt rust-analyzer clippy sqlx-cli];
