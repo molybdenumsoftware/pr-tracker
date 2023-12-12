@@ -56,7 +56,10 @@ async fn pr_not_landed() {
             assert_eq!(response.status(), rocket::http::Status::Ok);
 
             assert_eq!(
-                response.into_json::<pr_tracker_api::LandedIn>().await.unwrap(),
+                response
+                    .into_json::<pr_tracker_api::LandedIn>()
+                    .await
+                    .unwrap(),
                 pr_tracker_api::LandedIn { branches: vec![] }
             );
         }
@@ -96,7 +99,10 @@ async fn pr_landed() {
             assert_eq!(response.status(), rocket::http::Status::Ok);
 
             assert_eq!(
-                response.into_json::<pr_tracker_api::LandedIn>().await.unwrap(),
+                response
+                    .into_json::<pr_tracker_api::LandedIn>()
+                    .await
+                    .unwrap(),
                 pr_tracker_api::LandedIn {
                     branches: vec![pr_tracker_api::Branch("nixos-unstable".to_owned())]
                 }
