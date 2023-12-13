@@ -1,5 +1,5 @@
 [workspace]
-members = ["pr-tracker-api", "pr-tracker-store", "util"]
+members = ["crates/*"]
 resolver = "2"
 
 [workspace.package]
