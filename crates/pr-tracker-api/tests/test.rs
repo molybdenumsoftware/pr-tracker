@@ -22,7 +22,7 @@ async fn pr_not_found() {
             let client = rocket::local::asynchronous::Client::tracked(ctx.rocket())
                 .await
                 .unwrap();
-            let response = client.get("/landed/github/2134").dispatch().await;
+            let response = client.get("/api/v1/2134").dispatch().await;
             assert_eq!(response.status(), rocket::http::Status::NotFound);
             assert_eq!(
                 response.into_string().await,
@@ -52,7 +52,7 @@ async fn pr_not_landed() {
                 .await
                 .unwrap();
 
-            let response = client.get("/landed/github/123").dispatch().await;
+            let response = client.get("/api/v1/123").dispatch().await;
             assert_eq!(response.status(), rocket::http::Status::Ok);
 
             assert_eq!(
@@ -95,7 +95,7 @@ async fn pr_landed() {
                 .await
                 .unwrap();
 
-            let response = client.get("/landed/github/2134").dispatch().await;
+            let response = client.get("/api/v1/2134").dispatch().await;
             assert_eq!(response.status(), rocket::http::Status::Ok);
 
             assert_eq!(

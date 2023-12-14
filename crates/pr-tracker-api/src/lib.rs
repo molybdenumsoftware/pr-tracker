@@ -18,7 +18,7 @@ pub fn app() -> rocket::fairing::AdHoc {
 #[database("data")]
 struct Data(sqlx::Pool<sqlx::Postgres>);
 
-#[rocket::get("/landed/github/<pr>")]
+#[rocket::get("/api/v1/<pr>")]
 async fn landed(
     mut db: Connection<Data>,
     pr: u32,
