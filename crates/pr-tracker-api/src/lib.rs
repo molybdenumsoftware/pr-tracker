@@ -34,6 +34,7 @@ async fn landed(
 }
 
 #[rocket::get("/api/v1/healthcheck")]
+#[allow(clippy::needless_pass_by_value)]
 fn health_check(_db: Connection<Data>) {}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]

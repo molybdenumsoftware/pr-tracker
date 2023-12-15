@@ -37,7 +37,7 @@
 
       devShells.default = pkgs.mkShell {
         inputsFrom = attrValues packages;
-        packages = with pkgs; [rustfmt rust-analyzer clippy sqlx-cli];
+        packages = with pkgs; [rustfmt rust-analyzer sqlx-cli];
         SQLX_OFFLINE = "true";
       };
 
