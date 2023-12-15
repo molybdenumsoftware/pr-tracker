@@ -1,4 +1,5 @@
 {
+  clippy,
   rustPlatform,
   postgresql,
   buildInputs,
@@ -20,6 +21,7 @@ in
       }
     );
     buildAndTestSubdir = "crates/pr-tracker-api";
-    nativeCheckInputs = [postgresql];
+    nativeCheckInputs = [postgresql clippy];
+    postCheck = "cargo clippy -- --deny warnings";
     inherit buildInputs;
   }
