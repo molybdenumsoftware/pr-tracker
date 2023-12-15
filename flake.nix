@@ -61,11 +61,19 @@
         packages
         // {
           formatting = treefmtEval.config.build.check self;
+          api-module = import ./nixos-tests/api.nix {
+            modules = systemAgnosticOutputs.nixosModules;
+            inherit pkgs;
+          };
         };
 
       formatter = treefmtEval.config.build.wrapper;
     };
     systemSpecificOutputs = flake-utils.lib.eachDefaultSystem forEachDefaultSystem;
+    systemAgnosticOutputs = {
+      nixosModules.api = import ./modules/api.nix {pr-tracker = self;};
+    };
   in
-    systemSpecificOutputs;
+    systemSpecificOutputs
+    // systemAgnosticOutputs;
 }
