@@ -30,25 +30,35 @@
         else throw "unsupported";
       pkgs = nixpkgs.legacyPackages.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
-      util = bin: pkgs.writeShellScriptBin "util-${bin}" "cargo run --package util --bin ${bin}";
       packages.api = pkgs.callPackage ./api.nix {inherit buildInputs;};
+
+      sqlxPrepare = pkgs.writeShellApplication {
+        name = "util-sqlx-prepare";
+        runtimeInputs = [pkgs.sqlx-cli];
+        text = "cargo run --package util --bin sqlx-prepare";
+      };
+
+      dbRepl = pkgs.writeShellApplication {
+        name = "util-db-repl";
+        text = "cargo run --package util --bin db-repl";
+      };
     in {
       inherit packages;
 
       devShells.default = pkgs.mkShell {
         inputsFrom = attrValues packages;
-        packages = with pkgs; [rustfmt rust-analyzer sqlx-cli];
+        packages = with pkgs; [rustfmt rust-analyzer];
         SQLX_OFFLINE = "true";
       };
 
       apps.sqlx-prepare = {
         type = "app";
-        program = pipe "sqlx-prepare" [util getExe];
+        program = getExe sqlxPrepare;
       };
 
       apps.db-repl = {
         type = "app";
-        program = pipe "db-repl" [util getExe];
+        program = getExe dbRepl;
       };
 
       checks =
