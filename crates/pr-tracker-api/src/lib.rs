@@ -10,7 +10,7 @@ pub fn app() -> rocket::fairing::AdHoc {
     rocket::fairing::AdHoc::on_ignite("main", |rocket| async {
         rocket
             .attach(Data::init())
-            .mount("/", rocket::routes![landed])
+            .mount("/", rocket::routes![health_check, landed])
     })
 }
 
@@ -32,6 +32,9 @@ async fn landed(
 
     Ok(rocket::serde::json::Json(LandedIn { branches }))
 }
+
+#[rocket::get("/api/v1/healthcheck")]
+fn health_check(_db: Connection<Data>) {}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 #[serde(crate = "rocket::serde")]
