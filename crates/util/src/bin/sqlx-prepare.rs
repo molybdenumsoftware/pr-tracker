@@ -8,7 +8,7 @@ async fn main() {
         let status = Command::new("cargo")
             .args(["sqlx", "prepare", "--database-url"])
             .arg(ctx.db_url())
-            .current_dir("pr-tracker-store")
+            .current_dir(env!("STORE_CRATE_PATH"))
             .status()
             .unwrap();
 
