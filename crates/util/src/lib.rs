@@ -90,9 +90,15 @@ impl DatabaseContext {
         )
     }
 
-    pub async fn with<T>(f: impl FnOnce(&Self) -> futures::future::LocalBoxFuture<T>) -> T {
-        let ctx = Self::init().await;
-        let t = f(&ctx).await;
+    pub fn kill_db(&mut self) -> std::io::Result<()> {
+        self.postgres.kill()?;
+        self.postgres.wait()?;
+        Ok(())
+    }
+
+    pub async fn with<T>(f: impl FnOnce(&mut Self) -> futures::future::LocalBoxFuture<T>) -> T {
+        let mut ctx = Self::init().await;
+        let t = f(&mut ctx).await;
         drop(ctx);
         t
     }

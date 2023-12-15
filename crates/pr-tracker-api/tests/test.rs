@@ -16,8 +16,39 @@ impl Rocketable for util::DatabaseContext {
 }
 
 #[tokio::test]
+async fn healthcheck_ok() {
+    util::DatabaseContext::with(|ctx| {
+        async {
+            let client = rocket::local::asynchronous::Client::tracked(ctx.rocket())
+                .await
+                .unwrap();
+            let response = client.get("/api/v1/healthcheck").dispatch().await;
+            assert_eq!(response.status(), rocket::http::Status::Ok);
+        }
+        .boxed()
+    })
+    .await;
+}
+
+#[tokio::test]
+async fn healthcheck_not_ok() {
+    util::DatabaseContext::with(|ctx| {
+        async {
+            let client = rocket::local::asynchronous::Client::tracked(ctx.rocket())
+                .await
+                .unwrap();
+            ctx.kill_db().unwrap();
+            let response = client.get("/api/v1/healthcheck").dispatch().await;
+            assert_eq!(response.status(), rocket::http::Status::ServiceUnavailable);
+        }
+        .boxed()
+    })
+    .await;
+}
+
+#[tokio::test]
 async fn pr_not_found() {
-    util::DatabaseContext::with(|ctx: &util::DatabaseContext| {
+    util::DatabaseContext::with(|ctx| {
         async {
             let client = rocket::local::asynchronous::Client::tracked(ctx.rocket())
                 .await
