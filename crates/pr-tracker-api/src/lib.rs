@@ -5,11 +5,29 @@
 use rocket::serde::{Deserialize, Serialize};
 use rocket_db_pools::{Connection, Database};
 
+async fn run_migrations(rocket: rocket::Rocket<rocket::Build>) -> rocket::fairing::Result {
+    let Some(db) = Data::fetch(&rocket) else {
+        rocket::error!("Failed to connect to the database");
+        return Err(rocket);
+    };
+
+    let Err(e) = util::migrate(&db.0).await else {
+        return Ok(rocket);
+    };
+
+    rocket::error!("Failed to run database migrations: {e}");
+    Err(rocket)
+}
+
 #[must_use]
 pub fn app() -> rocket::fairing::AdHoc {
     rocket::fairing::AdHoc::on_ignite("main", |rocket| async {
         rocket
             .attach(Data::init())
+            .attach(rocket::fairing::AdHoc::try_on_ignite(
+                "run migrations",
+                run_migrations,
+            ))
             .mount("/", rocket::routes![health_check, landed])
     })
 }
