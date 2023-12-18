@@ -22,9 +22,9 @@
 
     forEachDefaultSystem = system: let
       buildInputs =
-        if hasSuffix "-darwin" system
+        if pkgs.stdenv.isDarwin
         then with pkgs; [darwin.apple_sdk.frameworks.SystemConfiguration]
-        else if hasSuffix "-linux" system
+        else if pkgs.stdenv.isLinux
         then with pkgs; [pkg-config openssl]
         else throw "unsupported";
       pkgs = nixpkgs.legacyPackages.${system};
