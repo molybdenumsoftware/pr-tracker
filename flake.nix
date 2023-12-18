@@ -16,7 +16,6 @@
     inherit
       (nixpkgs.lib)
       attrValues
-      getExe
       pipe
       hasSuffix
       ;
@@ -47,18 +46,13 @@
 
       devShells.default = pkgs.mkShell {
         inputsFrom = attrValues packages;
-        packages = with pkgs; [rustfmt rust-analyzer];
+        packages = with pkgs; [
+          rustfmt
+          rust-analyzer
+          sqlxPrepare
+          dbRepl
+        ];
         SQLX_OFFLINE = "true";
-      };
-
-      apps.sqlx-prepare = {
-        type = "app";
-        program = getExe sqlxPrepare;
-      };
-
-      apps.db-repl = {
-        type = "app";
-        program = getExe dbRepl;
       };
 
       checks =
