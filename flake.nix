@@ -21,13 +21,13 @@
       ;
 
     forEachDefaultSystem = system: let
+      pkgs = nixpkgs.legacyPackages.${system};
       buildInputs =
         if pkgs.stdenv.isDarwin
         then with pkgs; [darwin.apple_sdk.frameworks.SystemConfiguration]
         else if pkgs.stdenv.isLinux
         then with pkgs; [pkg-config openssl]
         else throw "unsupported";
-      pkgs = nixpkgs.legacyPackages.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
       packages.api = pkgs.callPackage ./api.nix {inherit buildInputs;};
 
