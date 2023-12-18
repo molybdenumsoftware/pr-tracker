@@ -31,27 +31,29 @@
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
       packages.api = pkgs.callPackage ./api.nix {inherit buildInputs;};
 
-      sqlxPrepare = pkgs.writeShellApplication {
-        name = "util-sqlx-prepare";
-        runtimeInputs = [pkgs.sqlx-cli];
-        text = "cargo run --package util --bin sqlx-prepare";
-      };
+      devUtils = [
+        (pkgs.writeShellApplication {
+          name = "util-sqlx-prepare";
+          runtimeInputs = [pkgs.sqlx-cli];
+          text = "cargo run --package util --bin sqlx-prepare";
+        })
 
-      dbRepl = pkgs.writeShellApplication {
-        name = "util-db-repl";
-        text = "cargo run --package util --bin db-repl";
-      };
+        (pkgs.writeShellApplication {
+          name = "util-db-repl";
+          text = "cargo run --package util --bin db-repl";
+        })
+      ];
     in {
       inherit packages;
 
       devShells.default = pkgs.mkShell {
         inputsFrom = attrValues packages;
-        packages = with pkgs; [
-          rustfmt
-          rust-analyzer
-          sqlxPrepare
-          dbRepl
-        ];
+        packages = with pkgs;
+          [
+            rustfmt
+            rust-analyzer
+          ]
+          ++ devUtils;
         SQLX_OFFLINE = "true";
       };
 
