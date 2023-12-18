@@ -18,6 +18,10 @@ impl Drop for DatabaseContext {
     }
 }
 
+pub async fn migrate(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), sqlx::migrate::MigrateError> {
+    sqlx::migrate!("./migrations").run(pool).await
+}
+
 impl DatabaseContext {
     // Will not be used as port, but as part of socket filename.
     // See `listen_addresses` below.
@@ -32,7 +36,7 @@ impl DatabaseContext {
         path.join("sockets")
     }
 
-    async fn pool(&self) -> Result<PgPool, sqlx::Error> {
+    pub async fn pool(&self) -> Result<PgPool, sqlx::Error> {
         let url = self.db_url();
         sqlx::PgPool::connect(&url).await
     }
@@ -70,14 +74,7 @@ impl DatabaseContext {
             std::thread::sleep(Duration::from_millis(10));
         }
 
-        let this = Self { tmp_dir, postgres };
-
-        sqlx::migrate!("./migrations")
-            .run(&this.pool().await.unwrap())
-            .await
-            .unwrap();
-
-        this
+        Self { tmp_dir, postgres }
     }
 
     pub fn db_url(&self) -> String {
