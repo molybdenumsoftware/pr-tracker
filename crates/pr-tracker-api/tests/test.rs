@@ -1,28 +1,46 @@
 use rocket::futures::FutureExt;
 
-trait Rocketable {
-    fn rocket(&self) -> rocket::Rocket<rocket::Build>;
+struct TestContext<'a> {
+    db: &'a mut util::DatabaseContext,
+    client: rocket::local::asynchronous::Client,
 }
 
-impl Rocketable for util::DatabaseContext {
-    fn rocket(&self) -> rocket::Rocket<rocket::Build> {
-        rocket::custom(
-            rocket::figment::Figment::from(rocket::Config::default())
-                .merge(("databases.data.url", self.db_url()))
-                .merge(("log_level", rocket::config::LogLevel::Debug)),
-        )
-        .attach(pr_tracker_api::app())
+impl TestContext<'_> {
+    async fn with(
+        test: impl for<'a> FnOnce(&'a mut TestContext<'a>) -> rocket::futures::future::LocalBoxFuture<()>
+            + 'static,
+    ) {
+        util::DatabaseContext::with(|db_context| {
+            async {
+                let rocket = rocket::custom(
+                    rocket::figment::Figment::from(rocket::Config::default())
+                        .merge(("databases.data.url", db_context.db_url()))
+                        .merge(("log_level", rocket::config::LogLevel::Debug)),
+                )
+                .attach(pr_tracker_api::app());
+
+                let api_client = rocket::local::asynchronous::Client::tracked(rocket)
+                    .await
+                    .unwrap();
+
+                let mut this = TestContext {
+                    db: db_context,
+                    client: api_client,
+                };
+
+                test(&mut this).await
+            }
+            .boxed_local()
+        })
+        .await;
     }
 }
 
 #[tokio::test]
 async fn healthcheck_ok() {
-    util::DatabaseContext::with(|ctx| {
+    TestContext::with(|ctx| {
         async {
-            let client = rocket::local::asynchronous::Client::tracked(ctx.rocket())
-                .await
-                .unwrap();
-            let response = client.get("/api/v1/healthcheck").dispatch().await;
+            let response = ctx.client.get("/api/v1/healthcheck").dispatch().await;
             assert_eq!(response.status(), rocket::http::Status::Ok);
         }
         .boxed()
@@ -32,13 +50,10 @@ async fn healthcheck_ok() {
 
 #[tokio::test]
 async fn healthcheck_not_ok() {
-    util::DatabaseContext::with(|ctx| {
+    TestContext::with(|ctx| {
         async {
-            let client = rocket::local::asynchronous::Client::tracked(ctx.rocket())
-                .await
-                .unwrap();
-            ctx.kill_db().unwrap();
-            let response = client.get("/api/v1/healthcheck").dispatch().await;
+            ctx.db.kill_db().unwrap();
+            let response = ctx.client.get("/api/v1/healthcheck").dispatch().await;
             assert_eq!(response.status(), rocket::http::Status::ServiceUnavailable);
         }
         .boxed()
@@ -48,12 +63,9 @@ async fn healthcheck_not_ok() {
 
 #[tokio::test]
 async fn pr_not_found() {
-    util::DatabaseContext::with(|ctx| {
+    TestContext::with(|ctx| {
         async {
-            let client = rocket::local::asynchronous::Client::tracked(ctx.rocket())
-                .await
-                .unwrap();
-            let response = client.get("/api/v1/2134").dispatch().await;
+            let response = ctx.client.get("/api/v1/2134").dispatch().await;
             assert_eq!(response.status(), rocket::http::Status::NotFound);
             assert_eq!(
                 response.into_string().await,
@@ -67,9 +79,9 @@ async fn pr_not_found() {
 
 #[tokio::test]
 async fn pr_not_landed() {
-    util::DatabaseContext::with(|ctx| {
+    TestContext::with(|ctx| {
         async {
-            let mut connection = ctx.connection().await.unwrap();
+            let mut connection = ctx.db.connection().await.unwrap();
 
             pr_tracker_store::Pr {
                 number: 123.try_into().unwrap(),
@@ -79,11 +91,7 @@ async fn pr_not_landed() {
             .await
             .unwrap();
 
-            let client = rocket::local::asynchronous::Client::tracked(ctx.rocket())
-                .await
-                .unwrap();
-
-            let response = client.get("/api/v1/123").dispatch().await;
+            let response = ctx.client.get("/api/v1/123").dispatch().await;
             assert_eq!(response.status(), rocket::http::Status::Ok);
 
             assert_eq!(
@@ -101,9 +109,9 @@ async fn pr_not_landed() {
 
 #[tokio::test]
 async fn pr_landed() {
-    util::DatabaseContext::with(|ctx| {
+    TestContext::with(|ctx| {
         async {
-            let connection = &mut ctx.connection().await.unwrap();
+            let connection = &mut ctx.db.connection().await.unwrap();
 
             let branch = pr_tracker_store::Branch::get_or_insert(connection, "nixos-unstable")
                 .await
@@ -122,11 +130,7 @@ async fn pr_landed() {
 
             landing.insert(connection).await.unwrap();
 
-            let client = rocket::local::asynchronous::Client::tracked(ctx.rocket())
-                .await
-                .unwrap();
-
-            let response = client.get("/api/v1/2134").dispatch().await;
+            let response = ctx.client.get("/api/v1/2134").dispatch().await;
             assert_eq!(response.status(), rocket::http::Status::Ok);
 
             assert_eq!(
