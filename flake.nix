@@ -43,6 +43,13 @@
           text = "cargo run --package util --bin db-repl";
         })
       ];
+
+      nixosTests = {
+        api-module = import ./nixos-tests/api.nix {
+          modules = systemAgnosticOutputs.nixosModules;
+          inherit pkgs;
+        };
+      };
     in {
       inherit packages;
 
@@ -59,12 +66,9 @@
 
       checks =
         packages
+        // nixosTests
         // {
           formatting = treefmtEval.config.build.check self;
-          api-module = import ./nixos-tests/api.nix {
-            modules = systemAgnosticOutputs.nixosModules;
-            inherit pkgs;
-          };
         };
 
       formatter = treefmtEval.config.build.wrapper;
