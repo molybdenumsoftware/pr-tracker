@@ -2,7 +2,10 @@
 // required because rocket::routes, remove if clippy permits.
 #![allow(clippy::no_effect_underscore_binding)]
 
-use rocket::serde::{Deserialize, Serialize};
+use rocket::{
+    futures::FutureExt,
+    serde::{Deserialize, Serialize},
+};
 use rocket_db_pools::{Connection, Database};
 
 async fn run_migrations(rocket: rocket::Rocket<rocket::Build>) -> rocket::fairing::Result {
@@ -22,13 +25,23 @@ async fn run_migrations(rocket: rocket::Rocket<rocket::Build>) -> rocket::fairin
 #[must_use]
 pub fn app() -> rocket::fairing::AdHoc {
     rocket::fairing::AdHoc::on_ignite("main", |rocket| async {
-        rocket
+        let rocket = rocket
             .attach(Data::init())
             .attach(rocket::fairing::AdHoc::try_on_ignite(
                 "run migrations",
                 run_migrations,
-            ))
-            .mount("/", rocket::routes![health_check, landed])
+            ));
+
+        #[cfg(target_family = "unix")]
+        let rocket = rocket.attach(rocket::fairing::AdHoc::on_liftoff("sd-notify", |_| {
+            if let Err(err) = sd_notify::notify(true, &[sd_notify::NotifyState::Ready]) {
+                rocket::error!("failed to notify systemd that this service is ready: {err}");
+            }
+
+            std::future::ready(()).boxed()
+        }));
+
+        rocket.mount("/", rocket::routes![health_check, landed])
     })
 }
 

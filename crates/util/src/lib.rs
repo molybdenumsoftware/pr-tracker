@@ -52,6 +52,9 @@ impl DatabaseContext {
         assert!(status.success());
 
         let postgres = Command::new("postgres")
+            // With this environment variable present, postgres sends a ready notification. This
+            // interferes with our testing of our own ready notification.
+            .env_remove("NOTIFY_SOCKET")
             .arg("-D")
             .arg(data_dir)
             .arg("-p")
