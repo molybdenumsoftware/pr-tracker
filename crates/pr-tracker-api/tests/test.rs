@@ -1,40 +1,8 @@
+#[path = "../test-util.rs"]
+mod test_util;
+
 use rocket::futures::FutureExt;
-
-struct TestContext<'a> {
-    db: &'a mut util::DatabaseContext,
-    client: rocket::local::asynchronous::Client,
-}
-
-impl TestContext<'_> {
-    async fn with(
-        test: impl for<'a> FnOnce(&'a mut TestContext<'a>) -> rocket::futures::future::LocalBoxFuture<()>
-            + 'static,
-    ) {
-        util::DatabaseContext::with(|db_context| {
-            async {
-                let rocket = rocket::custom(
-                    rocket::figment::Figment::from(rocket::Config::default())
-                        .merge(("databases.data.url", db_context.db_url()))
-                        .merge(("log_level", rocket::config::LogLevel::Debug)),
-                )
-                .attach(pr_tracker_api::app());
-
-                let api_client = rocket::local::asynchronous::Client::tracked(rocket)
-                    .await
-                    .unwrap();
-
-                let mut this = TestContext {
-                    db: db_context,
-                    client: api_client,
-                };
-
-                test(&mut this).await
-            }
-            .boxed_local()
-        })
-        .await;
-    }
-}
+use test_util::TestContext;
 
 #[tokio::test]
 async fn healthcheck_ok() {
