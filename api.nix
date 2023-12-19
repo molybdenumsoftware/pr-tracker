@@ -24,4 +24,6 @@ in
     nativeCheckInputs = [postgresql clippy];
     postCheck = "cargo clippy -- --deny warnings";
     inherit buildInputs;
+
+    meta.mainProgram = "pr-tracker-api";
   }

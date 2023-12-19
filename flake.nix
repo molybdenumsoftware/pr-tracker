@@ -16,6 +16,7 @@
     inherit
       (nixpkgs.lib)
       attrValues
+      optionalAttrs
       pipe
       hasSuffix
       ;
@@ -43,6 +44,15 @@
           text = "cargo run --package util --bin db-repl";
         })
       ];
+
+      # NixOS tests don't "just work" on Darwin. See
+      # https://github.com/NixOS/nixpkgs/issues/254552 for details.
+      nixosTests = optionalAttrs (!pkgs.stdenv.isDarwin) {
+        api-module = import ./nixos-tests/api.nix {
+          modules = systemAgnosticOutputs.nixosModules;
+          inherit pkgs;
+        };
+      };
     in {
       inherit packages;
 
@@ -59,12 +69,18 @@
 
       checks =
         packages
+        // nixosTests
         // {
           formatting = treefmtEval.config.build.check self;
         };
 
       formatter = treefmtEval.config.build.wrapper;
     };
+    systemSpecificOutputs = flake-utils.lib.eachDefaultSystem forEachDefaultSystem;
+    systemAgnosticOutputs = {
+      nixosModules.api = import ./modules/api.nix {pr-tracker = self;};
+    };
   in
-    flake-utils.lib.eachDefaultSystem forEachDefaultSystem;
+    systemSpecificOutputs
+    // systemAgnosticOutputs;
 }
