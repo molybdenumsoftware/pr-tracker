@@ -16,6 +16,7 @@
     inherit
       (nixpkgs.lib)
       attrValues
+      optionalAttrs
       pipe
       hasSuffix
       ;
@@ -44,7 +45,9 @@
         })
       ];
 
-      nixosTests = {
+      # NixOS tests don't "just work" on Darwin. See
+      # https://github.com/NixOS/nixpkgs/issues/254552 for details.
+      nixosTests = optionalAttrs (!pkgs.stdenv.isDarwin) {
         api-module = import ./nixos-tests/api.nix {
           modules = systemAgnosticOutputs.nixosModules;
           inherit pkgs;
