@@ -19,6 +19,7 @@
       optionalAttrs
       pipe
       hasSuffix
+      fileset
       ;
 
     forEachDefaultSystem = system: let
@@ -30,7 +31,16 @@
         then with pkgs; [pkg-config openssl]
         else throw "unsupported";
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
-      packages.api = pkgs.callPackage ./api.nix {inherit buildInputs;};
+
+      cargoWorkspaceSrc = fileset.toSource {
+        root = ./.;
+        fileset = fileset.unions [
+          ./Cargo.toml
+          ./Cargo.lock
+          ./crates
+        ];
+      };
+      packages.api = pkgs.callPackage ./api.nix {inherit buildInputs cargoWorkspaceSrc;};
 
       devUtils = [
         (pkgs.writeShellApplication {
