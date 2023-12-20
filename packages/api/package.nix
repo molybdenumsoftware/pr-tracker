@@ -10,7 +10,7 @@ rustPlatform.buildRustPackage {
   name = "pr-tracker-api";
   cargoLock.lockFile = ../../Cargo.lock;
   src = cargoWorkspaceSrc;
-  buildAndTestSubdir = "crates/pr-tracker-api";
+  buildAndTestSubdir = "crates/api";
   nativeCheckInputs = [postgresql clippy];
   postCheck = "cargo clippy -- --deny warnings";
   inherit buildInputs;

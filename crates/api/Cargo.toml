@@ -13,7 +13,7 @@ camino = "1.1.6"
 rocket = { version = "0.5.0", features = ["json"] }
 rocket_db_pools = { version = "0.1.0", features = ["sqlx_postgres"] }
 sqlx = { version = "0.7", default-features = false, features = ["macros", "migrate"] }
-pr-tracker-store = { version = "0.1.0", path = "../pr-tracker-store" }
+pr-tracker-store = { version = "0.1.0", path = "../store" }
 util = { version = "0.1.0", path = "../util" }
 
 [target.'cfg(target_family = "unix")'.dependencies]
