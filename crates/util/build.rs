@@ -6,7 +6,7 @@ fn main() {
     println!("cargo:rerun-if-changed=migrations");
 
     let util_crate_dir = Utf8Path::new(env!("CARGO_MANIFEST_DIR"));
-    let store_crate_dir = util_crate_dir.parent().unwrap().join("pr-tracker-store");
+    let store_crate_dir = util_crate_dir.parent().unwrap().join("store");
     assert!(
         store_crate_dir.exists(),
         "expected {store_crate_dir} to exist",
