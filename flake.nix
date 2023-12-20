@@ -40,7 +40,8 @@
           ./crates
         ];
       };
-      packages.api = pkgs.callPackage ./api.nix {inherit buildInputs cargoWorkspaceSrc;};
+
+      packages = import ./packages {inherit pkgs cargoWorkspaceSrc buildInputs;};
 
       devUtils = [
         (pkgs.writeShellApplication {
