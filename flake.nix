@@ -17,7 +17,6 @@
       (nixpkgs.lib)
       attrValues
       optionalAttrs
-      hasSuffix
       ;
 
     forEachDefaultSystem = system: let
