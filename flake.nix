@@ -17,31 +17,14 @@
       (nixpkgs.lib)
       attrValues
       optionalAttrs
-      pipe
       hasSuffix
-      fileset
       ;
 
     forEachDefaultSystem = system: let
       pkgs = nixpkgs.legacyPackages.${system};
-      buildInputs =
-        if pkgs.stdenv.isDarwin
-        then with pkgs; [darwin.apple_sdk.frameworks.SystemConfiguration]
-        else if pkgs.stdenv.isLinux
-        then with pkgs; [pkg-config openssl]
-        else throw "unsupported";
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
-      cargoWorkspaceSrc = fileset.toSource {
-        root = ./.;
-        fileset = fileset.unions [
-          ./Cargo.toml
-          ./Cargo.lock
-          ./crates
-        ];
-      };
-
-      packages = import ./packages {inherit pkgs cargoWorkspaceSrc buildInputs;};
+      packages = import ./packages {inherit pkgs;};
 
       devUtils = [
         (pkgs.writeShellApplication {
