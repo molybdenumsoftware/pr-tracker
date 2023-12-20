@@ -2,6 +2,14 @@
   inherit
     (pkgs.lib)
     fileset
+    filterAttrs
+    mapAttrs
+    pipe
+    ;
+
+  inherit
+    (builtins)
+    readDir
     ;
 
   buildInputs =
@@ -19,6 +27,10 @@
       ../crates
     ];
   };
-in {
-  api = pkgs.callPackage ./api/package.nix {inherit cargoWorkspaceSrc buildInputs;};
-}
+
+  onlyDirs = filterAttrs (_name: type: type == "directory");
+  callPackage = pkgs.newScope {inherit cargoWorkspaceSrc buildInputs;};
+  dirEntriesToPackageSet = mapAttrs (pkgDir: _type: callPackage (./. + "/${pkgDir}/package.nix") {});
+  packageSet = pipe ./. [readDir onlyDirs dirEntriesToPackageSet];
+in
+  packageSet
