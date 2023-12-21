@@ -1,8 +1,7 @@
 {
-  clippy,
   rustPlatform,
-  postgresql,
   buildInputs,
+  nativeCheckInputs,
   lib,
   cargoWorkspaceSrc,
 }:
@@ -11,9 +10,8 @@ rustPlatform.buildRustPackage {
   cargoLock.lockFile = ../../Cargo.lock;
   src = cargoWorkspaceSrc;
   buildAndTestSubdir = "crates/api";
-  nativeCheckInputs = [postgresql clippy];
   postCheck = "cargo clippy -- --deny warnings";
-  inherit buildInputs;
+  inherit buildInputs nativeCheckInputs;
 
   meta.mainProgram = "pr-tracker-api";
 }
