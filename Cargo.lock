@@ -479,6 +479,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "fragile-child"
+version = "1.0.0"
+
+[[package]]
 name = "futures"
 version = "0.3.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2376,6 +2380,7 @@ name = "util"
 version = "0.1.0"
 dependencies = [
  "camino",
+ "fragile-child",
  "futures",
  "sqlx",
  "tempfile",

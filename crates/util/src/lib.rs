@@ -1,5 +1,6 @@
+use fragile_child::{FragileChild, SpawnFragileChild};
 use sqlx::Connection;
-use std::process::{Child, Command};
+use std::process::Command;
 use std::time::{Duration, Instant};
 
 use camino::{Utf8Path, Utf8PathBuf};
@@ -7,15 +8,7 @@ use sqlx::PgPool;
 
 pub struct DatabaseContext {
     tmp_dir: tempfile::TempDir,
-    // TODO tokio Child
-    postgres: Child,
-}
-
-impl Drop for DatabaseContext {
-    fn drop(&mut self) {
-        self.postgres.kill().unwrap();
-        self.postgres.wait().unwrap();
-    }
+    postgres: FragileChild,
 }
 
 pub async fn migrate(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), sqlx::migrate::MigrateError> {
@@ -63,7 +56,7 @@ impl DatabaseContext {
             .arg(format!("unix_socket_directories={sockets_dir}"))
             .arg("-c")
             .arg("listen_addresses=")
-            .spawn()
+            .spawn_fragile()
             .unwrap();
 
         let socket_path = sockets_dir.join(format!(".s.PGSQL.{}", Self::PORT));
