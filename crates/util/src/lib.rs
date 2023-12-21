@@ -1,5 +1,6 @@
 use fragile_child::{FragileChild, SpawnFragileChild};
 use sqlx::Connection;
+use std::ops::Deref;
 use std::process::Command;
 use std::time::{Duration, Instant};
 
@@ -11,8 +12,12 @@ pub struct DatabaseContext {
     postgres: FragileChild,
 }
 
-pub async fn migrate(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), sqlx::migrate::MigrateError> {
-    sqlx::migrate!("./migrations").run(pool).await
+pub async fn migrate<'a, A>(migrator: A) -> Result<(), sqlx::migrate::MigrateError>
+where
+    A: sqlx::Acquire<'a>,
+    <A::Connection as Deref>::Target: sqlx::migrate::Migrate,
+{
+    sqlx::migrate!("./migrations").run(migrator).await
 }
 
 impl DatabaseContext {
