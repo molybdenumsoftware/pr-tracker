@@ -2,7 +2,6 @@ use fragile_child::{FragileChild, SpawnFragileChild};
 use sqlx::Connection;
 use std::ops::Deref;
 use std::process::Command;
-use std::time::{Duration, Instant};
 
 use camino::{Utf8Path, Utf8PathBuf};
 use sqlx::PgPool;
@@ -49,10 +48,15 @@ impl DatabaseContext {
 
         assert!(status.success());
 
+        let ready_socket_path = tmp_dir.path().join("postgresql-ready.sock");
+        let ready_socket = std::os::unix::net::UnixDatagram::bind(&ready_socket_path).unwrap();
+
         let postgres = Command::new("postgres")
             // With this environment variable present, postgres sends a ready notification. This
             // interferes with our testing of our own ready notification.
             .env_remove("NOTIFY_SOCKET")
+            // To reliably wait for postgres to be ready.
+            .env("NOTIFY_SOCKET", ready_socket_path)
             .arg("-D")
             .arg(data_dir)
             .arg("-p")
@@ -64,16 +68,14 @@ impl DatabaseContext {
             .spawn_fragile()
             .unwrap();
 
-        let socket_path = sockets_dir.join(format!(".s.PGSQL.{}", Self::PORT));
-        let started = Instant::now();
+        ready_socket
+            .set_read_timeout(Some(std::time::Duration::from_secs(5)))
+            .unwrap();
 
-        while !socket_path.exists() {
-            assert!(
-                started.elapsed() < Duration::from_secs(5),
-                "db should start within 5 seconds"
-            );
-            std::thread::sleep(Duration::from_millis(10));
-        }
+        const READY: &[u8] = b"READY=1";
+        let mut buf = [0; READY.len()];
+        ready_socket.recv(&mut buf).unwrap();
+        assert_eq!(buf, READY, "db should start within 5 seconds");
 
         Self { tmp_dir, postgres }
     }
