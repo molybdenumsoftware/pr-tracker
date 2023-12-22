@@ -12,12 +12,7 @@
     readDir
     ;
 
-  buildInputs =
-    if pkgs.stdenv.isDarwin
-    then with pkgs; [darwin.apple_sdk.frameworks.SystemConfiguration]
-    else if pkgs.stdenv.isLinux
-    then with pkgs; [pkg-config openssl]
-    else throw "unsupported";
+  buildInputs = with pkgs; [pkg-config openssl];
 
   nativeCheckInputs = with pkgs; [postgresql clippy];
 
