@@ -53,6 +53,7 @@
           [
             rustfmt
             rust-analyzer
+            sqlx-cli
           ]
           ++ devUtils;
         SQLX_OFFLINE = "true";
