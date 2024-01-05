@@ -1,4 +1,7 @@
-{pkgs}: let
+{
+  pkgs,
+  by-name,
+}: let
   inherit
     (pkgs.lib)
     fileset
@@ -25,9 +28,8 @@
     ];
   };
 
-  onlyDirs = filterAttrs (_name: type: type == "directory");
   callPackage = pkgs.newScope {inherit cargoWorkspaceSrc buildInputs nativeCheckInputs;};
-  dirEntriesToPackageSet = mapAttrs (pkgDir: _type: callPackage (./. + "/${pkgDir}/package.nix") {});
-  packageSet = pipe ./. [readDir onlyDirs dirEntriesToPackageSet];
+  byName = by-name.lib.byName callPackage;
+  packageSet = byName ./.;
 in
   packageSet

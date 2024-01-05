@@ -5,6 +5,8 @@
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+    by-name.url = "path:./by-name";
+    by-name.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = {
@@ -12,6 +14,7 @@
     nixpkgs,
     treefmt-nix,
     flake-utils,
+    by-name,
   }: let
     inherit
       (nixpkgs.lib)
@@ -23,7 +26,7 @@
       pkgs = nixpkgs.legacyPackages.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
-      packages = import ./packages {inherit pkgs;};
+      packages = import ./packages {inherit pkgs by-name;};
 
       devUtils = [
         (pkgs.writeShellApplication {

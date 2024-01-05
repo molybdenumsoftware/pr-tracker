@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "by-name": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1,
+        "narHash": "sha256-C2Ps2kULLhgkLc8fL5cckxyGLfelvC/sB+6ST7SmN2k=",
+        "path": "./by-name",
+        "type": "path"
+      },
+      "original": {
+        "path": "./by-name",
+        "type": "path"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -36,6 +53,7 @@
     },
     "root": {
       "inputs": {
+        "by-name": "by-name",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix"
