@@ -1,6 +1,5 @@
 {
   lib,
-  buildInputs,
   cargoWorkspaceSrc,
   nativeCheckInputs,
   rustPlatform,
@@ -11,7 +10,7 @@ rustPlatform.buildRustPackage {
   src = cargoWorkspaceSrc;
   buildAndTestSubdir = "crates/api";
   postCheck = "cargo clippy -- --deny warnings";
-  inherit buildInputs nativeCheckInputs;
+  inherit nativeCheckInputs;
 
   meta.mainProgram = "pr-tracker-api";
 }
