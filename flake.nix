@@ -5,8 +5,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    by-name.url = "path:./by-name";
-    by-name.inputs.nixpkgs.follows = "nixpkgs";
+    by-name.url = "github:mightyiam/by-name";
   };
 
   outputs = {

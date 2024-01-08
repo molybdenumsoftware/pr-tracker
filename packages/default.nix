@@ -29,7 +29,7 @@
   };
 
   callPackage = pkgs.newScope {inherit cargoWorkspaceSrc buildInputs nativeCheckInputs;};
-  byName = by-name.lib.byName callPackage;
+  byName = by-name.lib.trivial callPackage;
   packageSet = byName ./.;
 in
   packageSet

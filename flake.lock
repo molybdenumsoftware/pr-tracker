@@ -1,20 +1,18 @@
 {
   "nodes": {
     "by-name": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
       "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-C2Ps2kULLhgkLc8fL5cckxyGLfelvC/sB+6ST7SmN2k=",
-        "path": "./by-name",
-        "type": "path"
+        "lastModified": 1704508304,
+        "narHash": "sha256-kZkUHXG7kJ/kNdzUWSB1ADBkLGz8RICJM0StkwEnS9Q=",
+        "owner": "mightyiam",
+        "repo": "by-name",
+        "rev": "70be34d22afc10f8898180355178ad9f231e744b",
+        "type": "github"
       },
       "original": {
-        "path": "./by-name",
-        "type": "path"
+        "owner": "mightyiam",
+        "repo": "by-name",
+        "type": "github"
       }
     },
     "flake-utils": {
