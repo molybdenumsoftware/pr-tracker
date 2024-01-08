@@ -15,8 +15,9 @@
     flake-utils,
     by-name,
   }: let
+    inherit (nixpkgs) lib;
     inherit
-      (nixpkgs.lib)
+      (lib)
       attrValues
       optionalAttrs
       ;
@@ -25,7 +26,7 @@
       pkgs = nixpkgs.legacyPackages.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
-      packages = import ./packages {inherit pkgs by-name;};
+      packages = import ./packages {inherit lib pkgs by-name;};
 
       devUtils = [
         (pkgs.writeShellApplication {
@@ -43,7 +44,7 @@
       nixosTests = {
         api-module = import ./nixos-tests/api.nix {
           modules = systemAgnosticOutputs.nixosModules;
-          inherit pkgs;
+          inherit lib pkgs;
         };
       };
     in {

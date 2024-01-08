@@ -1,9 +1,10 @@
 {
+  lib,
   modules,
   pkgs,
 }: let
   inherit
-    (pkgs.lib)
+    (lib)
     mkDefault
     ;
 

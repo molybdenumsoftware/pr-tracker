@@ -1,9 +1,10 @@
 {
+  lib,
   pkgs,
   by-name,
 }: let
   inherit
-    (pkgs.lib)
+    (lib)
     fileset
     filterAttrs
     mapAttrs
