@@ -1,5 +1,20 @@
 {
   "nodes": {
+    "by-name": {
+      "locked": {
+        "lastModified": 1704508304,
+        "narHash": "sha256-kZkUHXG7kJ/kNdzUWSB1ADBkLGz8RICJM0StkwEnS9Q=",
+        "owner": "mightyiam",
+        "repo": "by-name",
+        "rev": "70be34d22afc10f8898180355178ad9f231e744b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mightyiam",
+        "repo": "by-name",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -36,6 +51,7 @@
     },
     "root": {
       "inputs": {
+        "by-name": "by-name",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix"
