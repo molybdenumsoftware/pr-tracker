@@ -16,8 +16,6 @@
     readDir
     ;
 
-  buildInputs = with pkgs; [pkg-config openssl];
-
   nativeCheckInputs = with pkgs; [postgresql clippy];
 
   cargoWorkspaceSrc = fileset.toSource {
@@ -29,7 +27,7 @@
     ];
   };
 
-  callPackage = pkgs.newScope {inherit buildInputs cargoWorkspaceSrc nativeCheckInputs;};
+  callPackage = pkgs.newScope {inherit cargoWorkspaceSrc nativeCheckInputs;};
   byName = by-name.lib.trivial callPackage;
   packageSet = byName ./.;
 in
