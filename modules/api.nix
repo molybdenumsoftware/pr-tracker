@@ -1,7 +1,7 @@
 {pr-tracker}: {
-  config,
-  pkgs,
   lib,
+  pkgs,
+  config,
   ...
 }: let
   inherit

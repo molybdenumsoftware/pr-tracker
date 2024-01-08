@@ -1,9 +1,9 @@
 {
-  rustPlatform,
-  buildInputs,
-  nativeCheckInputs,
   lib,
+  buildInputs,
   cargoWorkspaceSrc,
+  nativeCheckInputs,
+  rustPlatform,
 }:
 rustPlatform.buildRustPackage {
   name = "pr-tracker-api";

@@ -29,7 +29,7 @@
     ];
   };
 
-  callPackage = pkgs.newScope {inherit cargoWorkspaceSrc buildInputs nativeCheckInputs;};
+  callPackage = pkgs.newScope {inherit buildInputs cargoWorkspaceSrc nativeCheckInputs;};
   byName = by-name.lib.trivial callPackage;
   packageSet = byName ./.;
 in

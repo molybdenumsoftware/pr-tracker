@@ -1,7 +1,7 @@
 {
   lib,
-  modules,
   pkgs,
+  modules,
 }: let
   inherit
     (lib)
