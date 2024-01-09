@@ -28,6 +28,7 @@
       attrValues
       optionalAttrs
       ;
+    inherit (flake-utils) eachDefaultSystem flattenTree;
 
     forEachDefaultSystem = system: let
       pkgs = nixpkgs.legacyPackages.${system};
@@ -51,7 +52,7 @@
       ];
 
       nixosTests = {
-        api-module = import ./nixos-tests/api.nix {
+        api = import ./nixos-tests/api.nix {
           modules = systemAgnosticOutputs.nixosModules;
           inherit lib pkgs;
         };
@@ -65,17 +66,16 @@
         SQLX_OFFLINE = "true";
       };
 
-      checks =
-        packages
-        // nixosTests
+      checks = flattenTree {
+        inherit packages nixosTests clippyCheck formatting;
         // {
           inherit clippyCheck;
           formatting = treefmtEval.config.build.check self;
-        };
+        }};
 
       formatter = treefmtEval.config.build.wrapper;
     };
-    systemSpecificOutputs = flake-utils.lib.eachDefaultSystem forEachDefaultSystem;
+    systemSpecificOutputs = eachDefaultSystem forEachDefaultSystem;
     systemAgnosticOutputs = {
       nixosModules.api = import ./modules/api.nix {pr-tracker = self;};
     };
