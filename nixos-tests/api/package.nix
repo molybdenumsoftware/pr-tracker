@@ -1,6 +1,6 @@
 {
   lib,
-  pkgs,
+  nixosTest,
   modules,
 }: let
   inherit
@@ -18,7 +18,7 @@
   urlRoot = "http://localhost:${toString port}";
   user = "pr-tracker";
 in
-  pkgs.nixosTest {
+  nixosTest {
     name = "api module test";
 
     nodes.pr_tracker_api = {
