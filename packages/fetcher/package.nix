@@ -1,0 +1,2 @@
+{buildWorkspacePackage, ...}:
+buildWorkspacePackage "fetcher"

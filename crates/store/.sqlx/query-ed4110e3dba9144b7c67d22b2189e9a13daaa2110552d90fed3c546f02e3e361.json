@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE github_pr_query_cursor SET cursor = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ed4110e3dba9144b7c67d22b2189e9a13daaa2110552d90fed3c546f02e3e361"
+}
