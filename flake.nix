@@ -28,7 +28,11 @@
       attrValues
       optionalAttrs
       ;
-    inherit (flake-utils) eachDefaultSystem flattenTree;
+    inherit
+      (flake-utils.lib)
+      eachDefaultSystem
+      flattenTree
+      ;
 
     forEachDefaultSystem = system: let
       pkgs = nixpkgs.legacyPackages.${system};
@@ -67,11 +71,9 @@
       };
 
       checks = flattenTree {
-        inherit packages nixosTests clippyCheck formatting;
-        // {
-          inherit clippyCheck;
-          formatting = treefmtEval.config.build.check self;
-        }};
+        inherit packages nixosTests clippyCheck;
+        formatting = treefmtEval.config.build.check self;
+      };
 
       formatter = treefmtEval.config.build.wrapper;
     };
