@@ -27,6 +27,7 @@
       (lib)
       attrValues
       optionalAttrs
+      recurseIntoAttrs
       ;
     inherit
       (flake-utils.lib)
@@ -55,14 +56,14 @@
         })
       ];
 
-      nixosTests = {
+      nixosTests = recurseIntoAttrs {
         api = import ./nixos-tests/api.nix {
           modules = systemAgnosticOutputs.nixosModules;
           inherit lib pkgs;
         };
       };
     in {
-      inherit packages;
+      packages = flattenTree packages;
 
       devShells.default = pkgs.mkShell {
         inputsFrom = attrValues packages;
