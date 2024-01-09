@@ -63,7 +63,7 @@
         };
       };
     in {
-      packages = flattenTree packages;
+      packages = flattenTree (recurseIntoAttrs packages);
 
       devShells.default = pkgs.mkShell {
         inputsFrom = attrValues packages;
@@ -72,7 +72,8 @@
       };
 
       checks = flattenTree {
-        inherit packages nixosTests clippyCheck;
+        inherit nixosTests clippyCheck;
+        packages = recurseIntoAttrs packages;
         formatting = treefmtEval.config.build.check self;
       };
 
