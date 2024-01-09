@@ -52,7 +52,7 @@ async fn pr_not_landed() {
             let mut connection = ctx.db.connection().await.unwrap();
 
             pr_tracker_store::Pr {
-                number: 123.try_into().unwrap(),
+                number: 123.into(),
                 commit: Some("deadbeef".into()),
             }
             .insert(&mut connection)

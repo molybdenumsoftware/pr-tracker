@@ -2,8 +2,9 @@
   lib,
   pkgs,
   by-name,
-  craneLib,
-}: let
+  fenix,
+  ...
+} @ args: let
   inherit
     (lib)
     any
@@ -21,6 +22,8 @@
     readDir
     removeAttrs
     ;
+
+  craneLib = args.craneLib.overrideToolchain fenix.stable.toolchain;
 
   inherit
     (craneLib)

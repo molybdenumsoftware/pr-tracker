@@ -6,6 +6,8 @@
     by-name.url = "github:mightyiam/by-name";
     crane.inputs.nixpkgs.follows = "nixpkgs";
     crane.url = "github:ipetkov/crane";
+    fenix.inputs.nixpkgs.follows = "nixpkgs";
+    fenix.url = "github:nix-community/fenix";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
@@ -18,7 +20,8 @@
     crane,
     flake-utils,
     treefmt-nix,
-  }: let
+    ...
+  } @ inputs: let
     inherit (nixpkgs) lib;
     inherit
       (lib)
@@ -29,9 +32,10 @@
     forEachDefaultSystem = system: let
       pkgs = nixpkgs.legacyPackages.${system};
       craneLib = crane.lib.${system};
+      fenix = inputs.fenix.packages.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
-      inherit (import ./packages {inherit lib pkgs by-name craneLib;}) packages clippyCheck;
+      inherit (import ./packages {inherit lib pkgs by-name craneLib fenix;}) packages clippyCheck;
 
       devUtils = [
         (pkgs.writeShellApplication {
@@ -56,14 +60,8 @@
       inherit packages;
 
       devShells.default = pkgs.mkShell {
-        inputsFrom = (attrValues packages) ++ [clippyCheck];
-        packages = with pkgs;
-          [
-            rustfmt
-            rust-analyzer
-            sqlx-cli
-          ]
-          ++ devUtils;
+        inputsFrom = attrValues packages;
+        packages = with pkgs; [sqlx-cli] ++ devUtils;
         SQLX_OFFLINE = "true";
       };
 
