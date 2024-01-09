@@ -4,6 +4,8 @@
     nixpkgs.url = github:NixOS/nixpkgs/fb22f402f47148b2f42d4767615abb367c1b7cfd;
 
     by-name.url = "github:mightyiam/by-name";
+    crane.inputs.nixpkgs.follows = "nixpkgs";
+    crane.url = "github:ipetkov/crane";
     flake-utils.url = "github:numtide/flake-utils";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
@@ -13,6 +15,7 @@
     self,
     nixpkgs,
     by-name,
+    crane,
     flake-utils,
     treefmt-nix,
   }: let
@@ -25,9 +28,10 @@
 
     forEachDefaultSystem = system: let
       pkgs = nixpkgs.legacyPackages.${system};
+      craneLib = crane.lib.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
-      packages = import ./packages {inherit lib pkgs by-name;};
+      inherit (import ./packages {inherit lib pkgs by-name craneLib;}) packages clippyCheck;
 
       devUtils = [
         (pkgs.writeShellApplication {
@@ -52,7 +56,7 @@
       inherit packages;
 
       devShells.default = pkgs.mkShell {
-        inputsFrom = attrValues packages;
+        inputsFrom = (attrValues packages) ++ [clippyCheck];
         packages = with pkgs;
           [
             rustfmt
@@ -67,6 +71,7 @@
         packages
         // nixosTests
         // {
+          inherit clippyCheck;
           formatting = treefmtEval.config.build.check self;
         };
 
