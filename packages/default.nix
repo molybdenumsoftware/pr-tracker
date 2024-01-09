@@ -75,5 +75,5 @@
 
   callPackage = pkgs.newScope {inherit lib pkgs buildWorkspacePackage;};
   byName = by-name.lib.trivial callPackage;
-  packages = byName ./.;
+  packages = recurseIntoAttrs (byName ./.);
 in {inherit packages clippyCheck;}

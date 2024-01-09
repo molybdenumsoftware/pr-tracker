@@ -63,17 +63,17 @@
         };
       };
     in {
-      packages = flattenTree (recurseIntoAttrs packages);
+      packages = flattenTree packages;
 
       devShells.default = pkgs.mkShell {
-        inputsFrom = attrValues packages;
+        inputsFrom = attrValues (flattenTree packages);
         packages = with pkgs; [sqlx-cli] ++ devUtils;
         SQLX_OFFLINE = "true";
       };
 
       checks = flattenTree {
         inherit nixosTests clippyCheck;
-        packages = recurseIntoAttrs packages;
+        packages = packages;
         formatting = treefmtEval.config.build.check self;
       };
 
