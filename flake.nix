@@ -50,12 +50,7 @@
         })
       ];
 
-      nixosTests = {
-        api-module = import ./nixos-tests/api.nix {
-          modules = systemAgnosticOutputs.nixosModules;
-          inherit lib pkgs;
-        };
-      };
+      nixosTests = by-name.lib.trivial (pkgs.newScope {modules = systemAgnosticOutputs.nixosModules;}) ./nixos-tests;
     in {
       inherit packages;
 
@@ -67,7 +62,7 @@
 
       checks =
         packages
-        // nixosTests
+        // lib.traceVal(nixosTests)
         // {
           inherit clippyCheck;
           formatting = treefmtEval.config.build.check self;
