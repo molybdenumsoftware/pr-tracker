@@ -29,6 +29,8 @@
       optionalAttrs
       ;
 
+    flattenTree = import ./flattenTree.nix;
+
     forEachDefaultSystem = system: let
       pkgs = nixpkgs.legacyPackages.${system};
       craneLib = crane.lib.${system};
@@ -65,13 +67,11 @@
         SQLX_OFFLINE = "true";
       };
 
-      checks =
-        packages
-        // nixosTests
-        // {
-          inherit clippyCheck;
-          formatting = treefmtEval.config.build.check self;
-        };
+      checks = flattenTree {
+        inherit packages nixosTests;
+        clippy = clippyCheck;
+        formatting = treefmtEval.config.build.check self;
+      };
 
       formatter = treefmtEval.config.build.wrapper;
     };
