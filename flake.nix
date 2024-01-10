@@ -26,6 +26,7 @@
     inherit
       (lib)
       attrValues
+      callPackageWith
       ;
 
     flattenTree = import ./flattenTree.nix;
@@ -72,7 +73,10 @@
     };
     systemSpecificOutputs = flake-utils.lib.eachDefaultSystem forEachDefaultSystem;
     systemAgnosticOutputs = {
-      nixosModules.api = import ./modules/api.nix {pr-tracker = self;};
+      nixosModules = let
+        byName = by-name.lib.trivial (callPackageWith {pr-tracker = self;});
+      in
+        byName ./modules;
     };
   in
     systemSpecificOutputs
