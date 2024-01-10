@@ -51,12 +51,8 @@
         })
       ];
 
-      nixosTests = {
-        api-module = import ./nixos-tests/api.nix {
-          modules = systemAgnosticOutputs.nixosModules;
-          inherit lib pkgs;
-        };
-      };
+      nixosTestsByName = by-name.lib.trivial (pkgs.newScope {modules = systemAgnosticOutputs.nixosModules;});
+      nixosTests = nixosTestsByName ./nixos-tests;
     in {
       inherit packages;
 
