@@ -26,7 +26,6 @@
     inherit
       (lib)
       attrValues
-      optionalAttrs
       ;
 
     flattenTree = import ./flattenTree.nix;
