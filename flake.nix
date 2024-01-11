@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixpkgs-unstable;
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     by-name.url = "github:mightyiam/by-name";
     crane.inputs.nixpkgs.follows = "nixpkgs";
