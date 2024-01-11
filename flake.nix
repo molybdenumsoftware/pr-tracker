@@ -1,7 +1,6 @@
 {
   inputs = {
-    # pinned to avoid a later broken rustfmt https://github.com/NixOS/nixpkgs/issues/273920
-    nixpkgs.url = github:NixOS/nixpkgs/fb22f402f47148b2f42d4767615abb367c1b7cfd;
+    nixpkgs.url = github:NixOS/nixpkgs/nixpkgs-unstable;
 
     by-name.url = "github:mightyiam/by-name";
     crane.inputs.nixpkgs.follows = "nixpkgs";
