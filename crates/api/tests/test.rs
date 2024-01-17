@@ -52,7 +52,7 @@ async fn pr_not_landed() {
             let mut connection = ctx.db.connection().await.unwrap();
 
             pr_tracker_store::Pr {
-                number: 123.into(),
+                number: 123.try_into().unwrap(),
                 commit: Some("deadbeef".into()),
             }
             .insert(&mut connection)
@@ -86,7 +86,7 @@ async fn pr_landed() {
                 .unwrap();
 
             let github_pr = pr_tracker_store::Pr {
-                number: 2134.into(),
+                number: 2134.try_into().unwrap(),
                 commit: Some("deadbeef".into()),
             };
             github_pr.clone().insert(connection).await.unwrap();

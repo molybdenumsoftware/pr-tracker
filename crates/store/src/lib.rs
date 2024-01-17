@@ -1,12 +1,14 @@
 #![warn(clippy::pedantic)]
 
+use std::num::NonZeroU16;
+
 use futures::FutureExt;
 use sqlx::Connection;
 
 pub use sqlx::PgConnection;
 
-#[derive(Debug, derive_more::From, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
-pub struct PrNumber(pub i32);
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+pub struct PrNumber(NonZeroU16);
 
 #[derive(Debug, derive_more::From, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct BranchId(i32);
@@ -32,12 +34,13 @@ impl Pr {
     ///
     /// See [`sqlx::query!`].
     pub async fn insert(self, connection: &mut sqlx::PgConnection) -> sqlx::Result<()> {
+        let pr_number: i32 = self.number.into();
         sqlx::query!(
             "
             INSERT INTO github_prs(number, commit) VALUES ($1, $2)
             ON CONFLICT (number) DO UPDATE SET commit=$2
             ",
-            self.number.0,
+            pr_number,
             self.commit.map(|c| c.0),
         )
         .execute(&mut *connection)
@@ -74,7 +77,7 @@ impl Pr {
     pub async fn all(connection: &mut sqlx::PgConnection) -> Result<Vec<Pr>, sqlx::Error> {
         sqlx::query!("SELECT * from github_prs")
             .map(|pr| Self {
-                number: pr.number.into(),
+                number: pr.number.try_into().unwrap(),
                 commit: pr.commit.map(Into::into),
             })
             .fetch_all(connection)
@@ -99,7 +102,7 @@ impl Pr {
             commit.into().0
         )
         .map(|pr| Self {
-            number: pr.number.into(),
+            number: pr.number.try_into().unwrap(),
             commit: pr.commit.map(Into::into),
         })
         .fetch_optional(connection)
@@ -107,26 +110,29 @@ impl Pr {
     }
 }
 
-#[derive(Debug)]
-pub struct PrNumberTooLarge(std::num::TryFromIntError);
-
-impl From<std::num::TryFromIntError> for PrNumberTooLarge {
-    fn from(value: std::num::TryFromIntError) -> Self {
+impl From<NonZeroU16> for PrNumber {
+    fn from(value: NonZeroU16) -> Self {
         Self(value)
     }
 }
 
-impl TryFrom<u32> for PrNumber {
-    type Error = PrNumberTooLarge;
+#[derive(Debug)]
+pub struct PrNumberNonPositive;
 
-    fn try_from(value: u32) -> Result<Self, Self::Error> {
-        Ok(Self(value.try_into()?))
+impl TryFrom<i32> for PrNumber {
+    type Error = PrNumberNonPositive;
+
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        let value = u16::try_from(value)
+            .and_then(NonZeroU16::try_from)
+            .map_err(|_| PrNumberNonPositive)?;
+        Ok(Self(value))
     }
 }
 
 impl From<PrNumber> for i32 {
     fn from(value: PrNumber) -> Self {
-        value.0
+        u16::from(value.0).into()
     }
 }
 
@@ -270,7 +276,11 @@ impl Landing {
     ///
     /// See [`sqlx::query!`].
     pub async fn all(connection: &mut sqlx::PgConnection) -> Result<Vec<Self>, sqlx::Error> {
-        sqlx::query_as!(Self, "SELECT * from landings")
+        sqlx::query!("SELECT * from landings")
+            .map(|landing| Self {
+                github_pr: landing.github_pr.try_into().unwrap(),
+                branch_id: BranchId(landing.branch_id),
+            })
             .fetch_all(connection)
             .await
     }
@@ -285,9 +295,10 @@ impl Landing {
             txn: &mut sqlx::Transaction<'_, sqlx::Postgres>,
             landing: Landing,
         ) -> sqlx::Result<()> {
+            let pr_number: i32 = landing.github_pr.into();
             sqlx::query!(
                 "INSERT INTO landings(github_pr, branch_id) VALUES ($1, $2)",
-                landing.github_pr.0,
+                pr_number,
                 landing.branch_id.0,
             )
             .execute(&mut **txn)

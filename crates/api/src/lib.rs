@@ -2,6 +2,8 @@
 // required because rocket::routes, remove if clippy permits.
 #![allow(clippy::no_effect_underscore_binding)]
 
+use std::num::NonZeroU16;
+
 use rocket::{
     futures::FutureExt,
     serde::{Deserialize, Serialize},
@@ -52,9 +54,9 @@ struct Data(sqlx::Pool<sqlx::Postgres>);
 #[rocket::get("/api/v1/<pr>")]
 async fn landed(
     mut db: Connection<Data>,
-    pr: u32,
+    pr: NonZeroU16,
 ) -> Result<rocket::serde::json::Json<LandedIn>, LandedError> {
-    let landings = pr_tracker_store::Landing::for_pr(&mut db, pr.try_into()?).await?;
+    let landings = pr_tracker_store::Landing::for_pr(&mut db, pr.into()).await?;
 
     let branches = landings
         .into_iter()
@@ -85,14 +87,7 @@ pub struct LandedIn {
 }
 
 enum LandedError {
-    PrNumberTooLarge,
     ForPr(pr_tracker_store::ForPrError),
-}
-
-impl From<pr_tracker_store::PrNumberTooLarge> for LandedError {
-    fn from(_value: pr_tracker_store::PrNumberTooLarge) -> Self {
-        Self::PrNumberTooLarge
-    }
 }
 
 impl From<pr_tracker_store::ForPrError> for LandedError {
@@ -104,10 +99,6 @@ impl From<pr_tracker_store::ForPrError> for LandedError {
 impl<'r, 'o: 'r> rocket::response::Responder<'r, 'o> for LandedError {
     fn respond_to(self, request: &'r rocket::Request<'_>) -> rocket::response::Result<'o> {
         match self {
-            LandedError::PrNumberTooLarge => rocket::response::status::BadRequest(
-                rocket::response::content::RawText("Pull request number too large."),
-            )
-            .respond_to(request),
             LandedError::ForPr(for_pr_error) => match for_pr_error {
                 pr_tracker_store::ForPrError::Sqlx(_sqlx_error) => {
                     let status = rocket::http::Status::from_code(500).unwrap();
