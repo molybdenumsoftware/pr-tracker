@@ -1,14 +1,15 @@
 #![warn(clippy::pedantic)]
 
-use std::num::NonZeroU16;
+use std::num::NonZeroU32;
 
 use futures::FutureExt;
 use sqlx::Connection;
 
 pub use sqlx::PgConnection;
 
+/// From 1 to [`i32::MAX`].
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
-pub struct PrNumber(NonZeroU16);
+pub struct PrNumber(NonZeroU32);
 
 #[derive(Debug, derive_more::From, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct BranchId(i32);
@@ -110,12 +111,6 @@ impl Pr {
     }
 }
 
-impl From<NonZeroU16> for PrNumber {
-    fn from(value: NonZeroU16) -> Self {
-        Self(value)
-    }
-}
-
 #[derive(Debug)]
 pub struct PrNumberNonPositive;
 
@@ -123,8 +118,8 @@ impl TryFrom<i32> for PrNumber {
     type Error = PrNumberNonPositive;
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
-        let value = u16::try_from(value)
-            .and_then(NonZeroU16::try_from)
+        let value = u32::try_from(value)
+            .and_then(NonZeroU32::try_from)
             .map_err(|_| PrNumberNonPositive)?;
         Ok(Self(value))
     }
@@ -132,7 +127,9 @@ impl TryFrom<i32> for PrNumber {
 
 impl From<PrNumber> for i32 {
     fn from(value: PrNumber) -> Self {
-        u16::from(value.0).into()
+        u32::from(value.0)
+            .try_into()
+            .expect("should not be larger than i32::MAX")
     }
 }
 
