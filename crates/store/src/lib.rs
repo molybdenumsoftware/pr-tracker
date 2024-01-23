@@ -25,7 +25,7 @@ pub struct Pr {
 }
 
 impl Pr {
-    /// Inserts provided value into the database.
+    /// Insert into database.
     ///
     /// # Errors
     ///
@@ -147,7 +147,7 @@ pub struct Branch {
 }
 
 impl Branch {
-    /// Gets or inserts.
+    /// Gets from or inserts into database.
     ///
     /// # Errors
     ///
@@ -182,11 +182,11 @@ impl Branch {
             .await
     }
 
-    /// .
+    /// Retrieve all from database.
     ///
     /// # Errors
     ///
-    /// This function will return an error if .
+    /// See error type for details.
     pub async fn all(
         connection: &mut sqlx::PgConnection,
     ) -> sqlx::Result<std::collections::BTreeMap<BranchId, Self>> {
@@ -282,7 +282,7 @@ impl Landing {
             .await
     }
 
-    /// Inserts provided value into the database.
+    /// Insert into database.
     ///
     /// # Errors
     ///
