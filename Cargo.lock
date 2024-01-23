@@ -2437,7 +2437,7 @@ checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 
 [[package]]
 name = "pr-tracker-api"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "camino",
  "pr-tracker-store",
@@ -2453,7 +2453,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-fetcher"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "anyhow",
  "camino",
@@ -2477,7 +2477,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-store"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "derive_more",
  "futures",
@@ -3813,7 +3813,7 @@ checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
 
 [[package]]
 name = "util"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "camino",
  "fragile-child",
