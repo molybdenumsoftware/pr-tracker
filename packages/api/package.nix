@@ -1,2 +1,8 @@
-{buildWorkspacePackage, ...}:
-buildWorkspacePackage "api"
+{
+  buildWorkspacePackage,
+  postgresql,
+}:
+buildWorkspacePackage {
+  dir = "api";
+  nativeCheckInputs = [postgresql];
+}

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO github_pr_query_cursor (cursor) VALUES ($1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bcafdf1df11188dfb7c251989a469f7ad24800280996a0cad4caf5f57b88f5dc"
+}

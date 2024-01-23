@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO landings(github_pr, branch_id) VALUES ($1, $2) ON CONFLICT (github_pr, branch_id) DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7de00279cf2a65897081583a39bf86e3684664c7a0bbb15716cd1101ab1531d8"
+}

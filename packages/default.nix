@@ -3,6 +3,7 @@
   pkgs,
   by-name,
   fenix,
+  githubGraphqlSchema,
   ...
 } @ args: let
   inherit
@@ -35,9 +36,10 @@
   rootPath = craneLib.path ../.;
   sqlxQueryFilter = path: type: hasPrefix "${rootPath}/crates/store/.sqlx/" path;
   migrationsFilter = path: type: hasPrefix "${rootPath}/crates/util/migrations/" path;
+  graphQlFilter = path: type: hasPrefix "${rootPath}/crates/fetcher/src/graphql/" path;
 
   srcFilter = path: type:
-    any (p: p path type) [sqlxQueryFilter migrationsFilter filterCargoSources];
+    any (p: p path type) [sqlxQueryFilter migrationsFilter graphQlFilter filterCargoSources];
 
   src = cleanSourceWith {
     src = rootPath;
@@ -52,23 +54,32 @@
     version = "unversioned";
   };
 
-  clippyCheck = cargoClippy {
+  commonArgs = {
     inherit src cargoArtifacts;
-    cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
-    pname = title;
-    version = "unversioned";
+    GITHUB_GRAPHQL_SCHEMA = githubGraphqlSchema;
   };
 
-  buildWorkspacePackage = dir: let
+  clippyCheck = cargoClippy (commonArgs
+    // {
+      cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
+      pname = title;
+      version = "unversioned";
+    });
+
+  buildWorkspacePackage = args @ {dir, ...}: let
+    cleanedArgs = removeAttrs args ["dir"];
+
     cargoToml = rootPath + "/crates/${dir}/Cargo.toml";
     inherit (crateNameFromCargoToml {inherit cargoToml;}) pname version;
 
-    pkgArgs = {
-      inherit src cargoArtifacts pname version;
-      nativeCheckInputs = with pkgs; [postgresql];
-      meta.mainProgram = pname;
-      cargoExtraArgs = "--package ${pname}";
-    };
+    pkgArgs =
+      commonArgs
+      // {
+        inherit pname version;
+        meta.mainProgram = pname;
+        cargoExtraArgs = "--package ${pname}";
+      }
+      // cleanedArgs;
   in
     craneLib.buildPackage pkgArgs;
 

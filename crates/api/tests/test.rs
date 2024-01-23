@@ -55,7 +55,7 @@ async fn pr_not_landed() {
                 number: 123.try_into().unwrap(),
                 commit: Some("deadbeef".into()),
             }
-            .insert(&mut connection)
+            .upsert(&mut connection)
             .await
             .unwrap();
 
@@ -89,14 +89,14 @@ async fn pr_landed() {
                 number: 2134.try_into().unwrap(),
                 commit: Some("deadbeef".into()),
             };
-            github_pr.clone().insert(connection).await.unwrap();
+            github_pr.clone().upsert(connection).await.unwrap();
 
             let landing = pr_tracker_store::Landing {
                 github_pr: github_pr.number,
                 branch_id: branch.id(),
             };
 
-            landing.insert(connection).await.unwrap();
+            landing.upsert(connection).await.unwrap();
 
             let response = ctx.client.get("/api/v1/2134").dispatch().await;
             assert_eq!(response.status(), rocket::http::Status::Ok);
