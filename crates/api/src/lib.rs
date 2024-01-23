@@ -112,20 +112,20 @@ impl<'r, 'o: 'r> rocket::response::Responder<'r, 'o> for LandedError {
                 )
                 .respond_to(request)
             }
-            LandedError::ForPr(for_pr_error) => match for_pr_error {
-                pr_tracker_store::ForPrError::Sqlx(_sqlx_error) => {
-                    let status = rocket::http::Status::from_code(500).unwrap();
-                    rocket::response::status::Custom(
-                        status,
-                        rocket::response::content::RawText("Error. Sorry."),
-                    )
-                    .respond_to(request)
-                }
-                pr_tracker_store::ForPrError::PrNotFound => rocket::response::status::NotFound(
-                    rocket::response::content::RawText("Pull request not found."),
+            LandedError::ForPr(pr_tracker_store::ForPrError::Sqlx(_sqlx_error)) => {
+                let status = rocket::http::Status::from_code(500).unwrap();
+                rocket::response::status::Custom(
+                    status,
+                    rocket::response::content::RawText("Error. Sorry."),
                 )
-                .respond_to(request),
-            },
+                .respond_to(request)
+            }
+            LandedError::ForPr(pr_tracker_store::ForPrError::PrNotFound) => {
+                rocket::response::status::NotFound(rocket::response::content::RawText(
+                    "Pull request not found.",
+                ))
+                .respond_to(request)
+            }
         }
     }
 }
