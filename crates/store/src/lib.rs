@@ -179,15 +179,15 @@ impl GithubPrQueryCursor {
 }
 
 #[derive(Debug)]
-pub struct PrNumberNonPositive;
+pub struct PrNumberNonPositiveError;
 
 impl TryFrom<i32> for PrNumber {
-    type Error = PrNumberNonPositive;
+    type Error = PrNumberNonPositiveError;
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
         let value = u32::try_from(value)
             .and_then(NonZeroU32::try_from)
-            .map_err(|_| PrNumberNonPositive)?;
+            .map_err(|_| PrNumberNonPositiveError)?;
         Ok(Self(value))
     }
 }
