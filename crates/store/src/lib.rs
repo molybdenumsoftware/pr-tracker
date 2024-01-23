@@ -178,7 +178,8 @@ impl GithubPrQueryCursor {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
+#[error("pr number non positive")]
 pub struct PrNumberNonPositiveError;
 
 impl TryFrom<i32> for PrNumber {
@@ -200,9 +201,11 @@ impl From<PrNumber> for i32 {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum PrNumberFromI64Error {
+    #[error("pull request number non-positive")]
     NonPositive,
+    #[error("pull request number too large")]
     TooLarge,
 }
 
@@ -223,9 +226,11 @@ impl TryFrom<i64> for PrNumber {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum PrNumberFromUsizeError {
+    #[error("pull request number is zero")]
     IsZero,
+    #[error("pull request number too large")]
     TooLarge,
 }
 
@@ -321,8 +326,11 @@ impl Branch {
     }
 }
 
+#[derive(Debug, thiserror::Error)]
 pub enum ForPrError {
+    #[error(transparent)]
     Sqlx(sqlx::Error),
+    #[error("pr not found")]
     PrNotFound,
 }
 
