@@ -1,9 +1,9 @@
 #![warn(clippy::pedantic)]
 
-use std::num::NonZeroU32;
+use std::{collections::BTreeMap, num::NonZeroU32};
 
 use futures::FutureExt;
-use sqlx::Connection;
+use sqlx::{Connection, Postgres, Transaction};
 
 pub use sqlx::PgConnection;
 
@@ -46,7 +46,7 @@ impl Pr {
     /// # Panics
     ///
     /// See [`sqlx::query!`].
-    pub async fn upsert(self, connection: &mut sqlx::PgConnection) -> sqlx::Result<()> {
+    pub async fn upsert(self, connection: &mut PgConnection) -> sqlx::Result<()> {
         let pr_number: i32 = self.number.into();
         sqlx::query!(
             "
@@ -71,7 +71,7 @@ impl Pr {
     /// # Panics
     ///
     /// See [`sqlx::query!`].
-    pub async fn all(connection: &mut sqlx::PgConnection) -> Result<Vec<Pr>, sqlx::Error> {
+    pub async fn all(connection: &mut PgConnection) -> Result<Vec<Pr>, sqlx::Error> {
         sqlx::query!("SELECT * from github_prs")
             .map(|pr| Self {
                 number: pr.number.try_into().unwrap(),
@@ -91,7 +91,7 @@ impl Pr {
     ///
     /// See [`sqlx::query!`].
     pub async fn for_commit(
-        connection: &mut sqlx::PgConnection,
+        connection: &mut PgConnection,
         commit: impl Into<GitCommit>,
     ) -> Result<Option<Self>, sqlx::Error> {
         sqlx::query!(
@@ -140,7 +140,7 @@ impl GithubPrQueryCursor {
     pub async fn upsert(new_cursor: &Self, connection: &mut PgConnection) -> sqlx::Result<()> {
         async fn transaction(
             new_cursor: GithubPrQueryCursor,
-            txn: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+            txn: &mut Transaction<'_, Postgres>,
         ) -> sqlx::Result<()> {
             let old_cursor = GithubPrQueryCursor::get(txn).await?;
 
@@ -272,12 +272,12 @@ impl Branch {
     ///
     /// See error type for details.
     pub async fn get_or_insert(
-        connection: &mut sqlx::PgConnection,
+        connection: &mut PgConnection,
         name: impl AsRef<str>,
     ) -> sqlx::Result<Self> {
         async fn transaction(
             name: String,
-            txn: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+            txn: &mut Transaction<'_, Postgres>,
         ) -> sqlx::Result<Branch> {
             let branch = sqlx::query_as!(Branch, "SELECT * from branches WHERE name = $1", name)
                 .fetch_optional(&mut **txn)
@@ -306,9 +306,7 @@ impl Branch {
     /// # Errors
     ///
     /// See error type for details.
-    pub async fn all(
-        connection: &mut sqlx::PgConnection,
-    ) -> sqlx::Result<std::collections::BTreeMap<BranchId, Self>> {
+    pub async fn all(connection: &mut PgConnection) -> sqlx::Result<BTreeMap<BranchId, Self>> {
         Ok(sqlx::query_as!(Branch, "SELECT * FROM branches")
             .fetch_all(connection)
             .await?
@@ -345,11 +343,11 @@ impl Landing {
     ///
     /// See [`sqlx::query!`].
     pub async fn for_pr(
-        connection: &mut sqlx::PgConnection,
+        connection: &mut PgConnection,
         pr_num: PrNumber,
     ) -> Result<Vec<Branch>, ForPrError> {
         async fn transaction(
-            txn: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+            txn: &mut Transaction<'_, Postgres>,
             pr_num: PrNumber,
         ) -> Result<Vec<Branch>, ForPrError> {
             let pr_num: i32 = pr_num.into();
@@ -391,7 +389,7 @@ impl Landing {
     /// # Panics
     ///
     /// See [`sqlx::query!`].
-    pub async fn all(connection: &mut sqlx::PgConnection) -> Result<Vec<Self>, sqlx::Error> {
+    pub async fn all(connection: &mut PgConnection) -> Result<Vec<Self>, sqlx::Error> {
         sqlx::query!("SELECT * from landings")
             .map(|landing| Self {
                 github_pr: landing.github_pr.try_into().unwrap(),
@@ -406,9 +404,9 @@ impl Landing {
     /// # Errors
     ///
     /// See error type for details.
-    pub async fn upsert(self, connection: &mut sqlx::PgConnection) -> sqlx::Result<()> {
+    pub async fn upsert(self, connection: &mut PgConnection) -> sqlx::Result<()> {
         async fn transaction(
-            txn: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+            txn: &mut Transaction<'_, Postgres>,
             landing: Landing,
         ) -> sqlx::Result<()> {
             let pr_number: i32 = landing.github_pr.into();

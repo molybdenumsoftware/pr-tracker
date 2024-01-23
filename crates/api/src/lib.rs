@@ -2,13 +2,17 @@
 // required because rocket::routes, remove if clippy permits.
 #![allow(clippy::no_effect_underscore_binding)]
 
+use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositive};
 use rocket::{
     futures::FutureExt,
-    serde::{Deserialize, Serialize},
+    http::Status,
+    response::{self, status},
+    serde::{json::Json, Deserialize, Serialize},
+    Request, Rocket,
 };
 use rocket_db_pools::{Connection, Database};
 
-async fn run_migrations(rocket: rocket::Rocket<rocket::Build>) -> rocket::fairing::Result {
+async fn run_migrations(rocket: Rocket<rocket::Build>) -> rocket::fairing::Result {
     let Some(db) = Data::fetch(&rocket) else {
         rocket::error!("Failed to connect to the database");
         return Err(rocket);
@@ -50,18 +54,15 @@ pub fn app() -> rocket::fairing::AdHoc {
 struct Data(sqlx::Pool<sqlx::Postgres>);
 
 #[rocket::get("/api/v1/<pr>")]
-async fn landed(
-    mut db: Connection<Data>,
-    pr: i32,
-) -> Result<rocket::serde::json::Json<LandedIn>, LandedError> {
-    let landings = pr_tracker_store::Landing::for_pr(&mut db, pr.try_into()?).await?;
+async fn landed(mut db: Connection<Data>, pr: i32) -> Result<Json<LandedIn>, LandedError> {
+    let landings = Landing::for_pr(&mut db, pr.try_into()?).await?;
 
     let branches = landings
         .into_iter()
         .map(|branch| Branch::new(branch.name()))
         .collect();
 
-    Ok(rocket::serde::json::Json(LandedIn { branches }))
+    Ok(Json(LandedIn { branches }))
 }
 
 #[rocket::get("/api/v1/healthcheck")]
@@ -86,45 +87,40 @@ pub struct LandedIn {
 
 enum LandedError {
     PrNumberNonPositive,
-    ForPr(pr_tracker_store::ForPrError),
+    ForPr(ForPrError),
 }
 
-impl From<pr_tracker_store::PrNumberNonPositive> for LandedError {
-    fn from(_value: pr_tracker_store::PrNumberNonPositive) -> Self {
+impl From<PrNumberNonPositive> for LandedError {
+    fn from(_value: PrNumberNonPositive) -> Self {
         Self::PrNumberNonPositive
     }
 }
 
-impl From<pr_tracker_store::ForPrError> for LandedError {
-    fn from(value: pr_tracker_store::ForPrError) -> Self {
+impl From<ForPrError> for LandedError {
+    fn from(value: ForPrError) -> Self {
         Self::ForPr(value)
     }
 }
 
-impl<'r, 'o: 'r> rocket::response::Responder<'r, 'o> for LandedError {
-    fn respond_to(self, request: &'r rocket::Request<'_>) -> rocket::response::Result<'o> {
+impl<'r, 'o: 'r> response::Responder<'r, 'o> for LandedError {
+    fn respond_to(self, request: &'r Request<'_>) -> response::Result<'o> {
         match self {
             LandedError::PrNumberNonPositive => {
-                let status = rocket::http::Status::from_code(400).unwrap();
-                rocket::response::status::Custom(
+                let status = Status::from_code(400).unwrap();
+                status::Custom(
                     status,
-                    rocket::response::content::RawText("Non positive pull request number."),
+                    response::content::RawText("Non positive pull request number."),
                 )
                 .respond_to(request)
             }
-            LandedError::ForPr(pr_tracker_store::ForPrError::Sqlx(_sqlx_error)) => {
-                let status = rocket::http::Status::from_code(500).unwrap();
-                rocket::response::status::Custom(
-                    status,
-                    rocket::response::content::RawText("Error. Sorry."),
-                )
-                .respond_to(request)
+            LandedError::ForPr(ForPrError::Sqlx(_sqlx_error)) => {
+                let status = Status::from_code(500).unwrap();
+                status::Custom(status, response::content::RawText("Error. Sorry."))
+                    .respond_to(request)
             }
-            LandedError::ForPr(pr_tracker_store::ForPrError::PrNotFound) => {
-                rocket::response::status::NotFound(rocket::response::content::RawText(
-                    "Pull request not found.",
-                ))
-                .respond_to(request)
+            LandedError::ForPr(ForPrError::PrNotFound) => {
+                status::NotFound(response::content::RawText("Pull request not found."))
+                    .respond_to(request)
             }
         }
     }
