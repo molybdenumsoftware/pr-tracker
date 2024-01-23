@@ -2,7 +2,7 @@
 // required because rocket::routes, remove if clippy permits.
 #![allow(clippy::no_effect_underscore_binding)]
 
-use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositive};
+use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 use rocket::{
     futures::FutureExt,
     http::Status,
@@ -90,8 +90,8 @@ enum LandedError {
     ForPr(ForPrError),
 }
 
-impl From<PrNumberNonPositive> for LandedError {
-    fn from(_value: PrNumberNonPositive) -> Self {
+impl From<PrNumberNonPositiveError> for LandedError {
+    fn from(_value: PrNumberNonPositiveError) -> Self {
         Self::PrNumberNonPositive
     }
 }
