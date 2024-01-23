@@ -74,6 +74,22 @@
         "type": "github"
       }
     },
+    "github-graphql-schema": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1703012435,
+        "narHash": "sha256-YBvLH7j/5BLtcyYHfvs6y6UIJXvEAF1MZ7/x+Ioul1s=",
+        "owner": "octokit",
+        "repo": "graphql-schema",
+        "rev": "6c550c80082ac4b1e6b91302a6c1bf4c66443a0b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "octokit",
+        "repo": "graphql-schema",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1704842529,
@@ -96,6 +112,7 @@
         "crane": "crane",
         "fenix": "fenix",
         "flake-utils": "flake-utils",
+        "github-graphql-schema": "github-graphql-schema",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix"
       }

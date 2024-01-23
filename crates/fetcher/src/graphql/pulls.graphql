@@ -1,0 +1,21 @@
+query PullsQuery($owner: String!, $name: String!, $cursor: String, $pageSize: Int!) {
+  rateLimit {
+    limit
+    cost
+    remaining
+    resetAt
+  }
+  repository(owner: $owner, name: $name) {
+    pullRequests(first: $pageSize, after: $cursor, orderBy: { direction: ASC, field: UPDATED_AT }) {
+      pageInfo {
+        endCursor
+      }
+      nodes {
+        number
+        mergeCommit {
+          oid
+        }
+      }
+    }
+  }
+}
