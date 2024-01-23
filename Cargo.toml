@@ -12,4 +12,5 @@ repository = "https://github.com/molybdenumsoftware/pr-tracker"
 derive_more = { version = "1.0.0-beta.6", features = ["from", "deref"] }
 pr-tracker-store = { version = "0.1.0", path = "crates/store" }
 tempfile = "3.8.1"
+thiserror = "1.0.56"
 util = { version = "0.1.0", path = "crates/util" }

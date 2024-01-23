@@ -85,14 +85,17 @@ pub struct LandedIn {
     pub branches: Vec<Branch>,
 }
 
+#[derive(Debug, thiserror::Error)]
 enum LandedError {
-    PrNumberNonPositive,
+    #[error(transparent)]
+    PrNumberNonPositive(PrNumberNonPositiveError),
+    #[error(transparent)]
     ForPr(ForPrError),
 }
 
 impl From<PrNumberNonPositiveError> for LandedError {
-    fn from(_value: PrNumberNonPositiveError) -> Self {
-        Self::PrNumberNonPositive
+    fn from(value: PrNumberNonPositiveError) -> Self {
+        Self::PrNumberNonPositive(value)
     }
 }
 
@@ -105,7 +108,7 @@ impl From<ForPrError> for LandedError {
 impl<'r, 'o: 'r> response::Responder<'r, 'o> for LandedError {
     fn respond_to(self, request: &'r Request<'_>) -> response::Result<'o> {
         match self {
-            LandedError::PrNumberNonPositive => {
+            LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => {
                 let status = Status::from_code(400).unwrap();
                 status::Custom(
                     status,
