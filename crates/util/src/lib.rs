@@ -1,20 +1,24 @@
 use fragile_child::{FragileChild, SpawnFragileChild};
-use sqlx::Connection;
-use std::ops::Deref;
-use std::process::Command;
+use futures::future::LocalBoxFuture;
+use sqlx::{
+    migrate::{Migrate, MigrateError},
+    Connection, PgConnection, PgPool,
+};
+use std::{ops::Deref, os::unix::net::UnixDatagram};
+use std::{process::Command, time::Duration};
+use tempfile::{tempdir, TempDir};
 
 use camino::{Utf8Path, Utf8PathBuf};
-use sqlx::PgPool;
 
 pub struct DatabaseContext {
-    tmp_dir: tempfile::TempDir,
+    tmp_dir: TempDir,
     postgres: FragileChild,
 }
 
-pub async fn migrate<'a, A>(migrator: A) -> Result<(), sqlx::migrate::MigrateError>
+pub async fn migrate<'a, A>(migrator: A) -> Result<(), MigrateError>
 where
     A: sqlx::Acquire<'a>,
-    <A::Connection as Deref>::Target: sqlx::migrate::Migrate,
+    <A::Connection as Deref>::Target: Migrate,
 {
     sqlx::migrate!("./migrations").run(migrator).await
 }
@@ -24,9 +28,9 @@ impl DatabaseContext {
     // See `listen_addresses` below.
     const PORT: &'static str = "1";
 
-    pub async fn connection(&self) -> Result<sqlx::PgConnection, sqlx::Error> {
+    pub async fn connection(&self) -> Result<PgConnection, sqlx::Error> {
         let url = self.db_url();
-        sqlx::PgConnection::connect(&url).await
+        PgConnection::connect(&url).await
     }
 
     fn sockets_dir(path: &Utf8Path) -> Utf8PathBuf {
@@ -35,11 +39,11 @@ impl DatabaseContext {
 
     pub async fn pool(&self) -> Result<PgPool, sqlx::Error> {
         let url = self.db_url();
-        sqlx::PgPool::connect(&url).await
+        PgPool::connect(&url).await
     }
 
     async fn init() -> Self {
-        let tmp_dir = tempfile::tempdir().unwrap();
+        let tmp_dir = tempdir().unwrap();
         let sockets_dir = Self::sockets_dir(tmp_dir.path().try_into().unwrap());
         let data_dir = tmp_dir.path().join("data");
         std::fs::create_dir(&sockets_dir).unwrap();
@@ -49,7 +53,7 @@ impl DatabaseContext {
         assert!(status.success());
 
         let ready_socket_path = tmp_dir.path().join("postgresql-ready.sock");
-        let ready_socket = std::os::unix::net::UnixDatagram::bind(&ready_socket_path).unwrap();
+        let ready_socket = UnixDatagram::bind(&ready_socket_path).unwrap();
 
         let postgres = Command::new("postgres")
             // With this environment variable present, postgres sends a ready notification. This
@@ -69,7 +73,7 @@ impl DatabaseContext {
             .unwrap();
 
         ready_socket
-            .set_read_timeout(Some(std::time::Duration::from_secs(5)))
+            .set_read_timeout(Some(Duration::from_secs(5)))
             .unwrap();
 
         const READY: &[u8] = b"READY=1";
@@ -96,7 +100,7 @@ impl DatabaseContext {
         Ok(())
     }
 
-    pub async fn with<T>(f: impl FnOnce(&mut Self) -> futures::future::LocalBoxFuture<T>) -> T {
+    pub async fn with<T>(f: impl FnOnce(&mut Self) -> LocalBoxFuture<T>) -> T {
         let mut ctx = Self::init().await;
         let t = f(&mut ctx).await;
         drop(ctx);
