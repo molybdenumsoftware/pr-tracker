@@ -1,7 +1,8 @@
 {
   lib,
-  pkgs,
   modules,
+  nixosTest,
+  system,
 }: let
   inherit
     (lib)
@@ -18,7 +19,7 @@
   urlRoot = "http://localhost:${toString port}";
   user = "pr-tracker";
 in
-  pkgs.nixosTest {
+  nixosTest {
     name = "api module test";
 
     nodes.pr_tracker_api = {
@@ -28,7 +29,7 @@ in
     }: {
       imports = [modules.api];
 
-      nixpkgs.hostPlatform = pkgs.system;
+      nixpkgs.hostPlatform = system;
 
       services.postgresql.enable = true;
       services.postgresql.port = pgPort;
