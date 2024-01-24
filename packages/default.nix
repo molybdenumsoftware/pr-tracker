@@ -48,22 +48,17 @@
 
   title = "pr-tracker";
 
-  commonArgs = {
-    inherit src;
-  };
-
-  clippyCheck = cargoClippy (commonArgs
-    // {
-      inherit GITHUB_GRAPHQL_SCHEMA;
-      cargoArtifacts = craneLib.buildDepsOnly {
-        inherit src;
-        pname = title;
-        version = "unversioned";
-      };
-      cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
+  clippyCheck = cargoClippy {
+    inherit src GITHUB_GRAPHQL_SCHEMA;
+    cargoArtifacts = craneLib.buildDepsOnly {
+      inherit src;
       pname = title;
       version = "unversioned";
-    });
+    };
+    cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
+    pname = title;
+    version = "unversioned";
+  };
 
   buildWorkspacePackage = args @ {dir, ...}: let
     cleanedArgs = removeAttrs args ["dir"];
@@ -72,9 +67,8 @@
     inherit (crateNameFromCargoToml {inherit cargoToml;}) pname version;
 
     pkgArgs =
-      commonArgs
-      // {
-        inherit pname version;
+      {
+        inherit src pname version;
         meta.mainProgram = pname;
         cargoExtraArgs = "--package ${pname}";
       }
