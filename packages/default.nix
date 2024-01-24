@@ -48,19 +48,18 @@
 
   title = "pr-tracker";
 
-  cargoArtifacts = craneLib.buildDepsOnly {
-    inherit src;
-    pname = title;
-    version = "unversioned";
-  };
-
   commonArgs = {
-    inherit src cargoArtifacts;
+    inherit src;
     GITHUB_GRAPHQL_SCHEMA = githubGraphqlSchema;
   };
 
   clippyCheck = cargoClippy (commonArgs
     // {
+      cargoArtifacts = craneLib.buildDepsOnly {
+        inherit src;
+        pname = title;
+        version = "unversioned";
+      };
       cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
       pname = title;
       version = "unversioned";
