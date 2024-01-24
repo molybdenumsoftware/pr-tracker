@@ -3,7 +3,7 @@
   pkgs,
   by-name,
   fenix,
-  githubGraphqlSchema,
+  GITHUB_GRAPHQL_SCHEMA,
   ...
 } @ args: let
   inherit
@@ -49,8 +49,7 @@
   title = "pr-tracker";
 
   commonArgs = {
-    inherit src;
-    GITHUB_GRAPHQL_SCHEMA = githubGraphqlSchema;
+    inherit src GITHUB_GRAPHQL_SCHEMA;
   };
 
   clippyCheck = cargoClippy (commonArgs
