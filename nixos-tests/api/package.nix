@@ -2,7 +2,6 @@
   lib,
   modules,
   nixosTest,
-  system,
 }: let
   inherit
     (lib)
@@ -29,7 +28,7 @@ in
     }: {
       imports = [modules.api];
 
-      nixpkgs.hostPlatform = system;
+      nixpkgs.hostPlatform = pkgs.system;
 
       services.postgresql.enable = true;
       services.postgresql.port = pgPort;
