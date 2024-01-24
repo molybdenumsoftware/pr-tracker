@@ -3,7 +3,7 @@
   pkgs,
   by-name,
   fenix,
-  githubGraphqlSchema,
+  GITHUB_GRAPHQL_SCHEMA,
   ...
 } @ args: let
   inherit
@@ -50,11 +50,11 @@
 
   commonArgs = {
     inherit src;
-    GITHUB_GRAPHQL_SCHEMA = githubGraphqlSchema;
   };
 
   clippyCheck = cargoClippy (commonArgs
     // {
+      inherit GITHUB_GRAPHQL_SCHEMA;
       cargoArtifacts = craneLib.buildDepsOnly {
         inherit src;
         pname = title;
@@ -82,7 +82,15 @@
   in
     craneLib.buildPackage pkgArgs;
 
-  callPackage = pkgs.newScope {inherit lib pkgs buildWorkspacePackage;};
+  callPackage = pkgs.newScope {
+    inherit
+      lib
+      pkgs
+      buildWorkspacePackage
+      GITHUB_GRAPHQL_SCHEMA
+      ;
+  };
+
   byName = by-name.lib.trivial callPackage;
   packages = byName ./.;
 in {inherit packages clippyCheck;}

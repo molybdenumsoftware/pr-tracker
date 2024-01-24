@@ -33,7 +33,7 @@
 
     flattenTree = import ./flattenTree.nix;
 
-    githubGraphqlSchema = "${github-graphql-schema}/schema.graphql";
+    GITHUB_GRAPHQL_SCHEMA = "${github-graphql-schema}/schema.graphql";
 
     forEachDefaultSystem = system: let
       pkgs = nixpkgs.legacyPackages.${system};
@@ -41,7 +41,7 @@
       fenix = inputs.fenix.packages.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
-      inherit (import ./packages {inherit lib pkgs by-name craneLib fenix githubGraphqlSchema;}) packages clippyCheck;
+      inherit (import ./packages {inherit lib pkgs by-name craneLib fenix GITHUB_GRAPHQL_SCHEMA;}) packages clippyCheck;
 
       devUtils = [
         (pkgs.writeShellApplication {
@@ -62,10 +62,10 @@
       inherit packages;
 
       devShells.default = pkgs.mkShell {
+        inherit GITHUB_GRAPHQL_SCHEMA;
         inputsFrom = attrValues packages;
         packages = with pkgs; [sqlx-cli] ++ devUtils;
         SQLX_OFFLINE = "true";
-        GITHUB_GRAPHQL_SCHEMA = githubGraphqlSchema;
       };
 
       checks = flattenTree {
