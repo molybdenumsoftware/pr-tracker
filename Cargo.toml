@@ -14,3 +14,8 @@ pr-tracker-store = { version = "1.0.0", path = "crates/store" }
 tempfile = "3.8.1"
 thiserror = "1.0.56"
 util = { version = "1.0.0", path = "crates/util" }
+
+[profile.release]
+debug = true
+strip = "none"
+split-debuginfo = "off"
