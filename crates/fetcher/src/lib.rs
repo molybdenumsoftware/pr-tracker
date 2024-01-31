@@ -22,7 +22,7 @@ pub async fn run(
     repo_dir: &Utf8Path,
     branch_patterns: &[WildMatch],
 ) -> anyhow::Result<()> {
-    util::migrate(&mut *db_connection).await?;
+    pr_tracker_store::migrate(&mut *db_connection).await?;
 
     update_prs(&mut github_client, db_connection).await?;
 

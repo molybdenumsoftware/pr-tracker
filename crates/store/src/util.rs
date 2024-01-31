@@ -1,7 +1,10 @@
 use fragile_child::{FragileChild, SpawnFragileChild};
 use futures::future::LocalBoxFuture;
-use sqlx::{Connection, PgConnection, PgPool};
-use std::os::unix::net::UnixDatagram;
+use sqlx::{
+    migrate::{Migrate, MigrateError},
+    Connection, PgConnection, PgPool,
+};
+use std::{ops::Deref, os::unix::net::UnixDatagram};
 use std::{process::Command, time::Duration};
 use tempfile::{tempdir, TempDir};
 
@@ -10,6 +13,15 @@ use camino::{Utf8Path, Utf8PathBuf};
 pub struct DatabaseContext {
     tmp_dir: TempDir,
     postgres: FragileChild,
+}
+
+#[allow(clippy::missing_errors_doc)]
+pub async fn migrate<'a, A>(migrator: A) -> Result<(), MigrateError>
+where
+    A: sqlx::Acquire<'a>,
+    <A::Connection as Deref>::Target: Migrate,
+{
+    sqlx::migrate!("./migrations").run(migrator).await
 }
 
 impl DatabaseContext {

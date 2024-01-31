@@ -35,7 +35,7 @@
 
   rootPath = craneLib.path ../.;
   sqlxQueryFilter = path: type: hasPrefix "${rootPath}/crates/store/.sqlx/" path;
-  migrationsFilter = path: type: hasPrefix "${rootPath}/crates/util/migrations/" path;
+  migrationsFilter = path: type: hasPrefix "${rootPath}/crates/store/migrations/" path;
   graphQlFilter = path: type: hasPrefix "${rootPath}/crates/fetcher/src/graphql/" path;
 
   srcFilter = path: type:

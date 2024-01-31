@@ -7,7 +7,7 @@ async fn main() {
     DatabaseContext::with(|ctx| {
         async {
             let pool = ctx.pool().await.unwrap();
-            util::migrate(&pool).await.unwrap();
+            pr_tracker_store::migrate(&pool).await.unwrap();
 
             let status = Command::new("cargo")
                 .args(["sqlx", "prepare", "--database-url"])

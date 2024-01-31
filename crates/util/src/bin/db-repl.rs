@@ -8,7 +8,7 @@ async fn main() {
     let code = DatabaseContext::with(|database_ctx| {
         async {
             let pool = database_ctx.pool().await.unwrap();
-            util::migrate(&pool).await.unwrap();
+            pr_tracker_store::migrate(&pool).await.unwrap();
             let db_url = database_ctx.db_url();
             let status = Command::new("psql").arg(db_url).status().unwrap();
             status.code().unwrap()

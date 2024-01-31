@@ -3823,6 +3823,7 @@ dependencies = [
  "camino",
  "fragile-child",
  "futures",
+ "pr-tracker-store",
  "sqlx",
  "tempfile",
  "tokio",

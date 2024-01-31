@@ -1,9 +1,12 @@
 #![warn(clippy::pedantic)]
 
-use std::{collections::BTreeMap, num::NonZeroU32};
+use std::{collections::BTreeMap, num::NonZeroU32, ops::Deref};
 
 use futures::FutureExt;
-use sqlx::{Connection, Postgres, Transaction};
+use sqlx::{
+    migrate::{Migrate, MigrateError},
+    Connection, Postgres, Transaction,
+};
 
 pub use sqlx::PgConnection;
 
@@ -434,4 +437,13 @@ impl Landing {
             .await?;
         Ok(())
     }
+}
+
+#[allow(clippy::missing_errors_doc)]
+pub async fn migrate<'a, A>(migrator: A) -> Result<(), MigrateError>
+where
+    A: sqlx::Acquire<'a>,
+    <A::Connection as Deref>::Target: Migrate,
+{
+    sqlx::migrate!("./migrations").run(migrator).await
 }

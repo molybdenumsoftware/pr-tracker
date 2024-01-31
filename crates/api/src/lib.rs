@@ -18,7 +18,7 @@ async fn run_migrations(rocket: Rocket<rocket::Build>) -> rocket::fairing::Resul
         return Err(rocket);
     };
 
-    let Err(e) = util::migrate(&db.0).await else {
+    let Err(e) = pr_tracker_store::migrate(&db.0).await else {
         return Ok(rocket);
     };
 
