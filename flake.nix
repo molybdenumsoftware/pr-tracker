@@ -56,7 +56,7 @@
         })
       ];
 
-      nixosTestsByName = by-name.lib.trivial (pkgs.newScope {modules = systemAgnosticOutputs.nixosModules;});
+      nixosTestsByName = by-name.lib.trivial (pkgs.newScope {pr-tracker = self;});
       nixosTests = nixosTestsByName ./nixos-tests;
     in {
       inherit packages;

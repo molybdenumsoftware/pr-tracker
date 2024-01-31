@@ -66,11 +66,16 @@
     cargoToml = rootPath + "/crates/${dir}/Cargo.toml";
     inherit (crateNameFromCargoToml {inherit cargoToml;}) pname version;
 
+    cargoExtraArgs = "--package ${pname}";
+
     pkgArgs =
       {
-        inherit src pname version;
+        inherit src pname version cargoExtraArgs;
         meta.mainProgram = pname;
-        cargoExtraArgs = "--package ${pname}";
+
+        cargoArtifacts = craneLib.buildDepsOnly {
+          inherit src pname version cargoExtraArgs;
+        };
       }
       // cleanedArgs;
   in
