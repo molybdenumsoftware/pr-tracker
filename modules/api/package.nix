@@ -8,6 +8,7 @@
     (lib)
     getExe
     mkEnableOption
+    mkPackageOption
     mkIf
     mkOption
     optional
@@ -19,10 +20,10 @@
     toString
     ;
 
-  pr-tracker-api = pr-tracker.packages.${pkgs.system}.api;
   cfg = config.services.pr-tracker-api;
 in {
   options.services.pr-tracker-api.enable = mkEnableOption "the pr tracker api";
+  options.services.pr-tracker-api.package = mkPackageOption pr-tracker.packages.${pkgs.system} "api" {};
 
   options.services.pr-tracker-api.user = mkOption {
     type = types.str;
@@ -68,7 +69,7 @@ in {
     systemd.services.pr-tracker-api.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
     systemd.services.pr-tracker-api.bindsTo = optional cfg.localDb "postgresql.service";
 
-    systemd.services.pr-tracker-api.serviceConfig.ExecStart = getExe pr-tracker-api;
+    systemd.services.pr-tracker-api.serviceConfig.ExecStart = getExe cfg.package;
     systemd.services.pr-tracker-api.serviceConfig.User = cfg.user;
     systemd.services.pr-tracker-api.serviceConfig.Group = cfg.group;
     systemd.services.pr-tracker-api.serviceConfig.Type = "notify";
