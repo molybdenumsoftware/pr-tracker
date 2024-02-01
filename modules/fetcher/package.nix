@@ -21,6 +21,8 @@
     ;
 
   cfg = config.services.pr-tracker-fetcher;
+  defaultCacheDirName = "pr-tracker-fetcher";
+  defaultCacheDir = "/var/cache/${defaultCacheDirName}";
 in {
   options.services.pr-tracker-fetcher.enable = mkEnableOption "the pr tracker fetcher";
   options.services.pr-tracker-fetcher.package = mkPackageOption pr-tracker.packages.${pkgs.system} "fetcher" {};
@@ -64,7 +66,7 @@ in {
   options.services.pr-tracker-fetcher.cacheDir = mkOption {
     type = types.path;
     description = "Cache directory";
-    default = "/var/cache/pr-tracker-fetcher";
+    default = defaultCacheDir;
   };
 
   options.services.pr-tracker-fetcher.repo.owner = mkOption {
@@ -115,5 +117,6 @@ in {
     systemd.services.pr-tracker-fetcher.serviceConfig.Group = cfg.group;
     systemd.services.pr-tracker-fetcher.serviceConfig.Type = "oneshot";
     systemd.services.pr-tracker-fetcher.serviceConfig.Restart = "on-failure";
+    systemd.services.pr-tracker-fetcher.serviceConfig.CacheDir = optional (cfg.cacheDir == defaultCacheDir) defaultCacheDirName;
   };
 }
