@@ -14,7 +14,7 @@ pub struct PrNumber(NonZeroU32);
 #[derive(Debug, derive_more::From, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct BranchId(i32);
 
-#[derive(Debug, derive_more::From, PartialEq, Eq, Clone)]
+#[derive(Debug, derive_more::From, PartialEq, Eq, Clone, Hash)]
 #[from(forward)]
 pub struct GitCommit(pub String);
 
