@@ -5,10 +5,15 @@ mod repo;
 #[cfg(test)]
 mod test;
 
+use std::collections::HashMap;
+
 use camino::Utf8Path;
 use github::GithubClient;
 use itertools::Itertools;
-use pr_tracker_store::{Branch, GithubPrQueryCursor, Landing, PgConnection, Pr};
+use log::info;
+use pr_tracker_store::{
+    Branch, GitCommit, GithubPrQueryCursor, Landing, PgConnection, Pr, PrNumber,
+};
 use wildmatch::WildMatch;
 
 /// Run the darn thing.
@@ -33,8 +38,17 @@ pub async fn run(
 
     let repo_references = repo.references()?;
     let branches = find_tracked_branches(&repo_references, branch_patterns)?;
+
+    info!("Collecting PRs.");
+    let prs: HashMap<_, _> = Pr::all(db_connection)
+        .await?
+        .into_iter()
+        .filter_map(|Pr { number, commit }| commit.map(|commit| (commit, number)))
+        .collect();
+    info!("Collected {} PRs.", prs.len());
+
     for (branch_name, head) in branches {
-        update_landings(db_connection, &repo, branch_name, head).await?;
+        update_landings(db_connection, &prs, &repo, branch_name, head).await?;
     }
 
     Ok(())
@@ -77,6 +91,7 @@ fn find_tracked_branches<'a>(
 
 async fn update_landings(
     db_connection: &mut PgConnection,
+    prs: &HashMap<GitCommit, PrNumber>,
     repo: &gix::Repository,
     branch: String,
     head: gix::Id<'_>,
@@ -88,9 +103,10 @@ async fn update_landings(
     for commit in commits {
         let commit = commit?;
 
-        if let Some(pr) = Pr::for_commit(db_connection, commit.id.to_string()).await? {
+        let git_commit: GitCommit = commit.id.to_string().into();
+        if let Some(pr_number) = prs.get(&git_commit) {
             let landing = Landing {
-                github_pr: pr.number,
+                github_pr: *pr_number,
                 branch_id: branch.id(),
             };
 
