@@ -117,6 +117,6 @@ in {
     systemd.services.pr-tracker-fetcher.serviceConfig.Group = cfg.group;
     systemd.services.pr-tracker-fetcher.serviceConfig.Type = "oneshot";
     systemd.services.pr-tracker-fetcher.serviceConfig.Restart = "on-failure";
-    systemd.services.pr-tracker-fetcher.serviceConfig.CacheDir = optional (cfg.cacheDir == defaultCacheDir) defaultCacheDirName;
+    systemd.services.pr-tracker-fetcher.serviceConfig.CacheDirectory = optional (cfg.cacheDir == defaultCacheDir) defaultCacheDirName;
   };
 }

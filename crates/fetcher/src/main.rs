@@ -1,6 +1,6 @@
 #![warn(clippy::pedantic)]
 
-use anyhow::Context;
+use anyhow::{ensure, Context};
 use camino::Utf8PathBuf;
 use pr_tracker_fetcher::{github::GitHubGraphqlClient, run};
 use pr_tracker_store::PgConnection;
@@ -27,6 +27,12 @@ async fn main() -> anyhow::Result<()> {
 
     let cache_dir: Utf8PathBuf =
         get_required_environment_variable("PR_TRACKER_FETCHER_CACHE_DIR")?.into();
+
+    ensure!(
+        cache_dir.exists(),
+        "cache directory must exist: PR_TRACKER_FETCHER_CACHE_DIR={cache_dir}",
+    );
+
     let repo_dir = cache_dir
         .join("repos")
         .join("github.com")
