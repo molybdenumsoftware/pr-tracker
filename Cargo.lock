@@ -478,6 +478,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "db-context"
+version = "1.0.0"
+dependencies = [
+ "camino",
+ "fragile-child",
+ "futures",
+ "sqlx",
+ "tempfile",
+]
+
+[[package]]
 name = "der"
 version = "0.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2443,6 +2454,7 @@ name = "pr-tracker-api"
 version = "1.0.0"
 dependencies = [
  "camino",
+ "db-context",
  "pr-tracker-store",
  "rocket",
  "rocket_db_pools",
@@ -2461,6 +2473,7 @@ dependencies = [
  "anyhow",
  "camino",
  "chrono",
+ "db-context",
  "derive_more",
  "env_logger",
  "futures",
@@ -3821,10 +3834,9 @@ name = "util"
 version = "1.0.0"
 dependencies = [
  "camino",
- "fragile-child",
+ "db-context",
  "futures",
  "sqlx",
- "tempfile",
  "tokio",
 ]
 

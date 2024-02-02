@@ -9,6 +9,7 @@ license = "AGPL-3.0-only"
 repository = "https://github.com/molybdenumsoftware/pr-tracker"
 
 [workspace.dependencies]
+db-context = { version = "1.0.0", path = "crates/db-context" }
 derive_more = { version = "1.0.0-beta.6", features = ["from", "deref"] }
 pr-tracker-store = { version = "1.0.0", path = "crates/store" }
 tempfile = "3.8.1"
