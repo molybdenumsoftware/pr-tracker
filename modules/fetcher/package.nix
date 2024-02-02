@@ -6,6 +6,7 @@
 }: let
   inherit
     (builtins)
+    concatStringsSep
     toJSON
     ;
 
@@ -21,8 +22,6 @@
     ;
 
   cfg = config.services.pr-tracker-fetcher;
-  defaultCacheDirName = "pr-tracker-fetcher";
-  defaultCacheDir = "/var/cache/${defaultCacheDirName}";
 in {
   options.services.pr-tracker-fetcher.enable = mkEnableOption "the pr tracker fetcher";
   options.services.pr-tracker-fetcher.package = mkPackageOption pr-tracker.packages.${pkgs.system} "fetcher" {};
@@ -63,12 +62,6 @@ in {
     example = "/run/secrets/github-api.token";
   };
 
-  options.services.pr-tracker-fetcher.cacheDir = mkOption {
-    type = types.path;
-    description = "Cache directory";
-    default = defaultCacheDir;
-  };
-
   options.services.pr-tracker-fetcher.repo.owner = mkOption {
     type = types.str;
     description = "Owner of the GitHub repository to track.";
@@ -104,19 +97,21 @@ in {
     systemd.services.pr-tracker-fetcher.environment.PR_TRACKER_FETCHER_DATABASE_URL = cfg.databaseUrl;
     systemd.services.pr-tracker-fetcher.environment.PR_TRACKER_FETCHER_GITHUB_REPO_OWNER = cfg.repo.owner;
     systemd.services.pr-tracker-fetcher.environment.PR_TRACKER_FETCHER_GITHUB_REPO_NAME = cfg.repo.name;
-    systemd.services.pr-tracker-fetcher.environment.PR_TRACKER_FETCHER_CACHE_DIR = cfg.cacheDir;
     systemd.services.pr-tracker-fetcher.environment.PR_TRACKER_FETCHER_BRANCH_PATTERNS = toJSON cfg.branchPatterns;
     systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
     systemd.services.pr-tracker-fetcher.requires = optional cfg.localDb "postgresql.service";
-    systemd.services.pr-tracker-fetcher.script = ''
-      export PR_TRACKER_FETCHER_GITHUB_TOKEN=$(< ${cfg.githubApiTokenFile})
-      exec ${getExe cfg.package}
-    '';
+    systemd.services.pr-tracker-fetcher.script = concatStringsSep "\n" [
+      "export PR_TRACKER_FETCHER_GITHUB_TOKEN=$(< ${cfg.githubApiTokenFile})"
+      # CACHE_DIRECTORY is set by systemd based on the CacheDirectory setting.
+      # See https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
+      "export PR_TRACKER_FETCHER_CACHE_DIR=$CACHE_DIRECTORY"
+      "exec ${getExe cfg.package}"
+    ];
 
     systemd.services.pr-tracker-fetcher.serviceConfig.User = cfg.user;
     systemd.services.pr-tracker-fetcher.serviceConfig.Group = cfg.group;
     systemd.services.pr-tracker-fetcher.serviceConfig.Type = "oneshot";
     systemd.services.pr-tracker-fetcher.serviceConfig.Restart = "on-failure";
-    systemd.services.pr-tracker-fetcher.serviceConfig.CacheDir = optional (cfg.cacheDir == defaultCacheDir) defaultCacheDirName;
+    systemd.services.pr-tracker-fetcher.serviceConfig.CacheDirectory = "pr-tracker-fetcher";
   };
 }
