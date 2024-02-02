@@ -1,7 +1,7 @@
 use rocket::futures::FutureExt;
 
 pub struct TestContext<'a> {
-    pub db: &'a mut util::DatabaseContext,
+    pub db: &'a mut db_context::DatabaseContext,
     pub client: rocket::local::asynchronous::Client,
 }
 
@@ -10,7 +10,7 @@ impl TestContext<'_> {
         test: impl for<'a> FnOnce(&'a mut TestContext<'a>) -> rocket::futures::future::LocalBoxFuture<()>
             + 'static,
     ) {
-        util::DatabaseContext::with(|db_context| {
+        db_context::DatabaseContext::with(|db_context| {
             async {
                 let rocket = rocket::custom(
                     rocket::figment::Figment::from(rocket::Config::default())
