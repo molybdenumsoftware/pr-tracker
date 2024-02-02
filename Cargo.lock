@@ -3833,7 +3833,6 @@ checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
 name = "util"
 version = "1.0.0"
 dependencies = [
- "camino",
  "db-context",
  "futures",
  "sqlx",
