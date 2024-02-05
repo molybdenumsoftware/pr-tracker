@@ -1,5 +1,6 @@
 #![warn(clippy::pedantic)]
 
+use std::fmt::Write;
 use std::{collections::BTreeMap, num::NonZeroU32};
 
 use futures::FutureExt;
@@ -8,10 +9,12 @@ use sqlx::{Connection, Postgres, Transaction};
 pub use sqlx::PgConnection;
 
 /// From 1 to [`i32::MAX`].
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, derive_more::Display)]
 pub struct PrNumber(NonZeroU32);
 
-#[derive(Debug, derive_more::From, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(
+    Debug, derive_more::From, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, derive_more::Display,
+)]
 pub struct BranchId(i32);
 
 #[derive(Debug, derive_more::From, PartialEq, Eq, Clone, Hash)]
@@ -432,6 +435,38 @@ impl Landing {
         connection
             .transaction(|txn| transaction(txn, self).boxed())
             .await?;
+        Ok(())
+    }
+
+    /// Upserts provided values into the database.
+    ///
+    /// # Errors
+    ///
+    /// See error type for details.
+    #[allow(clippy::missing_panics_doc)]
+    pub async fn upsert_batch(
+        connection: &mut PgConnection,
+        landings: &[Self],
+    ) -> sqlx::Result<()> {
+        if landings.is_empty() {
+            return Ok(());
+        }
+
+        let mut values = String::new();
+        for Landing {
+            github_pr,
+            branch_id,
+        } in landings
+        {
+            write!(values, "({github_pr},{branch_id}),").unwrap();
+        }
+
+        let values = values.strip_suffix(',').expect("because non-empty");
+
+        let batch = format!("INSERT INTO landings(github_pr, branch_id) VALUES {values} ON CONFLICT (github_pr, branch_id) DO NOTHING");
+
+        sqlx::query(&batch).execute(connection).await?;
+
         Ok(())
     }
 }

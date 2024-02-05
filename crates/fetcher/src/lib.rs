@@ -100,6 +100,8 @@ async fn update_landings(
 
     let commits = repo.rev_walk([head]).all()?;
 
+    let mut landings = Vec::new();
+
     for commit in commits {
         let commit = commit?;
 
@@ -110,9 +112,11 @@ async fn update_landings(
                 branch_id: branch.id(),
             };
 
-            landing.upsert(db_connection).await?;
+            landings.push(landing);
         }
     }
+
+    Landing::upsert_batch(db_connection, &landings).await?;
 
     Ok(())
 }
