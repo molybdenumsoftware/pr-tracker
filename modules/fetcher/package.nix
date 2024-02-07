@@ -23,7 +23,7 @@
 
   cfg = config.services.pr-tracker-fetcher;
 in {
-  options.services.pr-tracker-fetcher.enable = mkEnableOption "the pr tracker fetcher";
+  options.services.pr-tracker-fetcher.enable = mkEnableOption "pr-tracker-fetcher";
   options.services.pr-tracker-fetcher.package = mkPackageOption pr-tracker.packages.${pkgs.system} "fetcher" {};
 
   options.services.pr-tracker-fetcher.user = mkOption {
