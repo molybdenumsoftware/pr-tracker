@@ -53,8 +53,11 @@ in
       services.pr-tracker-fetcher.package = pr-tracker.packages.${system}.fetcher.overrideAttrs {dontStrip = true;};
       systemd.services.pr-tracker-fetcher.environment.RUST_BACKTRACE = "1";
       services.pr-tracker-fetcher.user = user;
-      # TODO: stop leaking password to store https://github.com/molybdenumsoftware/pr-tracker/issues/84
-      services.pr-tracker-fetcher.databaseUrl = "postgresql://${user}:${dbPass}@localhost:${builtins.toString pgPort}/${user}";
+      services.pr-tracker-fetcher.dbUrlParams.user = user;
+      services.pr-tracker-fetcher.dbUrlParams.host = "localhost";
+      services.pr-tracker-fetcher.dbUrlParams.port = toString pgPort;
+      services.pr-tracker-fetcher.dbUrlParams.dbname = user;
+      services.pr-tracker-fetcher.dbPasswordFile = writeText "password-file" dbPass;
       services.pr-tracker-fetcher.localDb = true;
       services.pr-tracker-fetcher.onCalendar = "*:*:*"; # every single second
       services.pr-tracker-fetcher.githubApiTokenFile = writeText "gh-auth-token" "hunter2";
