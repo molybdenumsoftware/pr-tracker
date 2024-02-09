@@ -2,7 +2,6 @@
   pr-tracker,
   lib,
   nixosTest,
-  writeText,
 }: let
   inherit
     (builtins)
@@ -23,6 +22,7 @@ in
       inherit
         (pkgs)
         system
+        writeText
         ;
     in {
       imports = [pr-tracker.nixosModules.fetcher];
