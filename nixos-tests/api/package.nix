@@ -25,10 +25,15 @@ in
       pkgs,
       config,
       ...
-    }: {
+    }: let
+      inherit
+        (pkgs)
+        system
+        ;
+    in {
       imports = [pr-tracker.nixosModules.api];
 
-      nixpkgs.hostPlatform = pkgs.system;
+      nixpkgs.hostPlatform = system;
 
       services.postgresql.enable = true;
       services.postgresql.port = pgPort;
@@ -41,7 +46,7 @@ in
       ];
 
       services.pr-tracker-api.enable = true;
-      services.pr-tracker-api.package = pr-tracker.packages.${pkgs.system}.api.overrideAttrs {dontStrip = true;};
+      services.pr-tracker-api.package = pr-tracker.packages.${system}.api.overrideAttrs {dontStrip = true;};
       systemd.services.pr-tracker-api.environment.RUST_BACKTRACE = "1";
       services.pr-tracker-api.port = port;
       services.pr-tracker-api.user = user;

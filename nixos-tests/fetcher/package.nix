@@ -9,20 +9,30 @@
     toString
     ;
 
+  inherit
+    (pkgs)
+    nixosTest
+    ;
+
   pgPort = 5432;
   user = "pr-tracker";
 in
-  pkgs.nixosTest {
+  nixosTest {
     name = "fetcher module test";
 
     nodes.pr_tracker_fetcher = {
       pkgs,
       config,
       ...
-    }: {
+    }: let
+      inherit
+        (pkgs)
+        system
+        ;
+    in {
       imports = [pr-tracker.nixosModules.fetcher];
 
-      nixpkgs.hostPlatform = pkgs.system;
+      nixpkgs.hostPlatform = system;
 
       services.postgresql.enable = true;
       services.postgresql.port = pgPort;
@@ -35,7 +45,7 @@ in
       ];
 
       services.pr-tracker-fetcher.enable = true;
-      services.pr-tracker-fetcher.package = pr-tracker.packages.${pkgs.system}.fetcher.overrideAttrs {dontStrip = true;};
+      services.pr-tracker-fetcher.package = pr-tracker.packages.${system}.fetcher.overrideAttrs {dontStrip = true;};
       systemd.services.pr-tracker-fetcher.environment.RUST_BACKTRACE = "1";
       services.pr-tracker-fetcher.user = user;
       services.pr-tracker-fetcher.databaseUrl = "postgresql:///${user}?host=/run/postgresql&port=${builtins.toString pgPort}";
