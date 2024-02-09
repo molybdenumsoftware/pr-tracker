@@ -12,6 +12,8 @@
 
   inherit
     (lib)
+    attrsToList
+    escapeURL
     getExe
     mkEnableOption
     mkPackageOption
@@ -24,6 +26,7 @@
   inherit
     (pkgs)
     system
+    urlencode
     ;
 
   cfg = config.services.pr-tracker-fetcher;
@@ -49,10 +52,21 @@ in {
     example = ["release-*"];
   };
 
-  options.services.pr-tracker-fetcher.databaseUrl = mkOption {
-    type = types.str;
-    description = "URL of the database to connect to.";
-    example = "postgresql:///pr-tracker?host=/run/postgresql?port=5432";
+  options.services.pr-tracker-fetcher.dbUrlParams = mkOption {
+    type = types.attrsOf types.str;
+    description = "URL parameters to compose the database URL from.";
+    example = {
+      user = "pr-tracker";
+      host = "localhost";
+      port = "5432";
+      dbname = "pr-tracker";
+    };
+  };
+
+  options.services.pr-tracker-fetcher.dbPasswordFile = mkOption {
+    type = types.path;
+    description = "Path to a file containing the database password.";
+    example = "/run/secrets/db-password";
   };
 
   options.services.pr-tracker-fetcher.localDb = mkOption {
@@ -99,19 +113,31 @@ in {
     systemd.timers.pr-tracker-fetcher.wantedBy = ["timers.target"];
 
     systemd.services.pr-tracker-fetcher.description = "pr-tracker-fetcher";
-    systemd.services.pr-tracker-fetcher.environment.PR_TRACKER_FETCHER_DATABASE_URL = cfg.databaseUrl;
+    systemd.services.pr-tracker-fetcher.environment.PR_TRACKER_FETCHER_DATABASE_URL = let
+      pairs = map (param: "${escapeURL param.name}=${escapeURL param.value}") (attrsToList cfg.dbUrlParams);
+      params = concatStringsSep "&" pairs;
+    in "postgresql://?${params}";
     systemd.services.pr-tracker-fetcher.environment.PR_TRACKER_FETCHER_GITHUB_REPO_OWNER = cfg.repo.owner;
     systemd.services.pr-tracker-fetcher.environment.PR_TRACKER_FETCHER_GITHUB_REPO_NAME = cfg.repo.name;
     systemd.services.pr-tracker-fetcher.environment.PR_TRACKER_FETCHER_BRANCH_PATTERNS = toJSON cfg.branchPatterns;
     systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
     systemd.services.pr-tracker-fetcher.requires = optional cfg.localDb "postgresql.service";
-    systemd.services.pr-tracker-fetcher.script = concatStringsSep "\n" [
-      "export PR_TRACKER_FETCHER_GITHUB_TOKEN=$(< ${cfg.githubApiTokenFile})"
-      # CACHE_DIRECTORY is set by systemd based on the CacheDirectory setting.
-      # See https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
-      "export PR_TRACKER_FETCHER_CACHE_DIR=$CACHE_DIRECTORY"
-      "exec ${getExe cfg.package}"
-    ];
+    systemd.services.pr-tracker-fetcher.script = let
+      passwordFile = optional (cfg ? "dbPasswordFile") ''
+        PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.dbPasswordFile})
+        PR_TRACKER_FETCHER_DATABASE_URL="$PR_TRACKER_FETCHER_DATABASE_URL&password=$PASSWORD"
+      '';
+    in
+      concatStringsSep "\n" (
+        passwordFile
+        ++ [
+          "export PR_TRACKER_FETCHER_GITHUB_TOKEN=$(< ${cfg.githubApiTokenFile})"
+          # CACHE_DIRECTORY is set by systemd based on the CacheDirectory setting.
+          # See https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
+          "export PR_TRACKER_FETCHER_CACHE_DIR=$CACHE_DIRECTORY"
+          "exec ${getExe cfg.package}"
+        ]
+      );
 
     systemd.services.pr-tracker-fetcher.serviceConfig.User = cfg.user;
     systemd.services.pr-tracker-fetcher.serviceConfig.Group = cfg.group;
