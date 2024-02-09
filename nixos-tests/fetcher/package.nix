@@ -1,17 +1,11 @@
 {
   pr-tracker,
   lib,
-  pkgs,
-  writeText,
+  nixosTest,
 }: let
   inherit
     (builtins)
     toString
-    ;
-
-  inherit
-    (pkgs)
-    nixosTest
     ;
 
   pgPort = 5432;
@@ -28,6 +22,7 @@ in
       inherit
         (pkgs)
         system
+        writeText
         ;
     in {
       imports = [pr-tracker.nixosModules.fetcher];
