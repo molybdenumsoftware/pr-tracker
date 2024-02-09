@@ -24,6 +24,11 @@
     removeAttrs
     ;
 
+  inherit
+    (pkgs)
+    newScope
+    ;
+
   craneLib = args.craneLib.overrideToolchain fenix.stable.toolchain;
 
   inherit
@@ -81,7 +86,7 @@
   in
     craneLib.buildPackage pkgArgs;
 
-  callPackage = pkgs.newScope {
+  callPackage = newScope {
     inherit
       lib
       pkgs

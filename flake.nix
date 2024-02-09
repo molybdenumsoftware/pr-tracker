@@ -41,30 +41,38 @@
       fenix = inputs.fenix.packages.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
+      inherit
+        (pkgs)
+        mkShell
+        newScope
+        sqlx-cli
+        writeShellApplication
+        ;
+
       inherit (import ./packages {inherit lib pkgs by-name craneLib fenix GITHUB_GRAPHQL_SCHEMA;}) packages clippyCheck;
 
       devUtils = [
-        (pkgs.writeShellApplication {
+        (writeShellApplication {
           name = "util-sqlx-prepare";
-          runtimeInputs = [pkgs.sqlx-cli];
+          runtimeInputs = [sqlx-cli];
           text = "cargo run --package util --bin sqlx-prepare";
         })
 
-        (pkgs.writeShellApplication {
+        (writeShellApplication {
           name = "util-db-repl";
           text = "cargo run --package util --bin db-repl";
         })
       ];
 
-      nixosTestsByName = by-name.lib.trivial (pkgs.newScope {pr-tracker = self;});
+      nixosTestsByName = by-name.lib.trivial (newScope {pr-tracker = self;});
       nixosTests = nixosTestsByName ./nixos-tests;
     in {
       inherit packages;
 
-      devShells.default = pkgs.mkShell {
+      devShells.default = mkShell {
         inherit GITHUB_GRAPHQL_SCHEMA;
         inputsFrom = attrValues packages;
-        packages = with pkgs; [sqlx-cli] ++ devUtils;
+        packages = [sqlx-cli] ++ devUtils;
         SQLX_OFFLINE = "true";
       };
 
