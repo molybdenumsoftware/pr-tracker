@@ -10,9 +10,11 @@ repository.workspace = true
 
 [dependencies]
 camino = "1.1.6"
+confique.workspace = true
 pr-tracker-store.workspace = true
 rocket = { version = "0.5.0", features = ["json"] }
 rocket_db_pools = { version = "0.1.0", features = ["sqlx_postgres"] }
+serde.workspace = true
 sqlx = { version = "0.7", default-features = false, features = ["macros", "migrate"] }
 thiserror.workspace = true
 util.workspace = true

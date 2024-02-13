@@ -2489,11 +2489,13 @@ name = "pr-tracker-api"
 version = "1.0.0"
 dependencies = [
  "camino",
+ "confique",
  "db-context",
  "pr-tracker-store",
  "rocket",
  "rocket_db_pools",
  "sd-notify",
+ "serde",
  "sqlx",
  "tempfile",
  "thiserror",
