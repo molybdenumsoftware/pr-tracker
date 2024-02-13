@@ -67,8 +67,8 @@ in {
     };
 
     systemd.services.pr-tracker-api.description = "pr-tracker-api";
-    systemd.services.pr-tracker-api.environment.ROCKET_DATABASES = "{data={url=${cfg.databaseUrl}}}";
-    systemd.services.pr-tracker-api.environment.ROCKET_PORT = toString cfg.port;
+    systemd.services.pr-tracker-api.environment.PR_TRACKER_API_DATABASE_URL = cfg.databaseUrl;
+    systemd.services.pr-tracker-api.environment.PR_TRACKER_API_PORT = toString cfg.port;
 
     systemd.services.pr-tracker-api.wantedBy = ["multi-user.target"];
     systemd.services.pr-tracker-api.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";

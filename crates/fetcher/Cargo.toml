@@ -18,13 +18,13 @@ log = "0.4"
 env_logger = "0.10.1"
 pr-tracker-store.workspace = true
 reqwest = { version = "0.11.22", default-features = false, features = ["rustls"] }
-serde = "1.0.193"
+serde.workspace = true
 tokio = { version = "1.34.0", features = ["process", "macros", "rt", "rt-multi-thread"] }
 util.workspace = true
 wildmatch = { version = "2.3.0", features = ["serde"] }
 sqlx-core = "0.7.3"
 serde_json = "1.0.111"
-confique = { version = "0.2.5", default-features = false }
+confique.workspace = true
 
 [dev-dependencies]
 db-context.workspace = true
