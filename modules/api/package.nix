@@ -6,6 +6,8 @@
 }: let
   inherit
     (lib)
+    concatStringsSep
+    escapeShellArg
     getExe
     mkEnableOption
     mkPackageOption
@@ -67,14 +69,17 @@ in {
     };
 
     systemd.services.pr-tracker-api.description = "pr-tracker-api";
-    systemd.services.pr-tracker-api.environment.PR_TRACKER_API_DATABASE_URL = cfg.databaseUrl;
-    systemd.services.pr-tracker-api.environment.PR_TRACKER_API_PORT = toString cfg.port;
 
     systemd.services.pr-tracker-api.wantedBy = ["multi-user.target"];
     systemd.services.pr-tracker-api.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
     systemd.services.pr-tracker-api.bindsTo = optional cfg.localDb "postgresql.service";
 
-    systemd.services.pr-tracker-api.serviceConfig.ExecStart = getExe cfg.package;
+    systemd.services.pr-tracker-api.script = concatStringsSep "\n" [
+      "export PR_TRACKER_API_DATABASE_URL=${escapeShellArg cfg.databaseUrl}"
+      "export PR_TRACKER_API_PORT=${escapeShellArg (toString cfg.port)}"
+      "exec ${getExe cfg.package}"
+    ];
+
     systemd.services.pr-tracker-api.serviceConfig.User = cfg.user;
     systemd.services.pr-tracker-api.serviceConfig.Group = cfg.group;
     systemd.services.pr-tracker-api.serviceConfig.Type = "notify";
