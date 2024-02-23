@@ -65,9 +65,10 @@ in {
   };
 
   options.services.pr-tracker-fetcher.dbPasswordFile = mkOption {
-    type = types.path;
+    type = types.nullOr types.path;
     description = "Path to a file containing the database password.";
     example = "/run/secrets/db-password";
+    default = null;
   };
 
   options.services.pr-tracker-fetcher.localDb = mkOption {
@@ -122,7 +123,7 @@ in {
         params = concatStringsSep "&" pairs;
       in "postgresql://?${params}";
 
-      passwordFile = optional (cfg ? "dbPasswordFile") ''
+      passwordFile = optional (cfg.dbPasswordFile != null) ''
         PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.dbPasswordFile})
         PR_TRACKER_FETCHER_DATABASE_URL="$PR_TRACKER_FETCHER_DATABASE_URL&password=$PASSWORD"
       '';
