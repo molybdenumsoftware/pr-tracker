@@ -1,4 +1,7 @@
-{pr-tracker}: {
+{
+  pr-tracker,
+  attrsToURLParams,
+}: {
   config,
   lib,
   pkgs,
@@ -12,9 +15,7 @@
 
   inherit
     (lib)
-    attrsToList
     escapeShellArg
-    escapeURL
     getExe
     mkEnableOption
     mkPackageOption
@@ -118,10 +119,7 @@ in {
     systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
     systemd.services.pr-tracker-fetcher.requires = optional cfg.localDb "postgresql.service";
     systemd.services.pr-tracker-fetcher.script = let
-      databaseUrl = let
-        pairs = map (param: "${escapeURL param.name}=${escapeURL param.value}") (attrsToList cfg.dbUrlParams);
-        params = concatStringsSep "&" pairs;
-      in "postgresql://?${params}";
+      databaseUrl = "postgresql://?${attrsToURLParams cfg.dbUrlParams}";
 
       passwordFile = optional (cfg.dbPasswordFile != null) ''
         PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.dbPasswordFile})
