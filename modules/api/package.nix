@@ -1,4 +1,7 @@
-{pr-tracker}: {
+{
+  pr-tracker,
+  attrsToURLParams,
+}: {
   lib,
   pkgs,
   config,
@@ -25,6 +28,7 @@
   inherit
     (pkgs)
     system
+    urlencode
     ;
 
   cfg = config.services.pr-tracker-api;
@@ -49,10 +53,22 @@ in {
     description = "Port to listen on.";
   };
 
-  options.services.pr-tracker-api.databaseUrl = mkOption {
-    type = types.str;
-    description = "URL of the database to connect to.";
-    example = "postgresql:///pr-tracker?host=/run/postgresql?port=5432";
+  options.services.pr-tracker-api.dbUrlParams = mkOption {
+    type = types.attrsOf types.str;
+    description = "URL parameters to compose the database URL from.";
+    example = {
+      user = "pr-tracker";
+      host = "localhost";
+      port = "5432";
+      dbname = "pr-tracker";
+    };
+  };
+
+  options.services.pr-tracker-api.dbPasswordFile = mkOption {
+    type = types.nullOr types.path;
+    description = "Path to a file containing the database password.";
+    example = "/run/secrets/db-password";
+    default = null;
   };
 
   options.services.pr-tracker-api.localDb = mkOption {
@@ -74,12 +90,22 @@ in {
     systemd.services.pr-tracker-api.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
     systemd.services.pr-tracker-api.bindsTo = optional cfg.localDb "postgresql.service";
 
-    systemd.services.pr-tracker-api.script = concatStringsSep "\n" [
-      "export PR_TRACKER_API_DATABASE_URL=${escapeShellArg cfg.databaseUrl}"
-      "export PR_TRACKER_API_PORT=${escapeShellArg (toString cfg.port)}"
-      "exec ${getExe cfg.package}"
-    ];
+    systemd.services.pr-tracker-api.script = let
+      databaseUrl = "postgresql://?${attrsToURLParams cfg.dbUrlParams}";
 
+      passwordFile = optional (cfg.dbPasswordFile != null) ''
+        PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.dbPasswordFile})
+        PR_TRACKER_API_DATABASE_URL="$PR_TRACKER_API_DATABASE_URL&password=$PASSWORD"
+      '';
+    in
+      concatStringsSep "\n" (
+        [
+          "export PR_TRACKER_API_DATABASE_URL=${escapeShellArg databaseUrl}"
+          "export PR_TRACKER_API_PORT=${escapeShellArg (toString cfg.port)}"
+        ]
+        ++ passwordFile
+        ++ ["exec ${getExe cfg.package}"]
+      );
     systemd.services.pr-tracker-api.serviceConfig.User = cfg.user;
     systemd.services.pr-tracker-api.serviceConfig.Group = cfg.group;
     systemd.services.pr-tracker-api.serviceConfig.Type = "notify";
