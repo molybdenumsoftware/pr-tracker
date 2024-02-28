@@ -7,9 +7,10 @@ edition = "2021"
 
 [dependencies]
 anyhow = { version = "1.0.75", features = ["backtrace"] }
-camino = { version = "1.1.6", features = ["serde1"] }
+camino.workspace = true
 chrono = { version = "0.4.31", features = ["serde"] }
 derive_more.workspace = true
+pr-tracker-fetcher-config = { path = "../fetcher-config" }
 futures = "0.3.29"
 gix = { version = "0.56.0", features = ["revision"] }
 graphql_client = { version = "0.13.0", features = ["reqwest-rustls", "graphql_query_derive"], default-features = false }

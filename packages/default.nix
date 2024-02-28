@@ -13,6 +13,7 @@
     fileset
     filterAttrs
     hasPrefix
+    hasSuffix
     mapAttrs
     pipe
     recursiveUpdate
@@ -34,6 +35,7 @@
   inherit
     (craneLib)
     cargoClippy
+    cargoDoc
     crateNameFromCargoToml
     filterCargoSources
     ;
@@ -42,9 +44,10 @@
   sqlxQueryFilter = path: type: hasPrefix "${rootPath}/crates/store/.sqlx/" path;
   migrationsFilter = path: type: hasPrefix "${rootPath}/crates/util/migrations/" path;
   graphQlFilter = path: type: hasPrefix "${rootPath}/crates/fetcher/src/graphql/" path;
+  docsFilter = path: type: (hasPrefix "${rootPath}/crates/" path) && (hasSuffix ".md" path);
 
   srcFilter = path: type:
-    any (p: p path type) [sqlxQueryFilter migrationsFilter graphQlFilter filterCargoSources];
+    any (p: p path type) [sqlxQueryFilter migrationsFilter graphQlFilter filterCargoSources docsFilter];
 
   src = cleanSourceWith {
     src = rootPath;
@@ -53,13 +56,14 @@
 
   title = "pr-tracker";
 
+  cargoArtifacts = craneLib.buildDepsOnly {
+    inherit src;
+    pname = title;
+    version = "unversioned";
+  };
+
   clippyCheck = cargoClippy {
-    inherit src GITHUB_GRAPHQL_SCHEMA;
-    cargoArtifacts = craneLib.buildDepsOnly {
-      inherit src;
-      pname = title;
-      version = "unversioned";
-    };
+    inherit src GITHUB_GRAPHQL_SCHEMA cargoArtifacts;
     cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
     pname = title;
     version = "unversioned";
@@ -88,8 +92,11 @@
 
   callPackage = newScope {
     inherit
+      cargoArtifacts
+      cargoDoc
       lib
       pkgs
+      src
       buildWorkspacePackage
       GITHUB_GRAPHQL_SCHEMA
       ;

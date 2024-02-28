@@ -1,29 +1,12 @@
 #![warn(clippy::pedantic)]
-#![allow(non_snake_case, clippy::struct_field_names)]
 
 use anyhow::{ensure, Context};
-use camino::Utf8PathBuf;
 use confique::Config;
 use pr_tracker_fetcher::{github::GitHubGraphqlClient, run};
+use pr_tracker_fetcher_config::Environment;
 use pr_tracker_store::PgConnection;
 use sqlx_core::connection::Connection;
 use wildmatch::WildMatch;
-
-#[derive(Debug, Config)]
-struct Environment {
-    #[config(env = "PR_TRACKER_FETCHER_DATABASE_URL")]
-    PR_TRACKER_FETCHER_DATABASE_URL: String,
-    #[config(env = "PR_TRACKER_FETCHER_GITHUB_TOKEN")]
-    PR_TRACKER_FETCHER_GITHUB_TOKEN: String,
-    #[config(env = "PR_TRACKER_FETCHER_GITHUB_REPO_OWNER")]
-    PR_TRACKER_FETCHER_GITHUB_REPO_OWNER: String,
-    #[config(env = "PR_TRACKER_FETCHER_GITHUB_REPO_NAME")]
-    PR_TRACKER_FETCHER_GITHUB_REPO_NAME: String,
-    #[config(env = "PR_TRACKER_FETCHER_CACHE_DIR")]
-    PR_TRACKER_FETCHER_CACHE_DIR: Utf8PathBuf,
-    #[config(env = "PR_TRACKER_FETCHER_BRANCH_PATTERNS")]
-    PR_TRACKER_FETCHER_BRANCH_PATTERNS: String,
-}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

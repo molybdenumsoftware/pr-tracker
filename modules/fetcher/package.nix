@@ -10,6 +10,7 @@
   inherit
     (builtins)
     concatStringsSep
+    readFile
     toJSON
     ;
 
@@ -50,7 +51,7 @@ in {
 
   options.services.pr-tracker-fetcher.branchPatterns = mkOption {
     type = types.listOf types.str;
-    description = "List of branch patterns to track.";
+    description = readFile ../../crates/fetcher-config/BRANCH_PATTERNS.md;
     example = ["release-*"];
   };
 
@@ -80,19 +81,19 @@ in {
 
   options.services.pr-tracker-fetcher.githubApiTokenFile = mkOption {
     type = types.path;
-    description = "Path to a file containing a GitHub API token.";
+    description = "Path to a file containing a " + readFile ../../crates/fetcher-config/GITHUB_TOKEN.md;
     example = "/run/secrets/github-api.token";
   };
 
   options.services.pr-tracker-fetcher.repo.owner = mkOption {
     type = types.str;
-    description = "Owner of the GitHub repository to track.";
+    description = readFile ../../crates/fetcher-config/GITHUB_REPO_OWNER.md;
     example = "NixOS";
   };
 
   options.services.pr-tracker-fetcher.repo.name = mkOption {
     type = types.str;
-    description = "Name of the GitHub repository to track.";
+    description = readFile ../../crates/fetcher-config/GITHUB_REPO_NAME.md;
     example = "nixpkgs";
   };
 

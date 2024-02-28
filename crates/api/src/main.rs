@@ -1,19 +1,11 @@
 #![warn(clippy::pedantic)]
 // required because rocket::launch, remove if clippy permits.
 #![allow(clippy::no_effect_underscore_binding)]
-#![allow(non_snake_case, clippy::struct_field_names)]
 
 use confique::Config;
 use pr_tracker_api::app;
+use pr_tracker_api_config::Environment;
 use rocket::{figment::Figment, launch};
-
-#[derive(Debug, Config)]
-struct Environment {
-    #[config(env = "PR_TRACKER_API_DATABASE_URL")]
-    PR_TRACKER_API_DATABASE_URL: String,
-    #[config(env = "PR_TRACKER_API_PORT")]
-    PR_TRACKER_API_PORT: u16,
-}
 
 #[launch]
 fn rocket() -> _ {

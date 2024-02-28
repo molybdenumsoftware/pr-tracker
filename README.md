@@ -18,3 +18,9 @@ Two programs are provided:
 
 1. pr-tracker-fetcher: obtains data, determines landings and persists them.
 2. pr-tracker-api: provides an HTTP endpoint for querying landings
+
+## pr-tracker-fetcher
+[Environment variables](https://molybdenumsoftware.github.io/pr-tracker/pr_tracker_fetcher_config/struct.Environment.html)
+
+## pr-tracker-api
+[Environment variables](https://molybdenumsoftware.github.io/pr-tracker/pr_tracker_api_config/struct.Environment.html)
