@@ -32,6 +32,8 @@
     urlencode
     ;
 
+  common = import ./common.nix;
+
   cfg = config.services.pr-tracker-fetcher;
 in {
   options.services.pr-tracker-fetcher.enable = mkEnableOption "pr-tracker-fetcher";
@@ -39,13 +41,13 @@ in {
 
   options.services.pr-tracker-fetcher.user = mkOption {
     type = types.str;
-    description = "User to run under.";
+    description = common.user;
     default = "pr-tracker-fetcher";
   };
 
   options.services.pr-tracker-fetcher.group = mkOption {
     type = types.str;
-    description = "Group to run under.";
+    description = common.group;
     default = "pr-tracker-fetcher";
   };
 
@@ -57,7 +59,7 @@ in {
 
   options.services.pr-tracker-fetcher.dbUrlParams = mkOption {
     type = types.attrsOf types.str;
-    description = "URL parameters to compose the database URL from.";
+    description = common.dbUrlParams;
     example = {
       user = "pr-tracker";
       host = "localhost";
@@ -68,14 +70,14 @@ in {
 
   options.services.pr-tracker-fetcher.dbPasswordFile = mkOption {
     type = types.nullOr types.path;
-    description = "Path to a file containing the database password.";
+    description = common.dbPasswordFile;
     example = "/run/secrets/db-password";
     default = null;
   };
 
   options.services.pr-tracker-fetcher.localDb = mkOption {
     type = types.bool;
-    description = "Whether database is local.";
+    description = common.localDb;
     default = false;
   };
 
@@ -99,7 +101,7 @@ in {
 
   options.services.pr-tracker-fetcher.onCalendar = mkOption {
     type = types.str;
-    description = lib.mdDoc ''
+    description = ''
       When to run the fetcher. This is a systemd timer `OnCalendar` string, see
       {manpage}`systemd.time(7)` for a full specification.";
     '';

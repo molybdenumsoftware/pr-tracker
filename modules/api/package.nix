@@ -32,6 +32,8 @@
     urlencode
     ;
 
+  common = import ./common.nix;
+
   cfg = config.services.pr-tracker-api;
 in {
   options.services.pr-tracker-api.enable = mkEnableOption "pr-tracker-api";
@@ -39,13 +41,13 @@ in {
 
   options.services.pr-tracker-api.user = mkOption {
     type = types.str;
-    description = "User to run under.";
+    description = common.user;
     default = "pr-tracker-api";
   };
 
   options.services.pr-tracker-api.group = mkOption {
     type = types.str;
-    description = "Group to run under.";
+    description = common.group;
     default = "pr-tracker-api";
   };
 
@@ -56,7 +58,7 @@ in {
 
   options.services.pr-tracker-api.dbUrlParams = mkOption {
     type = types.attrsOf types.str;
-    description = "URL parameters to compose the database URL from.";
+    description = common.dbUrlParams;
     example = {
       user = "pr-tracker";
       host = "localhost";
@@ -67,14 +69,14 @@ in {
 
   options.services.pr-tracker-api.dbPasswordFile = mkOption {
     type = types.nullOr types.path;
-    description = "Path to a file containing the database password.";
+    description = common.dbPasswordFile;
     example = "/run/secrets/db-password";
     default = null;
   };
 
   options.services.pr-tracker-api.localDb = mkOption {
     type = types.bool;
-    description = "Whether database is local.";
+    description = common.localDb;
     default = false;
   };
 

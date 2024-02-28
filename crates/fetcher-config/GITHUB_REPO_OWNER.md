@@ -1,1 +1,1 @@
-Owner of the GitHub repository to track.
+GitHub repository owner.
