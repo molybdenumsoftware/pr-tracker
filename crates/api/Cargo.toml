@@ -9,6 +9,7 @@ repository.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+pr-tracker-api-config = { path = "../api-config" }
 camino = "1.1.6"
 confique.workspace = true
 pr-tracker-store.workspace = true

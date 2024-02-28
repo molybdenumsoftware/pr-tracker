@@ -2491,6 +2491,7 @@ dependencies = [
  "camino",
  "confique",
  "db-context",
+ "pr-tracker-api-config",
  "pr-tracker-store",
  "rocket",
  "rocket_db_pools",
@@ -2501,6 +2502,15 @@ dependencies = [
  "thiserror",
  "tokio",
  "util",
+]
+
+[[package]]
+name = "pr-tracker-api-config"
+version = "1.0.0"
+dependencies = [
+ "camino",
+ "confique",
+ "serde",
 ]
 
 [[package]]
@@ -2520,6 +2530,7 @@ dependencies = [
  "itertools",
  "log",
  "once_cell",
+ "pr-tracker-fetcher-config",
  "pr-tracker-store",
  "reqwest",
  "serde",
@@ -2529,6 +2540,15 @@ dependencies = [
  "tokio",
  "util",
  "wildmatch",
+]
+
+[[package]]
+name = "pr-tracker-fetcher-config"
+version = "1.0.0"
+dependencies = [
+ "camino",
+ "confique",
+ "serde",
 ]
 
 [[package]]
