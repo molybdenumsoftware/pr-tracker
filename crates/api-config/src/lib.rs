@@ -5,9 +5,10 @@ pub use environment::Environment;
 mod environment {
     use confique::Config;
 
+    /// See documentation for each field.
     #[derive(Debug, Config)]
     pub struct Environment {
-        /// A Postgres connection URL.
+        #[doc = include_str!("../../DATABASE_URL.md")]
         #[config(env = "PR_TRACKER_API_DATABASE_URL")]
         pub PR_TRACKER_API_DATABASE_URL: String,
         #[config(env = "PR_TRACKER_API_PORT")]
