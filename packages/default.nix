@@ -2,10 +2,10 @@
   lib,
   pkgs,
   by-name,
+  craneLib,
   fenix,
   GITHUB_GRAPHQL_SCHEMA,
-  ...
-} @ args: let
+}: let
   inherit
     (lib)
     any
@@ -30,17 +30,17 @@
     newScope
     ;
 
-  craneLib = args.craneLib.overrideToolchain fenix.stable.toolchain;
+  crane = craneLib.overrideToolchain fenix.stable.toolchain;
 
   inherit
-    (craneLib)
+    (crane)
     cargoClippy
     cargoDoc
     crateNameFromCargoToml
     filterCargoSources
     ;
 
-  rootPath = craneLib.path ../.;
+  rootPath = crane.path ../.;
   sqlxQueryFilter = path: type: hasPrefix "${rootPath}/crates/store/.sqlx/" path;
   migrationsFilter = path: type: hasPrefix "${rootPath}/crates/util/migrations/" path;
   graphQlFilter = path: type: hasPrefix "${rootPath}/crates/fetcher/src/graphql/" path;
@@ -56,7 +56,7 @@
 
   title = "pr-tracker";
 
-  cargoArtifacts = craneLib.buildDepsOnly {
+  cargoArtifacts = crane.buildDepsOnly {
     inherit src;
     pname = title;
     version = "unversioned";
@@ -82,13 +82,13 @@
         inherit src pname version cargoExtraArgs;
         meta.mainProgram = pname;
 
-        cargoArtifacts = craneLib.buildDepsOnly {
+        cargoArtifacts = crane.buildDepsOnly {
           inherit src pname version cargoExtraArgs;
         };
       }
       // cleanedArgs;
   in
-    craneLib.buildPackage pkgArgs;
+    crane.buildPackage pkgArgs;
 
   callPackage = newScope {
     inherit
