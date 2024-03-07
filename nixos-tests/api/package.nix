@@ -18,4 +18,5 @@
 in {
   tcp-db = nodeToTest "api with tcp db" (import ./tcp-db.nix pr-tracker);
   socket-db = nodeToTest "api with socket db" (import ./socket-db.nix pr-tracker);
+  default-package = nodeToTest "api with default package" (import ./default-package.nix pr-tracker);
 }
