@@ -37,7 +37,9 @@
   cfg = config.services.pr-tracker-api;
 in {
   options.services.pr-tracker-api.enable = mkEnableOption "pr-tracker-api";
-  options.services.pr-tracker-api.package = mkPackageOption pr-tracker.packages.${system} "api" {};
+  options.services.pr-tracker-api.package = mkPackageOption pr-tracker.packages.${system} "api" {
+    inherit (common) pkgsText;
+  };
 
   options.services.pr-tracker-api.user = mkOption {
     type = types.str;

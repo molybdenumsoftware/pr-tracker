@@ -7,4 +7,5 @@
     Contents will be appended to the database URL as a parameter.
   '';
   localDb = "Whether database is local.";
+  pkgsText = "pr-tracker.packages";
 }
