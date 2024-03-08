@@ -22,7 +22,7 @@ jobs:
           extra-conf: |
             experimental-features = no-url-literals
       - uses: DeterminateSystems/magic-nix-cache-action@main
-      - run: nix build .#docs
+      - run: nix build .#program-docs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: 'result/share/doc'
