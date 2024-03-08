@@ -1,4 +1,4 @@
-{pr-tracker}: {
+{
   config,
   lib,
   pkgs,
@@ -25,17 +25,16 @@
 
   inherit
     (pkgs)
-    system
     urlencode
     ;
 
-  attrsToURLParams = import ../../attrsToURLParams.nix lib;
+  attrsToURLParams = import ../attrsToURLParams.nix lib;
   common = import ./common.nix;
 
   cfg = config.services.pr-tracker-fetcher;
 in {
   options.services.pr-tracker-fetcher.enable = mkEnableOption "pr-tracker-fetcher";
-  options.services.pr-tracker-fetcher.package = mkPackageOption pr-tracker.packages.${system} "fetcher" {
+  options.services.pr-tracker-fetcher.package = mkPackageOption config._pr-tracker-packages "fetcher" {
     inherit (common) pkgsText;
   };
 

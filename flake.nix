@@ -28,7 +28,7 @@
     inherit
       (lib)
       attrValues
-      callPackageWith
+      mkOption
       ;
 
     flattenTree = import ./flattenTree.nix;
@@ -85,14 +85,15 @@
       formatter = treefmtEval.config.build.wrapper;
     };
     systemSpecificOutputs = flake-utils.lib.eachDefaultSystem forEachDefaultSystem;
-    systemAgnosticOutputs = {
-      nixosModules = let
-        byName = by-name.lib.trivial (callPackageWith {
-          pr-tracker = self;
-        });
-      in
-        byName ./modules;
+
+    mkPublicModule = path: {pkgs, ...}: {
+      imports = [path];
+      options._pr-tracker-packages = mkOption {internal = true;};
+      config._pr-tracker-packages = self.packages.${pkgs.system};
     };
+
+    systemAgnosticOutputs.nixosModules.api = mkPublicModule ./modules/api.nix;
+    systemAgnosticOutputs.nixosModules.fetcher = mkPublicModule ./modules/fetcher.nix;
   in
     systemSpecificOutputs
     // systemAgnosticOutputs;
