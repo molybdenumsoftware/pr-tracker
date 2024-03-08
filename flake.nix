@@ -31,8 +31,6 @@
       callPackageWith
       ;
 
-    attrsToURLParams = import ./attrsToURLParams.nix lib;
-
     flattenTree = import ./flattenTree.nix;
 
     GITHUB_GRAPHQL_SCHEMA = "${github-graphql-schema}/schema.graphql";
@@ -90,7 +88,6 @@
     systemAgnosticOutputs = {
       nixosModules = let
         byName = by-name.lib.trivial (callPackageWith {
-          inherit attrsToURLParams;
           pr-tracker = self;
         });
       in

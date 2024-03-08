@@ -1,7 +1,4 @@
-{
-  pr-tracker,
-  attrsToURLParams,
-}: {
+{pr-tracker}: {
   config,
   lib,
   pkgs,
@@ -32,6 +29,7 @@
     urlencode
     ;
 
+  attrsToURLParams = import ../../attrsToURLParams.nix lib;
   common = import ./common.nix;
 
   cfg = config.services.pr-tracker-fetcher;
