@@ -11,9 +11,15 @@ jobs:
   lockfile:
     runs-on: ubuntu-latest
     steps:
+      - uses: navikt/github-app-token-generator@v1
+        id: get-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_TOKEN }}
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/update-flake-lock@main
         with:
           commit-msg: "chore(flake): bump inputs"
           pr-title: "chore(flake): bump inputs"
+          token: ${{ steps.get-token.outputs.token }}
