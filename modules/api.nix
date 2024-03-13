@@ -52,7 +52,7 @@ in {
 
   options.services.pr-tracker-api.port = mkOption {
     type = types.port;
-    description = readFile ../../crates/api-config/PORT.md;
+    description = readFile ../crates/api-config/PORT.md;
   };
 
   options.services.pr-tracker-api.dbUrlParams = mkOption {

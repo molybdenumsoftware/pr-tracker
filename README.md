@@ -27,9 +27,13 @@ Two programs are provided:
 ## pr-tracker-fetcher
 
 Takes no arguments.
-Expects [configuration via environment](https://molybdenumsoftware.github.io/pr-tracker/pr_tracker_fetcher_config/struct.Environment.html)
+Expects [configuration via environment](https://molybdenumsoftware.github.io/pr-tracker/programs/pr_tracker_fetcher_config/struct.Environment.html)
 
 ## pr-tracker-api
 
 Takes no arguments.
-Expects [configuration via environment](https://molybdenumsoftware.github.io/pr-tracker/pr_tracker_api_config/struct.Environment.html)
+Expects [configuration via environment](https://molybdenumsoftware.github.io/pr-tracker/programs/pr_tracker_api_config/struct.Environment.html)
+
+## NixOS modules
+
+[Manual](https://molybdenumsoftware.github.io/pr-tracker/nixos-modules)

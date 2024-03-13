@@ -4,6 +4,9 @@
   by-name,
   craneLib,
   fenix,
+  nixpkgs,
+  nmdLib,
+  pr-tracker,
   GITHUB_GRAPHQL_SCHEMA,
 }: let
   inherit
@@ -95,9 +98,12 @@
       cargoArtifacts
       cargoDoc
       lib
+      nixpkgs
+      nmdLib
       pkgs
       src
       buildWorkspacePackage
+      pr-tracker
       GITHUB_GRAPHQL_SCHEMA
       ;
   };
