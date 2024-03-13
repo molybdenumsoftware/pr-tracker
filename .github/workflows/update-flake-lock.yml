@@ -16,3 +16,4 @@ jobs:
       - uses: DeterminateSystems/update-flake-lock@main
         with:
           commit-msg: "chore(flake): bump inputs"
+          pr-title: "chore(flake): bump inputs"
