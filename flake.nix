@@ -10,6 +10,8 @@
     flake-utils.url = "github:numtide/flake-utils";
     github-graphql-schema.flake = false;
     github-graphql-schema.url = "github:octokit/graphql-schema";
+    nmd.inputs.nixpkgs.follows = "nixpkgs";
+    nmd.url = "git+https://git.sr.ht/~rycee/nmd";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
@@ -21,6 +23,7 @@
     crane,
     flake-utils,
     github-graphql-schema,
+    nmd,
     treefmt-nix,
     ...
   } @ inputs: let
@@ -39,6 +42,7 @@
       pkgs = nixpkgs.legacyPackages.${system};
       craneLib = crane.lib.${system};
       fenix = inputs.fenix.packages.${system};
+      nmdLib = nmd.lib.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
       inherit
@@ -49,7 +53,14 @@
         writeShellApplication
         ;
 
-      inherit (import ./packages {inherit lib pkgs by-name craneLib fenix GITHUB_GRAPHQL_SCHEMA;}) packages clippyCheck;
+      inherit
+        (import ./packages {
+          inherit lib pkgs by-name craneLib fenix nixpkgs nmdLib GITHUB_GRAPHQL_SCHEMA;
+          pr-tracker = self;
+        })
+        packages
+        clippyCheck
+        ;
 
       devUtils = [
         (writeShellApplication {
@@ -80,6 +91,7 @@
         inherit packages nixosTests;
         clippy = clippyCheck;
         formatting = treefmtEval.config.build.check self;
+        filterOptions = assert (import ./filterOptions-check.nix lib); pkgs.hello;
       };
 
       formatter = treefmtEval.config.build.wrapper;

@@ -52,7 +52,7 @@ in {
 
   options.services.pr-tracker-fetcher.branchPatterns = mkOption {
     type = types.listOf types.str;
-    description = readFile ../../crates/fetcher-config/BRANCH_PATTERNS.md;
+    description = readFile ../crates/fetcher-config/BRANCH_PATTERNS.md;
     example = ["release-*"];
   };
 
@@ -82,19 +82,19 @@ in {
 
   options.services.pr-tracker-fetcher.githubApiTokenFile = mkOption {
     type = types.path;
-    description = "Path to a file containing a " + readFile ../../crates/fetcher-config/GITHUB_TOKEN.md;
+    description = "Path to a file containing a " + readFile ../crates/fetcher-config/GITHUB_TOKEN.md;
     example = "/run/secrets/github-api.token";
   };
 
   options.services.pr-tracker-fetcher.repo.owner = mkOption {
     type = types.str;
-    description = readFile ../../crates/fetcher-config/GITHUB_REPO_OWNER.md;
+    description = readFile ../crates/fetcher-config/GITHUB_REPO_OWNER.md;
     example = "NixOS";
   };
 
   options.services.pr-tracker-fetcher.repo.name = mkOption {
     type = types.str;
-    description = readFile ../../crates/fetcher-config/GITHUB_REPO_NAME.md;
+    description = readFile ../crates/fetcher-config/GITHUB_REPO_NAME.md;
     example = "nixpkgs";
   };
 
