@@ -37,3 +37,10 @@ Expects [configuration via environment](https://molybdenumsoftware.github.io/pr-
 ## NixOS modules
 
 [Manual](https://molybdenumsoftware.github.io/pr-tracker/nixos-modules)
+
+## Versioning
+
+- This project uses [Conventional Commits v1](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning v2](https://semver.org/spec/v2.0.0.html).
+- With regards to versioning, the documented executables and NixOS modules are public.
+  The libraries are private.
+- This project, with all its components, is versioned as one.
