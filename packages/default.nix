@@ -76,17 +76,17 @@
     cleanedArgs = removeAttrs args ["dir"];
 
     cargoToml = rootPath + "/crates/${dir}/Cargo.toml";
-    inherit (crateNameFromCargoToml {inherit cargoToml;}) pname version;
+    inherit (crateNameFromCargoToml {inherit cargoToml;}) pname;
 
     cargoExtraArgs = "--package ${pname}";
 
     pkgArgs =
       {
-        inherit src pname version cargoExtraArgs;
+        inherit src pname cargoExtraArgs;
         meta.mainProgram = pname;
 
         cargoArtifacts = crane.buildDepsOnly {
-          inherit src pname version cargoExtraArgs;
+          inherit src pname cargoExtraArgs;
         };
       }
       // cleanedArgs;
