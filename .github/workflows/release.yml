@@ -10,15 +10,16 @@ jobs:
   check:
     uses: ./.github/workflows/check.yml
 
-  generate-app-token:
-    uses: ./.github/workflows/generate-app-token.yml
-    secrets: inherit
-
   release:
-    needs: [check, generate-app-token]
+    needs: [check]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: navikt/github-app-token-generator@v1
+        id: get-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
       - uses: cycjimmy/semantic-release-action@v4
         with:
           extra_plugins: |
@@ -26,4 +27,4 @@ jobs:
             @semantic-release-cargo/semantic-release-cargo@2
             @semantic-release/git@10
         env:
-          GITHUB_TOKEN: ${{ needs.generate-app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}

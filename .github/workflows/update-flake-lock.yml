@@ -8,12 +8,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  generate-app-token:
-    uses: ./.github/workflows/generate-app-token.yml
-    secrets: inherit
-
   lockfile:
-    needs: generate-app-token
     runs-on: ubuntu-latest
     steps:
       - uses: navikt/github-app-token-generator@v1
@@ -28,7 +23,7 @@ jobs:
         with:
           commit-msg: "chore(flake): bump inputs"
           pr-title: "chore(flake): bump inputs"
-          token: ${{ needs.generate-app-token.outputs.token }}
+          token: ${{ steps.get-token.outputs.token }}
       - run: "gh pr merge --auto --merge ${{ steps.update.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ github.token }}
