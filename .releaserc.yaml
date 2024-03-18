@@ -1,0 +1,15 @@
+branches:
+  - main
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - - "@semantic-release/release-notes-generator"
+    - preset: conventionalcommits
+  - "@semantic-release/changelog"
+  - "@semantic-release/github"
+  - "@semantic-release-cargo/semantic-release-cargo"
+  - - "@semantic-release/git"
+    - assets:
+      - CHANGELOG.md
+      - Cargo.lock
+      - Cargo.toml
+dryRun: true
