@@ -10,6 +10,7 @@ permissions:
 jobs:
   generate-app-token:
     uses: ./.github/workflows/generate-app-token.yml
+    secrets: inherit
 
   lockfile:
     needs: generate-app-token

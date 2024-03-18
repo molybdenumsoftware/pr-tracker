@@ -12,6 +12,7 @@ jobs:
 
   generate-app-token:
     uses: ./.github/workflows/generate-app-token.yml
+    secrets: inherit
 
   release:
     needs: [check, generate-app-token]
