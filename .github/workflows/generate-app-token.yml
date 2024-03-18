@@ -1,7 +1,8 @@
 on:
   workflow_call:
     outputs:
-      token: ${{ jobs.job.outputs.token }}
+      token:
+        value: ${{ jobs.job.outputs.token }}
     
 jobs:
   job:
