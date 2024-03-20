@@ -12,13 +12,13 @@ repository = "https://github.com/molybdenumsoftware/pr-tracker"
 [workspace.dependencies]
 camino = { version = "1.1.6", features = ["serde1"] }
 confique = { version = "0.2.5", default-features = false }
-db-context = { version = "1.0.0", path = "crates/db-context" }
+db-context.path = "crates/db-context"
 derive_more = { version = "1.0.0-beta.6", features = ["from", "deref"] }
-pr-tracker-store = { version = "1.0.0", path = "crates/store" }
+pr-tracker-store.path = "crates/store"
 serde = "1.0.193"
 tempfile = "3.8.1"
 thiserror = "1.0.56"
-util = { version = "1.0.0", path = "crates/util" }
+util.path = "crates/util"
 
 [profile.release]
 debug = true

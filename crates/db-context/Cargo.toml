@@ -14,4 +14,4 @@ camino = "1.1.6"
 futures = "0.3.29"
 sqlx = { version = "0.7.3", features = ["postgres", "runtime-tokio"] }
 tempfile = "3.8.1"
-fragile-child = { version = "1.0.0", path = "../fragile-child" }
+fragile-child.path = "../fragile-child"
