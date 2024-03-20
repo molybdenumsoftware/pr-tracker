@@ -14,4 +14,3 @@ plugins:
       - CHANGELOG.md
       - Cargo.lock
       - Cargo.toml
-dryRun: true
