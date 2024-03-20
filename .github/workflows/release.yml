@@ -20,12 +20,6 @@ jobs:
         with:
           app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.PRIVATE_KEY }}
-      - run: cargo install cargo-edit@^0.12
-      - uses: cycjimmy/semantic-release-action@v4
-        with:
-          extra_plugins: |
-            @semantic-release/changelog@6
-            @semantic-release/exec@6
-            @semantic-release/git@10
+      - run: nix run .#release
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}

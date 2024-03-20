@@ -7,10 +7,10 @@ plugins:
   - "@semantic-release/changelog"
   - "@semantic-release/github"
   - - "@semantic-release/exec"
-    - prepareCmd: cargo set-version ${nextRelease.version}
+    - verifyConditionsCmd: bump-version --dry-run 999.0.0
+      prepareCmd: bump-version ${nextRelease.version}
   - - "@semantic-release/git"
     - assets:
       - CHANGELOG.md
       - Cargo.lock
       - Cargo.toml
-dryRun: true
