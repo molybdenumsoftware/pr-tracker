@@ -80,6 +80,8 @@
     in {
       inherit packages;
 
+      apps = import ./release {inherit pkgs flake-utils;};
+
       devShells.default = mkShell {
         inherit GITHUB_GRAPHQL_SCHEMA;
         inputsFrom = attrValues packages;
