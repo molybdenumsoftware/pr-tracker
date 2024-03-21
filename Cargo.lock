@@ -504,7 +504,7 @@ dependencies = [
 
 [[package]]
 name = "db-context"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "camino",
  "fragile-child",
@@ -769,7 +769,7 @@ dependencies = [
 
 [[package]]
 name = "fragile-child"
-version = "1.0.0"
+version = "1.0.1"
 
 [[package]]
 name = "futures"
@@ -2486,7 +2486,7 @@ checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 
 [[package]]
 name = "pr-tracker-api"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "camino",
  "confique",
@@ -2506,7 +2506,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-api-config"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "camino",
  "confique",
@@ -2515,7 +2515,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-fetcher"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anyhow",
  "camino",
@@ -2544,7 +2544,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-fetcher-config"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "camino",
  "confique",
@@ -2553,7 +2553,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-store"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "derive_more",
  "futures",
@@ -3889,7 +3889,7 @@ checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
 
 [[package]]
 name = "util"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "db-context",
  "futures",
