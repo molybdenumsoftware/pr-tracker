@@ -31,32 +31,32 @@
   attrsToURLParams = import ../attrsToURLParams.nix lib;
   common = import ./common.nix;
 
-  cfg = config.services.pr-tracker-fetcher;
+  cfg = config.services.pr-tracker.fetcher;
 in {
-  options.services.pr-tracker-fetcher.enable = mkEnableOption "pr-tracker-fetcher";
-  options.services.pr-tracker-fetcher.package = mkPackageOption config._pr-tracker-packages "fetcher" {
+  options.services.pr-tracker.fetcher.enable = mkEnableOption "pr-tracker-fetcher";
+  options.services.pr-tracker.fetcher.package = mkPackageOption config._pr-tracker-packages "fetcher" {
     inherit (common) pkgsText;
   };
 
-  options.services.pr-tracker-fetcher.user = mkOption {
+  options.services.pr-tracker.fetcher.user = mkOption {
     type = types.str;
     description = common.user;
     default = "pr-tracker-fetcher";
   };
 
-  options.services.pr-tracker-fetcher.group = mkOption {
+  options.services.pr-tracker.fetcher.group = mkOption {
     type = types.str;
     description = common.group;
     default = "pr-tracker-fetcher";
   };
 
-  options.services.pr-tracker-fetcher.branchPatterns = mkOption {
+  options.services.pr-tracker.fetcher.branchPatterns = mkOption {
     type = types.listOf types.str;
     description = readFile ../crates/fetcher-config/BRANCH_PATTERNS.md;
     example = ["release-*"];
   };
 
-  options.services.pr-tracker-fetcher.dbUrlParams = mkOption {
+  options.services.pr-tracker.fetcher.dbUrlParams = mkOption {
     type = types.attrsOf types.str;
     description = common.dbUrlParams;
     example = {
@@ -67,38 +67,38 @@ in {
     };
   };
 
-  options.services.pr-tracker-fetcher.dbPasswordFile = mkOption {
+  options.services.pr-tracker.fetcher.dbPasswordFile = mkOption {
     type = types.nullOr types.path;
     description = common.dbPasswordFile;
     example = "/run/secrets/db-password";
     default = null;
   };
 
-  options.services.pr-tracker-fetcher.localDb = mkOption {
+  options.services.pr-tracker.fetcher.localDb = mkOption {
     type = types.bool;
     description = common.localDb;
     default = false;
   };
 
-  options.services.pr-tracker-fetcher.githubApiTokenFile = mkOption {
+  options.services.pr-tracker.fetcher.githubApiTokenFile = mkOption {
     type = types.path;
     description = "Path to a file containing a " + readFile ../crates/fetcher-config/GITHUB_TOKEN.md;
     example = "/run/secrets/github-api.token";
   };
 
-  options.services.pr-tracker-fetcher.repo.owner = mkOption {
+  options.services.pr-tracker.fetcher.repo.owner = mkOption {
     type = types.str;
     description = readFile ../crates/fetcher-config/GITHUB_REPO_OWNER.md;
     example = "NixOS";
   };
 
-  options.services.pr-tracker-fetcher.repo.name = mkOption {
+  options.services.pr-tracker.fetcher.repo.name = mkOption {
     type = types.str;
     description = readFile ../crates/fetcher-config/GITHUB_REPO_NAME.md;
     example = "nixpkgs";
   };
 
-  options.services.pr-tracker-fetcher.onCalendar = mkOption {
+  options.services.pr-tracker.fetcher.onCalendar = mkOption {
     type = types.str;
     description = ''
       When to run the fetcher. This is a systemd timer `OnCalendar` string, see
