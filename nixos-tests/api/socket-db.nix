@@ -26,13 +26,13 @@ in {
     }
   ];
 
-  services.pr-tracker-api.enable = true;
-  services.pr-tracker-api.package = pr-tracker.packages.${system}.api.overrideAttrs {dontStrip = true;};
+  services.pr-tracker.api.enable = true;
+  services.pr-tracker.api.package = pr-tracker.packages.${system}.api.overrideAttrs {dontStrip = true;};
   systemd.services.pr-tracker-api.environment.RUST_BACKTRACE = "1";
-  services.pr-tracker-api.port = port;
-  services.pr-tracker-api.user = user;
-  services.pr-tracker-api.dbUrlParams.host = "/run/postgresql";
-  services.pr-tracker-api.dbUrlParams.port = toString pgPort;
-  services.pr-tracker-api.dbUrlParams.dbname = user;
-  services.pr-tracker-api.localDb = true;
+  services.pr-tracker.api.port = port;
+  services.pr-tracker.api.user = user;
+  services.pr-tracker.api.dbUrlParams.host = "/run/postgresql";
+  services.pr-tracker.api.dbUrlParams.port = toString pgPort;
+  services.pr-tracker.api.dbUrlParams.dbname = user;
+  services.pr-tracker.api.localDb = true;
 }

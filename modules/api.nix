@@ -31,31 +31,31 @@
   attrsToURLParams = import ../attrsToURLParams.nix lib;
   common = import ./common.nix;
 
-  cfg = config.services.pr-tracker-api;
+  cfg = config.services.pr-tracker.api;
 in {
-  options.services.pr-tracker-api.enable = mkEnableOption "pr-tracker-api";
-  options.services.pr-tracker-api.package = mkPackageOption config._pr-tracker-packages "api" {
+  options.services.pr-tracker.api.enable = mkEnableOption "pr-tracker-api";
+  options.services.pr-tracker.api.package = mkPackageOption config._pr-tracker-packages "api" {
     inherit (common) pkgsText;
   };
 
-  options.services.pr-tracker-api.user = mkOption {
+  options.services.pr-tracker.api.user = mkOption {
     type = types.str;
     description = common.user;
     default = "pr-tracker-api";
   };
 
-  options.services.pr-tracker-api.group = mkOption {
+  options.services.pr-tracker.api.group = mkOption {
     type = types.str;
     description = common.group;
     default = "pr-tracker-api";
   };
 
-  options.services.pr-tracker-api.port = mkOption {
+  options.services.pr-tracker.api.port = mkOption {
     type = types.port;
     description = readFile ../crates/api-config/PORT.md;
   };
 
-  options.services.pr-tracker-api.dbUrlParams = mkOption {
+  options.services.pr-tracker.api.dbUrlParams = mkOption {
     type = types.attrsOf types.str;
     description = common.dbUrlParams;
     example = {
@@ -66,14 +66,14 @@ in {
     };
   };
 
-  options.services.pr-tracker-api.dbPasswordFile = mkOption {
+  options.services.pr-tracker.api.dbPasswordFile = mkOption {
     type = types.nullOr types.path;
     description = common.dbPasswordFile;
     example = "/run/secrets/db-password";
     default = null;
   };
 
-  options.services.pr-tracker-api.localDb = mkOption {
+  options.services.pr-tracker.api.localDb = mkOption {
     type = types.bool;
     description = common.localDb;
     default = false;
