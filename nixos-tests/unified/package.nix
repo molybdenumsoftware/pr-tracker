@@ -18,6 +18,5 @@
     };
 in {
   create-db-locally = nodeToTest "unified with auto created db" (import ./create-db-locally.nix pr-tracker);
-  socket-db = nodeToTest "fetcher with socket db" (import ./socket-db.nix pr-tracker);
-  default-package = nodeToTest "fetcher with default package" (import ./default-package.nix pr-tracker);
+  with-manual-db = nodeToTest "unified with manually created db" (import ./with-manual-db.nix pr-tracker);
 }
