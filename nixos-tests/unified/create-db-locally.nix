@@ -22,11 +22,7 @@ in {
   systemd.services.pr-tracker-fetcher.environment.RUST_BACKTRACE = "1";
   services.pr-tracker-unified.port = port;
   services.pr-tracker-unified.user = user;
-  services.pr-tracker-unified.dbUrlParams.user = user;
-  services.pr-tracker-unified.dbUrlParams.host = "localhost";
-  services.pr-tracker-unified.dbUrlParams.port = toString pgPort;
-  services.pr-tracker-unified.dbUrlParams.dbname = user;
-  services.pr-tracker-unified.dbPasswordFile = writeText "password-file" dbPass;
-  services.pr-tracker-unified.localDb = true;
+  services.pr-tracker-unified.createDatabaseLocally = true;
+  services.pr-tracker-unified.branchPatterns = ["*"];
 }
 
