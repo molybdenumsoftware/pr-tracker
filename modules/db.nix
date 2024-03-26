@@ -4,6 +4,7 @@
     mkOption
     types
     ;
+
   manual = types.submodule {
     urlParams = mkOption {
       type = types.attrsOf types.str;
@@ -35,5 +36,5 @@
 in {
   options.services.pr-tracker.db = mkOption {
     type = types.either manual (types.enum ["createLocally"]);
-  } ;
+  };
 }

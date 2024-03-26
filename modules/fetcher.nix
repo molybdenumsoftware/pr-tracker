@@ -33,6 +33,7 @@
 
   cfg = config.services.pr-tracker.fetcher;
   dbCfg = config.services.pr-tracker.db;
+  isLocal = dbCfg == "createLocally" || dbCfg.isLocal;
 in {
   imports = [./db.nix];
 
@@ -97,8 +98,8 @@ in {
     systemd.timers.pr-tracker-fetcher.wantedBy = ["timers.target"];
 
     systemd.services.pr-tracker-fetcher.description = "pr-tracker-fetcher";
-    systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional dbCfg.isLocal "postgresql.service";
-    systemd.services.pr-tracker-fetcher.requires = optional dbCfg.isLocal "postgresql.service";
+    systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional isLocal "postgresql.service";
+    systemd.services.pr-tracker-fetcher.requires = optional isLocal "postgresql.service";
     systemd.services.pr-tracker-fetcher.script = let
       databaseUrl = "postgresql://?${attrsToURLParams dbCfg.urlParams}";
 
