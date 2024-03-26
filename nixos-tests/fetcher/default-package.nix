@@ -9,7 +9,6 @@ pr-tracker: {
     writeText
     ;
   pgPort = 5432;
-  user = "pr-tracker";
 in {
   imports = [pr-tracker.nixosModules.fetcher];
 
@@ -17,7 +16,6 @@ in {
 
   services.pr-tracker.fetcher.enable = true;
   systemd.services.pr-tracker-fetcher.environment.RUST_BACKTRACE = "1";
-  services.pr-tracker.fetcher.user = user;
   services.pr-tracker.db = "createLocally";
   services.pr-tracker.fetcher.onCalendar = "*:*:*"; # every single second
   services.pr-tracker.fetcher.githubApiTokenFile = writeText "gh-auth-token" "hunter2";

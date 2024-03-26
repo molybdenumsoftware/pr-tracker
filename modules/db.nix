@@ -4,8 +4,7 @@
     mkOption
     types
     ;
-in {
-  options.services.pr-tracker.db = {
+    manual = {
     urlParams = mkOption {
       type = types.attrsOf types.str;
       description = "URL parameters from which to compose the ${builtins.readFile ../crates/DATABASE_URL.md}";
@@ -33,4 +32,6 @@ in {
       default = false;
     };
   };
+in {
+  options.services.pr-tracker.db = types.either manual (types.enum ["createLocally"]);
 }
