@@ -13,40 +13,44 @@
   cfg = config.services.pr-tracker;
 
   dbCfgType = types.submodule {
-    urlParams = mkOption {
-      type = types.attrsOf types.str;
-      description = "URL parameters from which to compose the ${builtins.readFile ../crates/DATABASE_URL.md}";
-      example = {
-        user = "pr-tracker";
-        host = "localhost";
-        port = "5432";
-        dbname = "pr-tracker";
+    options = {
+      urlParams = mkOption {
+        type = types.attrsOf types.str;
+        description = "URL parameters from which to compose the ${builtins.readFile ../crates/DATABASE_URL.md}";
+        example = {
+          user = "pr-tracker";
+          host = "localhost";
+          port = "5432";
+          dbname = "pr-tracker";
+        };
       };
-    };
 
-    passwordFile = mkOption {
-      type = types.nullOr types.path;
-      description = ''
-        Path to a file containing the database password.
-        Contents will be appended to the database URL as a parameter.
-      '';
-      example = "/run/secrets/db-password";
-      default = null;
-    };
+      passwordFile = mkOption {
+        type = types.nullOr types.path;
+        description = ''
+          Path to a file containing the database password.
+          Contents will be appended to the database URL as a parameter.
+        '';
+        example = "/run/secrets/db-password";
+        default = null;
+      };
 
-    isLocal = mkOption {
-      type = types.bool;
-      description = "Whether database is local.";
-      default = false;
+      isLocal = mkOption {
+        type = types.bool;
+        description = "Whether database is local.";
+        default = false;
+      };
     };
   };
 in {
   options.services.pr-tracker.db = mkOption {
     type = types.either dbCfgType (types.enum ["createLocally"]);
+    description = "";
   };
 
   options.services.pr-tracker.dbCfg = mkOption {
-    internal = true;
+    #internal = true;
+    description = "";
     type = dbCfgType;
   };
 

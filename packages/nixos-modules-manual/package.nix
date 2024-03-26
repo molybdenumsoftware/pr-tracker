@@ -38,7 +38,7 @@
 
   options =
     filterOptions
-    (path: option: any (hasPrefix "${pr-tracker}/") option.declarations)
+    (path: option: (any (hasPrefix "${pr-tracker}/") option.declarations) && !(option.internal or false))
     configuration.options;
 
   optionsDocs = buildPackages.nixosOptionsDoc {

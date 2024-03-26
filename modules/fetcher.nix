@@ -32,7 +32,7 @@
   common = import ./common.nix;
 
   cfg = config.services.pr-tracker.fetcher;
-  dbCfg = config.services.pr-tracker.dbCfg;
+  inherit (config.services.pr-tracker) dbCfg;
 in {
   imports = [./db.nix];
 
