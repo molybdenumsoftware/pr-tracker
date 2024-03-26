@@ -32,8 +32,7 @@
   common = import ./common.nix;
 
   cfg = config.services.pr-tracker.api;
-  dbCfg = config.services.pr-tracker.db;
-  isLocal = dbCfg == "createLocally" || dbCfg.isLocal;
+  dbCfg = config.services.pr-tracker.dbCfg;
 in {
   imports = [./db.nix];
 
@@ -69,8 +68,8 @@ in {
     systemd.services.pr-tracker-api.description = "pr-tracker-api";
 
     systemd.services.pr-tracker-api.wantedBy = ["multi-user.target"];
-    systemd.services.pr-tracker-api.after = ["network.target"] ++ optional isLocal "postgresql.service";
-    systemd.services.pr-tracker-api.bindsTo = optional isLocal "postgresql.service";
+    systemd.services.pr-tracker-api.after = ["network.target"] ++ optional dbConfig.isLocal "postgresql.service";
+    systemd.services.pr-tracker-api.bindsTo = optional dbConfig.isLocal "postgresql.service";
 
     systemd.services.pr-tracker-api.script = let
       databaseUrl = "postgresql://?${attrsToURLParams dbCfg.urlParams}";

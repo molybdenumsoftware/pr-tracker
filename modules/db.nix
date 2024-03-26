@@ -1,11 +1,17 @@
-{lib, ...}: let
+{
+  lib,
+  config,
+  ...
+}: let
   inherit
     (lib)
     mkOption
     types
     ;
 
-  manual = types.submodule {
+  cfg = config.services.pr-tracker;
+
+  dbCfg = types.submodule {
     urlParams = mkOption {
       type = types.attrsOf types.str;
       description = "URL parameters from which to compose the ${builtins.readFile ../crates/DATABASE_URL.md}";
@@ -35,6 +41,17 @@
   };
 in {
   options.services.pr-tracker.db = mkOption {
-    type = types.either manual (types.enum ["createLocally"]);
+    type = types.either dbCfg (types.enum ["createLocally"]);
   };
+  options.services.pr-tracker.dbCfg = mkOption {
+    private = true;
+    type = dbCfg;
+  };
+
+  config.services.pr-tracker.dbCfg = mkIf (cfg.api.enable || cfg.fetcher.enable) (
+    if (cfg.db == "createLocally")
+    then {
+    }
+    else cfg.db
+  );
 }
