@@ -4,7 +4,7 @@
     mkOption
     types
     ;
-    manual = {
+  manual = types.submodule {
     urlParams = mkOption {
       type = types.attrsOf types.str;
       description = "URL parameters from which to compose the ${builtins.readFile ../crates/DATABASE_URL.md}";
