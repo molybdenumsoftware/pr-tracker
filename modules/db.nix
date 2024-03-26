@@ -7,6 +7,7 @@
     (lib)
     mkIf
     mkOption
+    optional
     types
     ;
 
@@ -58,15 +59,16 @@ in {
   config.services.postgresql = mkIf (programsEnabled && cfg.db.createLocally) {
     enable = true;
     ensureDatabases = [dbname];
-    ensureUsers = [
-      {
-        name = cfg.api.user;
-        ensureDBOwnership = true;
-      }
-      {
-        name = cfg.fetcher.user;
-        ensureDBOwnership = true;
-      }
-    ];
+    ensureUsers =
+      (optional (cfg ? api)
+        {
+          name = cfg.api.user;
+          ensureDBOwnership = true;
+        })
+      ++ (optional (cfg ? fetcher)
+        {
+          name = cfg.fetcher.user;
+          ensureDBOwnership = true;
+        });
   };
 }
