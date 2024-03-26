@@ -60,15 +60,19 @@ in {
     enable = true;
     ensureDatabases = [dbname];
     ensureUsers =
-      (optional (cfg ? api)
+      (
+        optional (cfg ? api)
         {
           name = cfg.api.user;
           ensureDBOwnership = true;
-        })
-      ++ (optional (cfg ? fetcher)
+        }
+      )
+      ++ (
+        optional (cfg ? fetcher)
         {
           name = cfg.fetcher.user;
           ensureDBOwnership = true;
-        });
+        }
+      );
   };
 }
