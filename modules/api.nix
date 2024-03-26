@@ -32,7 +32,10 @@
   common = import ./common.nix;
 
   cfg = config.services.pr-tracker.api;
+  dbCfg = config.services.pr-tracker.db;
 in {
+  imports = [./db.nix];
+
   options.services.pr-tracker.api.enable = mkEnableOption "pr-tracker-api";
   options.services.pr-tracker.api.package = mkPackageOption config._pr-tracker-packages "api" {
     inherit (common) pkgsText;
@@ -55,30 +58,6 @@ in {
     description = readFile ../crates/api-config/PORT.md;
   };
 
-  options.services.pr-tracker.api.dbUrlParams = mkOption {
-    type = types.attrsOf types.str;
-    description = common.dbUrlParams;
-    example = {
-      user = "pr-tracker";
-      host = "localhost";
-      port = "5432";
-      dbname = "pr-tracker";
-    };
-  };
-
-  options.services.pr-tracker.api.dbPasswordFile = mkOption {
-    type = types.nullOr types.path;
-    description = common.dbPasswordFile;
-    example = "/run/secrets/db-password";
-    default = null;
-  };
-
-  options.services.pr-tracker.api.localDb = mkOption {
-    type = types.bool;
-    description = common.localDb;
-    default = false;
-  };
-
   config = mkIf cfg.enable {
     users.groups.${cfg.group} = {};
     users.users.${cfg.user} = {
@@ -89,14 +68,14 @@ in {
     systemd.services.pr-tracker-api.description = "pr-tracker-api";
 
     systemd.services.pr-tracker-api.wantedBy = ["multi-user.target"];
-    systemd.services.pr-tracker-api.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
-    systemd.services.pr-tracker-api.bindsTo = optional cfg.localDb "postgresql.service";
+    systemd.services.pr-tracker-api.after = ["network.target"] ++ optional dbCfg.isLocal "postgresql.service";
+    systemd.services.pr-tracker-api.bindsTo = optional dbCfg.isLocal "postgresql.service";
 
     systemd.services.pr-tracker-api.script = let
-      databaseUrl = "postgresql://?${attrsToURLParams cfg.dbUrlParams}";
+      databaseUrl = "postgresql://?${attrsToURLParams dbCfg.urlParams}";
 
-      passwordFile = optional (cfg.dbPasswordFile != null) ''
-        PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.dbPasswordFile})
+      passwordFile = optional (dbCfg.passwordFile != null) ''
+        PASSWORD=$(${getExe urlencode} --encode-set component < ${dbCfg.passwordFile})
         PR_TRACKER_API_DATABASE_URL="$PR_TRACKER_API_DATABASE_URL&password=$PASSWORD"
       '';
     in

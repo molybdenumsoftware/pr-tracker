@@ -32,7 +32,10 @@
   common = import ./common.nix;
 
   cfg = config.services.pr-tracker.fetcher;
+  dbCfg = config.services.pr-tracker.db;
 in {
+  imports = [./db.nix];
+
   options.services.pr-tracker.fetcher.enable = mkEnableOption "pr-tracker-fetcher";
   options.services.pr-tracker.fetcher.package = mkPackageOption config._pr-tracker-packages "fetcher" {
     inherit (common) pkgsText;
@@ -54,30 +57,6 @@ in {
     type = types.listOf types.str;
     description = readFile ../crates/fetcher-config/BRANCH_PATTERNS.md;
     example = ["release-*"];
-  };
-
-  options.services.pr-tracker.fetcher.dbUrlParams = mkOption {
-    type = types.attrsOf types.str;
-    description = common.dbUrlParams;
-    example = {
-      user = "pr-tracker";
-      host = "localhost";
-      port = "5432";
-      dbname = "pr-tracker";
-    };
-  };
-
-  options.services.pr-tracker.fetcher.dbPasswordFile = mkOption {
-    type = types.nullOr types.path;
-    description = common.dbPasswordFile;
-    example = "/run/secrets/db-password";
-    default = null;
-  };
-
-  options.services.pr-tracker.fetcher.localDb = mkOption {
-    type = types.bool;
-    description = common.localDb;
-    default = false;
   };
 
   options.services.pr-tracker.fetcher.githubApiTokenFile = mkOption {
@@ -118,13 +97,13 @@ in {
     systemd.timers.pr-tracker-fetcher.wantedBy = ["timers.target"];
 
     systemd.services.pr-tracker-fetcher.description = "pr-tracker-fetcher";
-    systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
-    systemd.services.pr-tracker-fetcher.requires = optional cfg.localDb "postgresql.service";
+    systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional dbCfg.isLocal "postgresql.service";
+    systemd.services.pr-tracker-fetcher.requires = optional dbCfg.isLocal "postgresql.service";
     systemd.services.pr-tracker-fetcher.script = let
-      databaseUrl = "postgresql://?${attrsToURLParams cfg.dbUrlParams}";
+      databaseUrl = "postgresql://?${attrsToURLParams dbCfg.urlParams}";
 
-      passwordFile = optional (cfg.dbPasswordFile != null) ''
-        PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.dbPasswordFile})
+      passwordFile = optional (dbCfg.passwordFile != null) ''
+        PASSWORD=$(${getExe urlencode} --encode-set component < ${dbCfg.passwordFile})
         PR_TRACKER_FETCHER_DATABASE_URL="$PR_TRACKER_FETCHER_DATABASE_URL&password=$PASSWORD"
       '';
     in
