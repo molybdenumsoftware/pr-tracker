@@ -46,15 +46,11 @@ in {
     default = false;
   };
 
-  config.services.pr-tracker.db.urlParams = mkIf programsEnabled (
-    if cfg.db.createLocally
-    then {
-      urlParams.host = "/run/postgresql";
-      urlParams.port = toString config.services.postgresql.port;
-      urlParams.dbname = "pr-tracker";
-      isLocal = true;
-      createLocally = true;
-    }
-    else cfg.db
-  );
+  config.services.pr-tracker.db.urlParams = mkIf (programsEnabled && cfg.db.createLocally) {
+    host = "/run/postgresql";
+    port = toString config.services.postgresql.port;
+    dbname = "pr-tracker";
+  };
+
+  config.services.pr-tracker.db.isLocal = mkIf (programsEnabled && cfg.db.createLocally) true;
 }
