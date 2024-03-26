@@ -16,7 +16,7 @@ in {
 
   services.pr-tracker.fetcher.enable = true;
   systemd.services.pr-tracker-fetcher.environment.RUST_BACKTRACE = "1";
-  services.pr-tracker.db = "createLocally";
+  services.pr-tracker.db.createLocally = true;
   services.pr-tracker.fetcher.onCalendar = "*:*:*"; # every single second
   services.pr-tracker.fetcher.githubApiTokenFile = writeText "gh-auth-token" "hunter2";
   services.pr-tracker.fetcher.branchPatterns = ["*"];

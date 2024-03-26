@@ -25,7 +25,7 @@ nixosTest {
 
     nixpkgs.hostPlatform = system;
 
-    services.pr-tracker.db = "createLocally";
+    services.pr-tracker.db.createLocally = true;
 
     services.pr-tracker.api.enable = true;
     services.pr-tracker.api.port = port;
