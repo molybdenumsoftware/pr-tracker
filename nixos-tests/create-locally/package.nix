@@ -3,11 +3,14 @@
   lib,
   nixosTest,
 }: let
-  inherit (builtins) tryEval;
+  inherit
+    (builtins)
+    tryEval
+    ;
 
   port = 7000;
 in
-  assert tryEval;
+  assert (tryEval true).success == false;
     nixosTest {
       name = "create-locally";
 
@@ -52,4 +55,3 @@ in
         pr_tracker.wait_until_succeeds("journalctl -u pr-tracker-fetcher.service --grep 'error sending request for url'", timeout=60)
       '';
     }
-
