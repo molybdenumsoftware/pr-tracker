@@ -33,5 +33,7 @@
     };
   };
 in {
-  options.services.pr-tracker.db = types.either manual (types.enum ["createLocally"]);
+  options.services.pr-tracker.db = mkOption {
+    type = types.either manual (types.enum ["createLocally"]);
+  } ;
 }
