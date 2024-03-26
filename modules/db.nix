@@ -12,6 +12,7 @@
 
   cfg = config.services.pr-tracker;
   programsEnabled = (cfg.api or {}).enable or false || (cfg.fetcher or {}).enable or false;
+  dbname = "pr-tracker";
 in {
   options.services.pr-tracker.db.urlParams = mkOption {
     type = types.attrsOf types.str;
@@ -49,8 +50,23 @@ in {
   config.services.pr-tracker.db.urlParams = mkIf (programsEnabled && cfg.db.createLocally) {
     host = "/run/postgresql";
     port = toString config.services.postgresql.port;
-    dbname = "pr-tracker";
+    inherit dbname;
   };
 
   config.services.pr-tracker.db.isLocal = mkIf (programsEnabled && cfg.db.createLocally) true;
+
+  config.services.postgresql = mkIf (programsEnabled && cfg.db.createLocally) {
+    enable = true;
+    ensureDatabases = [dbname];
+    ensureUsers = [
+      {
+        name = cfg.api.user;
+        ensureDBOwnership = true;
+      }
+      {
+        name = cfg.fetcher.user;
+        ensureDBOwnership = true;
+      }
+    ];
+  };
 }
