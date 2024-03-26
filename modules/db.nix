@@ -5,13 +5,14 @@
 }: let
   inherit
     (lib)
+    mkIf
     mkOption
     types
     ;
 
   cfg = config.services.pr-tracker;
 
-  dbCfg = types.submodule {
+  dbCfgType = types.submodule {
     urlParams = mkOption {
       type = types.attrsOf types.str;
       description = "URL parameters from which to compose the ${builtins.readFile ../crates/DATABASE_URL.md}";
@@ -41,16 +42,23 @@
   };
 in {
   options.services.pr-tracker.db = mkOption {
-    type = types.either dbCfg (types.enum ["createLocally"]);
-  };
-  options.services.pr-tracker.dbCfg = mkOption {
-    private = true;
-    type = dbCfg;
+    type = types.either dbCfgType (types.enum ["createLocally"]);
   };
 
-  config.services.pr-tracker.dbCfg = mkIf (cfg.api.enable || cfg.fetcher.enable) (
+  options.services.pr-tracker.dbCfg = mkOption {
+    internal = true;
+    type = dbCfgType;
+  };
+
+  config.services.pr-tracker.dbCfg = mkIf ((cfg.api or {}).enable or false || (cfg.fetcher or {}).enable or false) (
     if (cfg.db == "createLocally")
     then {
+      urlParams = {
+        host = "/run/postgresql";
+        port = toString config.services.postgresql.port;
+        dbname = "pr-tracker";
+      };
+      isLocal = true;
     }
     else cfg.db
   );
