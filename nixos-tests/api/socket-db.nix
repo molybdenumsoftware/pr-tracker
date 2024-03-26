@@ -16,23 +16,10 @@ in {
 
   nixpkgs.hostPlatform = system;
 
-  services.postgresql.enable = true;
-  services.postgresql.port = pgPort;
-  services.postgresql.ensureDatabases = [user];
-  services.postgresql.ensureUsers = [
-    {
-      name = user;
-      ensureDBOwnership = true;
-    }
-  ];
-
   services.pr-tracker.api.enable = true;
   services.pr-tracker.api.package = pr-tracker.packages.${system}.api.overrideAttrs {dontStrip = true;};
   systemd.services.pr-tracker-api.environment.RUST_BACKTRACE = "1";
   services.pr-tracker.api.port = port;
   services.pr-tracker.api.user = user;
-  services.pr-tracker.db.urlParams.host = "/run/postgresql";
-  services.pr-tracker.db.urlParams.port = toString pgPort;
-  services.pr-tracker.db.urlParams.dbname = user;
-  services.pr-tracker.db.isLocal = true;
+  services.pr-tracker.db.createLocally = true;
 }
