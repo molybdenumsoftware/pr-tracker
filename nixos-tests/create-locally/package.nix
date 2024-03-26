@@ -10,7 +10,7 @@
 
   port = 7000;
 in
-  assert (tryEval true).success == false;
+  assert (tryEval (throw "")).success == false;
     nixosTest {
       name = "create-locally";
 

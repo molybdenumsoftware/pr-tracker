@@ -40,6 +40,12 @@
         description = "Whether database is local.";
         default = false;
       };
+
+      createLocally = mkOption {
+        type = types.nullOr types.bool;
+        description = "Whether to create a local database automatically.";
+        default = false;
+      };
     };
   };
 in {
