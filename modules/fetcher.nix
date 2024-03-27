@@ -14,6 +14,7 @@
   inherit
     (lib)
     escapeShellArg
+    filterAttrs
     getExe
     mkEnableOption
     mkPackageOption
@@ -56,27 +57,33 @@ in {
     example = ["release-*"];
   };
 
-  options.services.pr-tracker.fetcher.dbUrlParams = mkOption {
+  options.services.pr-tracker.fetcher.db.user = mkOption {
+    type = types.nullOr types.str;
+    description = common.db.user;
+    example = "pr-tracker-fetcher";
+    default = null;
+  };
+
+  options.services.pr-tracker.fetcher.db.urlParams = mkOption {
     type = types.attrsOf types.str;
-    description = common.dbUrlParams;
+    description = common.db.urlParams;
     example = {
-      user = "pr-tracker";
       host = "localhost";
       port = "5432";
       dbname = "pr-tracker";
     };
   };
 
-  options.services.pr-tracker.fetcher.dbPasswordFile = mkOption {
+  options.services.pr-tracker.fetcher.db.passwordFile = mkOption {
     type = types.nullOr types.path;
-    description = common.dbPasswordFile;
+    description = common.db.passwordFile;
     example = "/run/secrets/db-password";
     default = null;
   };
 
-  options.services.pr-tracker.fetcher.localDb = mkOption {
+  options.services.pr-tracker.fetcher.db.isLocal = mkOption {
     type = types.bool;
-    description = common.localDb;
+    description = common.db.isLocal;
     default = false;
   };
 
@@ -118,13 +125,15 @@ in {
     systemd.timers.pr-tracker-fetcher.wantedBy = ["timers.target"];
 
     systemd.services.pr-tracker-fetcher.description = "pr-tracker-fetcher";
-    systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
-    systemd.services.pr-tracker-fetcher.requires = optional cfg.localDb "postgresql.service";
+    systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional cfg.db.isLocal "postgresql.service";
+    systemd.services.pr-tracker-fetcher.requires = optional cfg.db.isLocal "postgresql.service";
     systemd.services.pr-tracker-fetcher.script = let
-      databaseUrl = "postgresql://?${attrsToURLParams cfg.dbUrlParams}";
+      userParam = filterAttrs (_: v: v != null) {inherit (cfg.db) user;};
+      urlParams = userParam // cfg.db.urlParams;
+      databaseUrl = "postgresql://?${attrsToURLParams urlParams}";
 
-      passwordFile = optional (cfg.dbPasswordFile != null) ''
-        PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.dbPasswordFile})
+      passwordFile = optional (cfg.db.passwordFile != null) ''
+        PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.db.passwordFile})
         PR_TRACKER_FETCHER_DATABASE_URL="$PR_TRACKER_FETCHER_DATABASE_URL&password=$PASSWORD"
       '';
     in
