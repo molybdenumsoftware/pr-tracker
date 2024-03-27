@@ -74,5 +74,10 @@ in {
           ensureDBOwnership = true;
         }
       );
+    postStart = lib.mkAfter ''
+      $PSQL ${dbname} -c 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO "extraUser1"'
+      $PSQL ${dbname} -c 'GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO "extraUser1"'
+      # ....
+    '';
   };
 }
