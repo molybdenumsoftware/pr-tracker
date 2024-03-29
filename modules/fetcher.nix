@@ -29,7 +29,7 @@
     ;
 
   attrsToURLParams = import ../attrsToURLParams.nix lib;
-  common = import ./common.nix;
+  common = import ./common.nix lib;
 
   cfg = config.services.pr-tracker.fetcher;
 in {
@@ -40,13 +40,13 @@ in {
 
   options.services.pr-tracker.fetcher.user = mkOption {
     type = types.str;
-    description = common.user;
+    description = common.userDescription;
     default = "pr-tracker-fetcher";
   };
 
   options.services.pr-tracker.fetcher.group = mkOption {
     type = types.str;
-    description = common.group;
+    description = common.groupDescription;
     default = "pr-tracker-fetcher";
   };
 
@@ -56,29 +56,9 @@ in {
     example = ["release-*"];
   };
 
-  options.services.pr-tracker.fetcher.dbUrlParams = mkOption {
-    type = types.attrsOf types.str;
-    description = common.dbUrlParams;
-    example = {
-      user = "pr-tracker";
-      host = "localhost";
-      port = "5432";
-      dbname = "pr-tracker";
-    };
-  };
-
-  options.services.pr-tracker.fetcher.dbPasswordFile = mkOption {
-    type = types.nullOr types.path;
-    description = common.dbPasswordFile;
-    example = "/run/secrets/db-password";
-    default = null;
-  };
-
-  options.services.pr-tracker.fetcher.localDb = mkOption {
-    type = types.bool;
-    description = common.localDb;
-    default = false;
-  };
+  options.services.pr-tracker.fetcher.dbUrlParams = common.dbUrlParams;
+  options.services.pr-tracker.fetcher.dbPasswordFile = common.dbPasswordFile;
+  options.services.pr-tracker.fetcher.localDb = common.localDb;
 
   options.services.pr-tracker.fetcher.githubApiTokenFile = mkOption {
     type = types.path;

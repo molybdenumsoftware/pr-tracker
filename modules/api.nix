@@ -29,7 +29,7 @@
     ;
 
   attrsToURLParams = import ../attrsToURLParams.nix lib;
-  common = import ./common.nix;
+  common = import ./common.nix lib;
 
   cfg = config.services.pr-tracker.api;
 in {
@@ -40,13 +40,13 @@ in {
 
   options.services.pr-tracker.api.user = mkOption {
     type = types.str;
-    description = common.user;
+    description = common.userDescription;
     default = "pr-tracker-api";
   };
 
   options.services.pr-tracker.api.group = mkOption {
     type = types.str;
-    description = common.group;
+    description = common.groupDescription;
     default = "pr-tracker-api";
   };
 
@@ -55,29 +55,9 @@ in {
     description = readFile ../crates/api-config/PORT.md;
   };
 
-  options.services.pr-tracker.api.dbUrlParams = mkOption {
-    type = types.attrsOf types.str;
-    description = common.dbUrlParams;
-    example = {
-      user = "pr-tracker";
-      host = "localhost";
-      port = "5432";
-      dbname = "pr-tracker";
-    };
-  };
-
-  options.services.pr-tracker.api.dbPasswordFile = mkOption {
-    type = types.nullOr types.path;
-    description = common.dbPasswordFile;
-    example = "/run/secrets/db-password";
-    default = null;
-  };
-
-  options.services.pr-tracker.api.localDb = mkOption {
-    type = types.bool;
-    description = common.localDb;
-    default = false;
-  };
+  options.services.pr-tracker.api.dbUrlParams = common.dbUrlParams;
+  options.services.pr-tracker.api.dbPasswordFile = common.dbPasswordFile;
+  options.services.pr-tracker.api.localDb = common.localDb;
 
   config = mkIf cfg.enable {
     users.groups.${cfg.group} = {};
