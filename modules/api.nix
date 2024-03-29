@@ -55,9 +55,7 @@ in {
     description = readFile ../crates/api-config/PORT.md;
   };
 
-  options.services.pr-tracker.api.dbUrlParams = common.dbUrlParams;
-  options.services.pr-tracker.api.dbPasswordFile = common.dbPasswordFile;
-  options.services.pr-tracker.api.localDb = common.localDb;
+  options.services.pr-tracker.api.db = common.db;
 
   config = mkIf cfg.enable {
     users.groups.${cfg.group} = {};
@@ -69,14 +67,14 @@ in {
     systemd.services.pr-tracker-api.description = "pr-tracker-api";
 
     systemd.services.pr-tracker-api.wantedBy = ["multi-user.target"];
-    systemd.services.pr-tracker-api.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
-    systemd.services.pr-tracker-api.bindsTo = optional cfg.localDb "postgresql.service";
+    systemd.services.pr-tracker-api.after = ["network.target"] ++ optional cfg.db.isLocal "postgresql.service";
+    systemd.services.pr-tracker-api.bindsTo = optional cfg.db.isLocal "postgresql.service";
 
     systemd.services.pr-tracker-api.script = let
-      databaseUrl = "postgresql://?${attrsToURLParams cfg.dbUrlParams}";
+      databaseUrl = "postgresql://?${attrsToURLParams cfg.db.urlParams}";
 
-      passwordFile = optional (cfg.dbPasswordFile != null) ''
-        PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.dbPasswordFile})
+      passwordFile = optional (cfg.db.passwordFile != null) ''
+        PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.db.passwordFile})
         PR_TRACKER_API_DATABASE_URL="$PR_TRACKER_API_DATABASE_URL&password=$PASSWORD"
       '';
     in

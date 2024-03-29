@@ -6,7 +6,7 @@
   userDescription = "User to run under.";
   groupDescription = "Group to run under.";
 
-  dbUrlParams = mkOption {
+  db.urlParams = mkOption {
     type = types.attrsOf types.str;
     description = "URL parameters from which to compose the ${builtins.readFile ../crates/DATABASE_URL.md}";
     example = {
@@ -17,7 +17,7 @@
     };
   };
 
-  dbPasswordFile = mkOption {
+  db.passwordFile = mkOption {
     type = types.nullOr types.path;
     description = ''
       Path to a file containing the database password.
@@ -27,7 +27,7 @@
     default = null;
   };
 
-  localDb = mkOption {
+  db.isLocal = mkOption {
     type = types.bool;
     description = "Whether database is local.";
     default = false;

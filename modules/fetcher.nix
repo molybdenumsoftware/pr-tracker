@@ -56,9 +56,7 @@ in {
     example = ["release-*"];
   };
 
-  options.services.pr-tracker.fetcher.dbUrlParams = common.dbUrlParams;
-  options.services.pr-tracker.fetcher.dbPasswordFile = common.dbPasswordFile;
-  options.services.pr-tracker.fetcher.localDb = common.localDb;
+  options.services.pr-tracker.fetcher.db = common.db;
 
   options.services.pr-tracker.fetcher.githubApiTokenFile = mkOption {
     type = types.path;
@@ -98,13 +96,13 @@ in {
     systemd.timers.pr-tracker-fetcher.wantedBy = ["timers.target"];
 
     systemd.services.pr-tracker-fetcher.description = "pr-tracker-fetcher";
-    systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional cfg.localDb "postgresql.service";
-    systemd.services.pr-tracker-fetcher.requires = optional cfg.localDb "postgresql.service";
+    systemd.services.pr-tracker-fetcher.after = ["network.target"] ++ optional cfg.db.isLocal "postgresql.service";
+    systemd.services.pr-tracker-fetcher.requires = optional cfg.db.isLocal "postgresql.service";
     systemd.services.pr-tracker-fetcher.script = let
-      databaseUrl = "postgresql://?${attrsToURLParams cfg.dbUrlParams}";
+      databaseUrl = "postgresql://?${attrsToURLParams cfg.db.urlParams}";
 
-      passwordFile = optional (cfg.dbPasswordFile != null) ''
-        PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.dbPasswordFile})
+      passwordFile = optional (cfg.db.passwordFile != null) ''
+        PASSWORD=$(${getExe urlencode} --encode-set component < ${cfg.db.passwordFile})
         PR_TRACKER_FETCHER_DATABASE_URL="$PR_TRACKER_FETCHER_DATABASE_URL&password=$PASSWORD"
       '';
     in

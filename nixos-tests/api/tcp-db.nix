@@ -41,10 +41,10 @@ in {
   systemd.services.pr-tracker-api.environment.RUST_BACKTRACE = "1";
   services.pr-tracker.api.port = port;
   services.pr-tracker.api.user = user;
-  services.pr-tracker.api.dbUrlParams.user = user;
-  services.pr-tracker.api.dbUrlParams.host = "localhost";
-  services.pr-tracker.api.dbUrlParams.port = toString pgPort;
-  services.pr-tracker.api.dbUrlParams.dbname = user;
-  services.pr-tracker.api.dbPasswordFile = writeText "password-file" dbPass;
-  services.pr-tracker.api.localDb = true;
+  services.pr-tracker.api.db.urlParams.user = user;
+  services.pr-tracker.api.db.urlParams.host = "localhost";
+  services.pr-tracker.api.db.urlParams.port = toString pgPort;
+  services.pr-tracker.api.db.urlParams.dbname = user;
+  services.pr-tracker.api.db.passwordFile = writeText "password-file" dbPass;
+  services.pr-tracker.api.db.isLocal = true;
 }
