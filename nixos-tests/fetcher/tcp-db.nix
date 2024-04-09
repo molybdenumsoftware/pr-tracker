@@ -18,7 +18,7 @@ in {
   nixpkgs.hostPlatform = system;
 
   services.postgresql.enable = true;
-  services.postgresql.port = pgPort;
+  services.postgresql.settings.port = pgPort;
   services.postgresql.enableTCPIP = true;
   services.postgresql.initialScript = writeText "postgresql-init-script" ''
     CREATE ROLE "${user}" WITH LOGIN PASSWORD '${dbPass}';

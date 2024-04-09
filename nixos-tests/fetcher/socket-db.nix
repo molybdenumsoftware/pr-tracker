@@ -16,7 +16,7 @@ in {
   nixpkgs.hostPlatform = system;
 
   services.postgresql.enable = true;
-  services.postgresql.port = pgPort;
+  services.postgresql.settings.port = pgPort;
   services.postgresql.ensureDatabases = [user];
   services.postgresql.ensureUsers = [
     {
