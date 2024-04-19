@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  options,
   ...
 }: let
   inherit
@@ -29,10 +30,12 @@
     ;
 
   attrsToURLParams = import ../attrsToURLParams.nix lib;
-  common = import ./common.nix lib;
+  common = import ./common.nix {inherit lib options config;};
 
   cfg = config.services.pr-tracker.api;
 in {
+  imports = [./db.nix];
+
   options.services.pr-tracker.api.enable = mkEnableOption "pr-tracker-api";
   options.services.pr-tracker.api.package = mkPackageOption config._pr-tracker-packages "api" {
     inherit (common) pkgsText;

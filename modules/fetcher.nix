@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  options,
   pkgs,
   ...
 }: let
@@ -29,10 +30,12 @@
     ;
 
   attrsToURLParams = import ../attrsToURLParams.nix lib;
-  common = import ./common.nix lib;
+  common = import ./common.nix {inherit lib options config;};
 
   cfg = config.services.pr-tracker.fetcher;
 in {
+  imports = [./db.nix];
+
   options.services.pr-tracker.fetcher.enable = mkEnableOption "pr-tracker-fetcher";
   options.services.pr-tracker.fetcher.package = mkPackageOption config._pr-tracker-packages "fetcher" {
     inherit (common) pkgsText;
