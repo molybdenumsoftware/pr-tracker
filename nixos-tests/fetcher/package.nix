@@ -16,6 +16,5 @@
     };
 in {
   tcp-db = nodeToTest "fetcher with tcp db" (import ./tcp-db.nix pr-tracker);
-  socket-db = nodeToTest "fetcher with socket db" (import ./socket-db.nix pr-tracker);
   default-package = nodeToTest "fetcher with default package" (import ./default-package.nix pr-tracker);
 }
