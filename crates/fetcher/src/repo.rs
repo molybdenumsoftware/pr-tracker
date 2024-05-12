@@ -47,7 +47,7 @@ pub async fn fetch_or_clone(repo_path: &Utf8Path, remote: &str) -> anyhow::Resul
     } else {
         isolated_git([
             "clone",
-            &remote,
+            remote,
             "--bare",
             "--filter=tree:0",
             repo_path.as_str(),
