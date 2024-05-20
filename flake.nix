@@ -40,7 +40,7 @@
 
     forEachDefaultSystem = system: let
       pkgs = nixpkgs.legacyPackages.${system};
-      craneLib = crane.lib.${system};
+      craneLib = crane.mkLib pkgs;
       fenix = inputs.fenix.packages.${system};
       nmdLib = nmd.lib.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
