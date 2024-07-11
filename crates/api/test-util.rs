@@ -1,7 +1,11 @@
 use rocket::futures::FutureExt;
 
 pub struct TestContext<'a> {
+    // sorry, Rust — definitely in use
+    #[allow(dead_code)]
     pub db: &'a mut db_context::DatabaseContext,
+    // sorry, Rust — definitely in use
+    #[allow(dead_code)]
     pub client: rocket::local::asynchronous::Client,
 }
 
