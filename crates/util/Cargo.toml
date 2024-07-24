@@ -11,6 +11,6 @@ publish = false
 
 [dependencies]
 db-context.workspace = true
-futures = "0.3.29"
-sqlx = { version = "0.7.3", features = ["postgres", "runtime-tokio"] }
-tokio = { version = "1.34.0", features = ["process", "macros", "rt", "rt-multi-thread"] }
+futures = "*"
+sqlx = { version = "*", features = ["postgres", "runtime-tokio"] }
+tokio = { version = "*", features = ["process", "macros", "rt", "rt-multi-thread"] }
