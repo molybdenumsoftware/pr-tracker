@@ -2,7 +2,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-    by-name.url = "github:mightyiam/by-name";
     crane.inputs.nixpkgs.follows = "nixpkgs";
     crane.url = "github:ipetkov/crane";
     fenix.inputs.nixpkgs.follows = "nixpkgs";
@@ -19,7 +18,6 @@
   outputs = {
     self,
     nixpkgs,
-    by-name,
     crane,
     flake-utils,
     github-graphql-schema,
@@ -54,8 +52,8 @@
         ;
 
       inherit
-        (import ./packages {
-          inherit lib pkgs by-name craneLib fenix nixpkgs nmdLib GITHUB_GRAPHQL_SCHEMA;
+        (import ./packages.nix {
+          inherit lib pkgs craneLib fenix nixpkgs nmdLib GITHUB_GRAPHQL_SCHEMA;
           pr-tracker = self;
         })
         packages
@@ -75,8 +73,10 @@
         })
       ];
 
-      nixosTestsByName = by-name.lib.trivial (newScope {pr-tracker = self;});
-      nixosTests = nixosTestsByName ./nixos-tests;
+      nixosTests = lib.packagesFromDirectoryRecursive {
+        callPackage = newScope {pr-tracker = self;};
+        directory = ./nixos-tests;
+      };
     in {
       inherit packages;
 

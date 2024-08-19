@@ -1,7 +1,6 @@
 {
   lib,
   pkgs,
-  by-name,
   craneLib,
   fenix,
   nixpkgs,
@@ -39,8 +38,8 @@
     ;
 
   src = fileset.toSource {
-    root = ../.;
-    fileset = fileset.unions [../crates ../Cargo.toml ../Cargo.lock];
+    root = ./.;
+    fileset = fileset.unions [./crates ./Cargo.toml ./Cargo.lock];
   };
 
   title = "pr-tracker";
@@ -94,6 +93,8 @@
       ;
   };
 
-  byName = by-name.lib.trivial callPackage;
-  packages = byName ./.;
+  packages = lib.filesystem.packagesFromDirectoryRecursive {
+    inherit callPackage;
+    directory = ./packages;
+  };
 in {inherit packages clippyCheck;}
