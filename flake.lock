@@ -1,20 +1,5 @@
 {
   "nodes": {
-    "by-name": {
-      "locked": {
-        "lastModified": 1707052225,
-        "narHash": "sha256-f2C+TiGzZL0RCWLwIuYY2yy1gnz+QCsn5mUTY3mfxxs=",
-        "owner": "mightyiam",
-        "repo": "by-name",
-        "rev": "1e827c714b6e21cd0ed0a6d0898a6b1099fc5242",
-        "type": "github"
-      },
-      "original": {
-        "owner": "mightyiam",
-        "repo": "by-name",
-        "type": "github"
-      }
-    },
     "crane": {
       "inputs": {
         "nixpkgs": [
@@ -129,7 +114,6 @@
     },
     "root": {
       "inputs": {
-        "by-name": "by-name",
         "crane": "crane",
         "fenix": "fenix",
         "flake-utils": "flake-utils",
