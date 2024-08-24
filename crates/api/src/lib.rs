@@ -11,6 +11,23 @@ use rocket::{
     Request, Rocket,
 };
 use rocket_db_pools::{Connection, Database};
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
+
+#[derive(OpenApi)]
+#[openapi(
+    paths(
+        landed,
+    ),
+    //<<< components(
+    //<<<     schemas(todo::Todo, todo::TodoError)
+    //<<< ),
+    //<<< tags(
+    //<<<     (name = "todo", description = "Todo management endpoints.")
+    //<<< ),
+    //<<< modifiers(&SecurityAddon)
+)]
+struct ApiDoc;
 
 async fn run_migrations(rocket: Rocket<rocket::Build>) -> rocket::fairing::Result {
     let Some(db) = Data::fetch(&rocket) else {
@@ -45,7 +62,14 @@ pub fn app() -> rocket::fairing::AdHoc {
             std::future::ready(()).boxed()
         }));
 
-        rocket.mount("/", rocket::routes![health_check, landed])
+        rocket
+            .mount("/", rocket::routes![health_check, landed])
+            .mount(
+                "/",
+                SwaggerUi::new("/swagger-ui/<_..>")
+                    .url("/api-docs/openapi.json", ApiDoc::openapi())
+                    .url("/api-docs/openapi2.json", ApiDoc::openapi()),
+            )
     })
 }
 
@@ -53,6 +77,12 @@ pub fn app() -> rocket::fairing::AdHoc {
 #[database("data")]
 struct Data(sqlx::Pool<sqlx::Postgres>);
 
+#[utoipa::path(
+    context_path = "/todo",
+    responses(
+        (status = 200, description = "Get all todos", body = [Todo])
+    )
+)]
 #[rocket::get("/api/v1/<pr>")]
 async fn landed(mut db: Connection<Data>, pr: i32) -> Result<Json<LandedIn>, LandedError> {
     let landings = Landing::for_pr(&mut db, pr.try_into()?).await?;
