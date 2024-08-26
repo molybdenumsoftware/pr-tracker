@@ -5,6 +5,7 @@
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 use rocket::{
     futures::FutureExt,
+    get,
     http::Status,
     response::{self, status},
     serde::{json::Json, Deserialize, Serialize},
