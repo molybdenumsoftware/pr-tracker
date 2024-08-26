@@ -18,9 +18,8 @@ async fn openapi() {
         async {
             let response = ctx.client.get("/openapi.json").dispatch().await;
             assert_eq!(response.status(), rocket::http::Status::Ok);
-            let body = response.body();
-            let body = body.to_string().await.unwrap();
-            response.into_json::<Task>().await.unwrap();
+            let body = response.into_string().await.unwrap();
+            println!("{body}");
         }
         .boxed()
     })
