@@ -79,7 +79,7 @@ struct Data(sqlx::Pool<sqlx::Postgres>);
 #[utoipa::path(
     // context_path = "/todo",
     responses(
-        (status = 200, description = "Get all todos", body = [Todo])
+        (status = 200, description = "Get all todos", body = LandedIn)
     )
 )]
 #[get("/api/v1/<pr>")]
