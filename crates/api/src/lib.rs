@@ -67,8 +67,7 @@ pub fn app() -> rocket::fairing::AdHoc {
             .mount(
                 "/",
                 SwaggerUi::new("/swagger-ui/<_..>")
-                    .url("/api-docs/openapi.json", ApiDoc::openapi())
-                    .url("/api-docs/openapi2.json", ApiDoc::openapi()),
+                    .url("/api-docs/openapi.json", ApiDoc::openapi()),
             )
     })
 }
@@ -78,12 +77,12 @@ pub fn app() -> rocket::fairing::AdHoc {
 struct Data(sqlx::Pool<sqlx::Postgres>);
 
 #[utoipa::path(
-    context_path = "/todo",
+    // context_path = "/todo",
     responses(
         (status = 200, description = "Get all todos", body = [Todo])
     )
 )]
-#[rocket::get("/api/v1/<pr>")]
+#[get("/api/v1/<pr>")]
 async fn landed(mut db: Connection<Data>, pr: i32) -> Result<Json<LandedIn>, LandedError> {
     let landings = Landing::for_pr(&mut db, pr.try_into()?).await?;
 
