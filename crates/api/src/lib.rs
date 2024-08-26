@@ -20,9 +20,9 @@ use utoipa_swagger_ui::SwaggerUi;
     paths(
         landed,
     ),
-    //<<< components(
-    //<<<     schemas(todo::Todo, todo::TodoError)
-    //<<< ),
+    components(
+        schemas(LandedIn, LandedError)
+    ),
     //<<< tags(
     //<<<     (name = "todo", description = "Todo management endpoints.")
     //<<< ),
@@ -108,13 +108,13 @@ impl Branch {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, utoipa::ToSchema)]
 #[serde(crate = "rocket::serde")]
 pub struct LandedIn {
     pub branches: Vec<Branch>,
 }
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, thiserror::Error, utoipa::ToSchema)]
 enum LandedError {
     #[error(transparent)]
     PrNumberNonPositive(PrNumberNonPositiveError),

@@ -1,16 +1,8 @@
 #[path = "../test-util.rs"]
 mod test_util;
 
-use pr_tracker_api::ApiDoc;
 use rocket::futures::FutureExt;
 use test_util::TestContext;
-
-#[derive(serde::Deserialize)]
-struct Task {
-    id: usize,
-    complete: bool,
-    text: String,
-}
 
 #[tokio::test]
 async fn openapi() {
