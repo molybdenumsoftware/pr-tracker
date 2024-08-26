@@ -28,7 +28,7 @@ use utoipa_swagger_ui::SwaggerUi;
     //<<< ),
     //<<< modifiers(&SecurityAddon)
 )]
-struct ApiDoc;
+pub struct ApiDoc;
 
 async fn run_migrations(rocket: Rocket<rocket::Build>) -> rocket::fairing::Result {
     let Some(db) = Data::fetch(&rocket) else {
@@ -67,8 +67,7 @@ pub fn app() -> rocket::fairing::AdHoc {
             .mount("/", rocket::routes![health_check, landed])
             .mount(
                 "/",
-                SwaggerUi::new("/swagger-ui/<_..>")
-                    .url("/api-docs/openapi.json", ApiDoc::openapi()),
+                SwaggerUi::new("/swagger-ui/<_..>").url("/openapi.json", ApiDoc::openapi()),
             )
     })
 }
