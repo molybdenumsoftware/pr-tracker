@@ -28,6 +28,7 @@ Two programs are provided:
 
 ## pr-tracker-fetcher
 
+Intended to be periodically executed.
 Takes no arguments.
 Expects [configuration via environment](https://molybdenumsoftware.github.io/pr-tracker/programs/pr_tracker_fetcher_config/struct.Environment.html).
 
@@ -48,3 +49,53 @@ Expects [configuration via environment](https://molybdenumsoftware.github.io/pr-
 - This project, with all its components, is versioned as one.
 
 [^1]: Note that in GitHub, a pull request has a "merge commit" even having been merged without an actual merge commit.
+
+## Alternatives and prior art
+
+- [Alyssa Ross' pr-tracker](https://nixpk.gs/pr-tracker.html) ([source](https://git.qyliss.net/pr-tracker))
+  Server-side rendered web app. Computes landings for a given PR on the fly by invoking Git on the backend.
+- [ocfox's nixpkgs-tracker](https://nixpkgs-tracker.ocfox.me/) ([source](https://github.com/ocfox/nixpkgs-tracker))
+  Client-side rendered web app. Computes landings for a given PR on the fly using GitHub api.
+- [Maralorn's nixpkgs-bot](https://blog.maralorn.de/projects#nixpkgs-bot) ([source](https://code.maralorn.de/maralorn/config/src/commit/b34d2e0d0adc62c30875edb475f1c09a752fe19e/packages/nixpkgs-bot))
+  Matrix bot that provides notification of PR landings.
+  Periodically computes new PR landings using Git and sends messages.
+
+All of the above are [Nixpkgs](https://github.com/nixos/nixpkgs/) specific, whereas this project is not.
+None of the above internally maintain a dataset of landings.
+None of the above currently provide an HTTP API.
+
+## Vision
+
+### Push-driven updates
+
+The current architecture of obtaining data via polling allows instantaneous
+and hopefully reliable responses.
+However, the data can be stale.
+
+In the future, we intend to provide fresher data by subscribing to GitHub webhooks.
+
+Since the public cannot subscribe to GitHub webhooks,
+this will require deployment by the repo owner.
+
+### Event record keeping
+
+Building upon the implementation of push-driven updates,
+we intend to keep track of _when_ PRs land in branches.
+This requires a dataset of landings.
+
+### Webhook service
+
+We intend to allow users to subscribe to webhook notifications of PR landings.
+This provides a couple of benefits over subscribing to GitHub webhooks directly:
+
+- GitHub webhooks can only notify when a PR lands in its target branch. They
+  cannot notify when that PR lands in other branches.
+- Only repo owners can subscribe to GitHub webhooks.
+
+### Backport PRs
+
+A backport PR is a re-application of another PR, targeting a different branch.
+
+We intend to adopt or invent a workflow whereby in backport PRs the original PR is declared.
+Using that metadata, when providing landings for an original PR,
+we intend to also include branches on which a backport PR had landed.
