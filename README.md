@@ -50,7 +50,7 @@ Expects [configuration via environment](https://molybdenumsoftware.github.io/pr-
 
 [^1]: Note that in GitHub, a pull request has a "merge commit" even having been merged without an actual merge commit.
 
-## Alternatives and prior art
+## Prior art
 
 - [Alyssa Ross' pr-tracker](https://nixpk.gs/pr-tracker.html) ([source](https://git.qyliss.net/pr-tracker))
   Server-side rendered web app. Computes landings for a given PR on the fly by invoking Git on the backend.
