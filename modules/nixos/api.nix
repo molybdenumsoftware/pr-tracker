@@ -29,7 +29,7 @@
     urlencode
     ;
 
-  attrsToURLParams = import ../attrsToURLParams.nix lib;
+  attrsToURLParams = import ../../attrsToURLParams.nix lib;
   common = import ./common.nix {inherit lib options config;};
 
   cfg = config.services.pr-tracker.api;
@@ -55,7 +55,7 @@ in {
 
   options.services.pr-tracker.api.port = mkOption {
     type = types.port;
-    description = readFile ../crates/api-config/PORT.md;
+    description = readFile ../../crates/api-config/PORT.md;
   };
 
   options.services.pr-tracker.api.db = common.db;
