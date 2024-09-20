@@ -26,8 +26,8 @@
   configuration = evalModules {
     modules =
       [
-        ../../modules/api.nix
-        ../../modules/fetcher.nix
+        pr-tracker.nixosModules.api
+        pr-tracker.nixosModules.fetcher
         {
           nixpkgs.hostPlatform = system;
           system.stateVersion = "24.05";

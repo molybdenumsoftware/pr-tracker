@@ -15,7 +15,7 @@ in {
   db.urlParams = mkOption {
     type = types.nullOr (types.attrsOf types.str);
     description = ''
-      URL parameters from which to compose the ${builtins.readFile ../crates/DATABASE_URL.md}
+      URL parameters from which to compose the ${builtins.readFile ../../crates/DATABASE_URL.md}
       Required unless {option}`${options.services.pr-tracker.db.createLocally}` is true.
     '';
     example = {
