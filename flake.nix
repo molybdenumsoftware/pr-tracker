@@ -21,15 +21,23 @@
       systems = import inputs.systems;
       _module.args.GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
       imports = [
-        ./modules/flake/api.nix
-        ./modules/flake/checks.nix
-        ./modules/flake/dev-shell.nix
-        ./modules/flake/fetcher.nix
-        ./modules/flake/filterOptions-check.nix
-        ./modules/flake/formatting.nix
-        ./modules/flake/nixos-common.nix
-        ./modules/flake/packages.nix
-        ./modules/flake/release
+        ./modules/crate-utils.nix
+        ./modules/clippy.nix
+        ./modules/nixos-modules-lib.nix
+        ./modules/api
+        ./modules/fetcher
+        ./modules/private-nixos-modules
+        ./modules/program-docs.nix
+        ./modules/nixos-manual
+        ./modules/integration-tests
+        ./modules/dev-shell.nix
+        ./modules/formatting.nix
+        ./modules/release
+        ./modules/filter-options.nix
+        # Added for backwards compatibility. TODO: remove this.
+        {
+          flake.nixosModules.common = {};
+        }
       ];
     });
 }
