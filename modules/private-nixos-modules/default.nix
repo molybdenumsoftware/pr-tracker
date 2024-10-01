@@ -1,0 +1,3 @@
+{
+  imports = [./db.nix];
+}

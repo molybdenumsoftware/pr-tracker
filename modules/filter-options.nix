@@ -5,7 +5,7 @@
     ...
   }: let
     filterOptionsCheck = let
-      subject = import ../../filterOptions.nix lib;
+      subject = import ../filterOptions.nix lib;
 
       tests.testEmpty = {
         expr = subject (p: o: true) {};
