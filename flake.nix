@@ -34,10 +34,6 @@
         ./modules/formatting.nix
         ./modules/release
         ./modules/filter-options.nix
-        # Added for backwards compatibility. TODO: remove this.
-        {
-          flake.nixosModules.common = {};
-        }
       ];
     });
 }
