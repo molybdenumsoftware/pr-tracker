@@ -1,3 +1,14 @@
+## [4.0.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v3.0.0...v4.0.0) (2024-10-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **flake:** rm empty nixosModules.common
+
+### Miscellaneous Chores
+
+* **flake:** rm empty nixosModules.common ([c5c573e](https://github.com/molybdenumsoftware/pr-tracker/commit/c5c573e4dce4ae2ff3335282f4651fa28ab9d508))
+
 ## [3.0.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v2.0.0...v3.0.0) (2024-04-19)
 
 
