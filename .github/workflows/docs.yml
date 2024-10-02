@@ -1,4 +1,5 @@
 on:
+  pull_request:
   push:
     branches:
       - main
@@ -9,7 +10,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -26,9 +27,10 @@ jobs:
           nix build .#program-docs
           mkdir docs
           cp -r result/share/doc docs/programs
-          nix build .#nixos-modules-manual
+          nix build .#nixos-manual
           cp -r result docs/nixos-modules
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs
-      - uses: actions/deploy-pages@v4
+      - if: github.ref == 'refs/heads/main'
+        uses: actions/deploy-pages@v4
