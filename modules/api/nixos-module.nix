@@ -1,5 +1,6 @@
 {
   mkNixosModuleLib,
+  moduleLocation,
   privateNixosModules,
   ...
 }: {
@@ -15,6 +16,10 @@
 
     cfg = config.services.pr-tracker.api;
   in {
+    # https://github.com/NixOS/nixpkgs/issues/215496
+    key = "${moduleLocation}#api";
+    _file = "${moduleLocation}#api";
+
     imports = [
       privateNixosModules.db
     ];
