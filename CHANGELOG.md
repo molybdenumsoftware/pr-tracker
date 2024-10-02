@@ -1,3 +1,10 @@
+## [4.1.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v4.0.0...v4.1.0) (2024-10-02)
+
+
+### Features
+
+* **flake:** NixOS modules have key and _file ([2564acf](https://github.com/molybdenumsoftware/pr-tracker/commit/2564acf1ed3c46f4fb9615c57f033b071a5eebee))
+
 ## [4.0.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v3.0.0...v4.0.0) (2024-10-01)
 
 
