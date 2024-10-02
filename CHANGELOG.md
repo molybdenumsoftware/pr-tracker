@@ -1,3 +1,10 @@
+## [4.1.1](https://github.com/molybdenumsoftware/pr-tracker/compare/v4.1.0...v4.1.1) (2024-10-02)
+
+
+### Bug Fixes
+
+* nixos docs now deploy ([996f96c](https://github.com/molybdenumsoftware/pr-tracker/commit/996f96cc836bb42022eeb99567ef5689ab6095e3))
+
 ## [4.1.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v4.0.0...v4.1.0) (2024-10-02)
 
 
