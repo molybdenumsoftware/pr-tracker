@@ -1,3 +1,4 @@
+use db_context::LogDestination;
 use rocket::futures::FutureExt;
 
 pub struct TestContext<'a> {
@@ -14,28 +15,31 @@ impl TestContext<'_> {
         test: impl for<'a> FnOnce(&'a mut TestContext<'a>) -> rocket::futures::future::LocalBoxFuture<()>
             + 'static,
     ) {
-        db_context::DatabaseContext::with(|db_context| {
-            async {
-                let rocket = rocket::custom(
-                    rocket::figment::Figment::from(rocket::Config::default())
-                        .merge(("databases.data.url", db_context.db_url()))
-                        .merge(("log_level", rocket::config::LogLevel::Debug)),
-                )
-                .attach(pr_tracker_api::app());
+        db_context::DatabaseContext::with(
+            |db_context| {
+                async {
+                    let rocket = rocket::custom(
+                        rocket::figment::Figment::from(rocket::Config::default())
+                            .merge(("databases.data.url", db_context.db_url()))
+                            .merge(("log_level", rocket::config::LogLevel::Debug)),
+                    )
+                    .attach(pr_tracker_api::app());
 
-                let api_client = rocket::local::asynchronous::Client::tracked(rocket)
-                    .await
-                    .unwrap();
+                    let api_client = rocket::local::asynchronous::Client::tracked(rocket)
+                        .await
+                        .unwrap();
 
-                let mut this = TestContext {
-                    db: db_context,
-                    client: api_client,
-                };
+                    let mut this = TestContext {
+                        db: db_context,
+                        client: api_client,
+                    };
 
-                test(&mut this).await
-            }
-            .boxed_local()
-        })
+                    test(&mut this).await
+                }
+                .boxed_local()
+            },
+            LogDestination::Inherit,
+        )
         .await;
     }
 }

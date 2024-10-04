@@ -1,3 +1,4 @@
 /crates/fetcher/src/graphql/schema.graphql
+/logs
 /result
 /target

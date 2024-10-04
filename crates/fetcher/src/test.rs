@@ -1,5 +1,5 @@
 use camino::Utf8PathBuf;
-use db_context::DatabaseContext;
+use db_context::{DatabaseContext, LogDestination};
 use futures::{future::LocalBoxFuture, FutureExt};
 use itertools::Itertools;
 use pr_tracker_store::{Branch, GitCommit, GithubPrQueryCursor, Landing, Pr, PrNumber};
@@ -121,36 +121,39 @@ impl TestContext<'_> {
     ) {
         once_cell::sync::Lazy::get(&LOGGER);
 
-        DatabaseContext::with(|db_context| {
-            async move {
-                let tempdir = tempfile::tempdir().unwrap();
+        DatabaseContext::with(
+            |db_context| {
+                async move {
+                    let tempdir = tempfile::tempdir().unwrap();
 
-                let remote_repo_path =
-                    Utf8PathBuf::try_from(tempdir.path().join("remote-repo")).unwrap();
+                    let remote_repo_path =
+                        Utf8PathBuf::try_from(tempdir.path().join("remote-repo")).unwrap();
 
-                isolated_git(["init", remote_repo_path.as_str(), "--initial-branch=main"])
-                    .await
-                    .unwrap();
+                    isolated_git(["init", remote_repo_path.as_str(), "--initial-branch=main"])
+                        .await
+                        .unwrap();
 
-                let mut test_context = TestContext {
-                    db_context,
-                    tempdir,
-                    pull_requests: BTreeSet::new(),
-                    pull_request_mtime_counter: 0,
-                    remote_repo_path,
-                    page_size: usize::MAX,
-                    queried_cursors: Vec::new(),
-                };
+                    let mut test_context = TestContext {
+                        db_context,
+                        tempdir,
+                        pull_requests: BTreeSet::new(),
+                        pull_request_mtime_counter: 0,
+                        remote_repo_path,
+                        page_size: usize::MAX,
+                        queried_cursors: Vec::new(),
+                    };
 
-                test_context
-                    .isolated_git(["commit", "--allow-empty", "-m", "init"])
-                    .await;
+                    test_context
+                        .isolated_git(["commit", "--allow-empty", "-m", "init"])
+                        .await;
 
-                test(&mut test_context).await;
-                drop(test_context);
-            }
-            .boxed_local()
-        })
+                    test(&mut test_context).await;
+                    drop(test_context);
+                }
+                .boxed_local()
+            },
+            LogDestination::Inherit,
+        )
         .await;
     }
 
