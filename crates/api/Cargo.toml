@@ -13,9 +13,8 @@ publish = false
 pr-tracker-api-config = { path = "../api-config" }
 camino = "*"
 confique.workspace = true
+poem = "*"
 pr-tracker-store.workspace = true
-rocket = { version = "*", features = ["json"] }
-rocket_db_pools = { version = "*", features = ["sqlx_postgres"] }
 serde.workspace = true
 sqlx = { version = "*", default-features = false, features = ["macros", "migrate"] }
 thiserror.workspace = true

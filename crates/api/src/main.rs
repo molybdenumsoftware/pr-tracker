@@ -1,14 +1,13 @@
 #![warn(clippy::pedantic)]
-// required because rocket::launch, remove if clippy permits.
-#![allow(clippy::no_effect_underscore_binding)]
 
 use confique::Config;
+use poem::listener::TcpListener;
 use pr_tracker_api::app;
 use pr_tracker_api_config::Environment;
 use rocket::{figment::Figment, launch};
 
-#[launch]
-fn rocket() -> _ {
+#[tokio::main]
+fn main() -> _ {
     let config = Environment::builder()
         .env()
         .load()
@@ -19,9 +18,7 @@ fn rocket() -> _ {
         PR_TRACKER_API_PORT: port,
     } = config;
 
-    let figment = Figment::from(rocket::Config::default())
-        .merge(("port", port))
-        .merge(("databases.data.url", db_url));
-
-    rocket::custom(figment).attach(app())
+    Server::new(TcpListener::bind(format!("0.0.0.0:{port}")))
+        .run(app())
+        .await
 }

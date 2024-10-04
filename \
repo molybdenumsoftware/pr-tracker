@@ -1,17 +1,28 @@
 #![warn(clippy::pedantic)]
 use poem::EndpointExt;
 use serde::{Deserialize, Serialize};
-use sqlx::{migrate::MigrateError, Connection, PgConnection, PgPool};
+use sqlx::{Connection, PgConnection, PgPool};
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
+async fn run_migrations(rocket: Rocket<rocket::Build>) -> rocket::fairing::Result {
+    let Some(db) = Data::fetch(&rocket) else {
+        rocket::error!("Failed to connect to the database");
+        return Err(rocket);
+    };
+
+    let Err(e) = util::migrate(&db.0).await else {
+        return Ok(rocket);
+    };
+
+    rocket::error!("Failed to run database migrations: {e}");
+    Err(rocket)
+}
+
 #[must_use]
-pub async fn app() -> Result<impl poem::IntoEndpoint, MigrateError> {
+pub async fn app() -> impl poem::IntoEndpoint {
     let url = ">>> TODO <<<";
-    let db_pool = PgPool::connect(&url).await.unwrap(); // TODO handle error (or not)
-
-    util::migrate(&db_pool).await?;
-
+    let db_pool = PgPool::connect(&url).await.unwrap();
     poem::Route::new()
         .at("/api/v1/healthcheck", poem::get(health_check))
         .at("/api/v1/:pr", poem::get(landed))
@@ -41,15 +52,14 @@ async fn landed(
     poem::web::Data(db_pool): poem::web::Data<&PgPool>,
     pr: i32,
 ) -> Result<LandedIn, LandedError> {
-    let mut conn = db_pool.acquire().await.unwrap();
-    let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
+    let landings = Landing::for_pr(&mut db_pool, pr.try_into()?).await?;
 
     let branches = landings
         .into_iter()
         .map(|branch| Branch::new(branch.name()))
         .collect();
 
-    Ok(LandedIn { branches })
+    Ok(Json(LandedIn { branches }))
 }
 
 #[poem::handler]
