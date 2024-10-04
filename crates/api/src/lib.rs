@@ -12,10 +12,10 @@ pub async fn app() -> Result<impl poem::IntoEndpoint, MigrateError> {
 
     util::migrate(&db_pool).await?;
 
-    poem::Route::new()
+    Ok(poem::Route::new()
         .at("/api/v1/healthcheck", poem::get(health_check))
         .at("/api/v1/:pr", poem::get(landed))
-        .with(poem::middleware::AddData::new(db_pool))
+        .with(poem::middleware::AddData::new(db_pool)))
 
     //<<< rocket::fairing::AdHoc::on_ignite("main", |rocket| async {
     //<<<     let rocket = rocket
