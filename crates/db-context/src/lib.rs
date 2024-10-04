@@ -1,11 +1,18 @@
 use fragile_child::{FragileChild, SpawnFragileChild};
 use futures::future::LocalBoxFuture;
 use sqlx::{Connection, PgConnection, PgPool};
+use std::fs::{create_dir_all, OpenOptions};
 use std::os::unix::net::UnixDatagram;
 use std::{process::Command, time::Duration};
 use tempfile::{tempdir, TempDir};
 
 use camino::{Utf8Path, Utf8PathBuf};
+
+#[derive(Copy, Clone, Debug)]
+pub enum LogDestination {
+    File,
+    Inherit,
+}
 
 pub struct DatabaseContext {
     tmp_dir: TempDir,
@@ -31,20 +38,46 @@ impl DatabaseContext {
         PgPool::connect(&url).await
     }
 
-    async fn init() -> Self {
+    async fn init(log_destination: LogDestination) -> Self {
         let tmp_dir = tempdir().unwrap();
         let sockets_dir = Self::sockets_dir(tmp_dir.path().try_into().unwrap());
         let data_dir = tmp_dir.path().join("data");
         std::fs::create_dir(&sockets_dir).unwrap();
 
-        let status = Command::new("initdb").arg(&data_dir).status().unwrap();
+        let mut initdb = Command::new("initdb");
+        let mut postgres = Command::new("postgres");
+
+        match log_destination {
+            LogDestination::File => {
+                let repo = gix::discover(".").unwrap();
+                let repo_root: Utf8PathBuf =
+                    repo.work_dir().unwrap().to_path_buf().try_into().unwrap();
+                let path = repo_root.join("logs").join("psql.log");
+                println!("Logging to {path}");
+                create_dir_all(path.parent().unwrap()).unwrap();
+
+                let log_destination = OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(path.clone())
+                    .unwrap();
+
+                initdb.stdout(log_destination.try_clone().unwrap());
+                postgres.stderr(log_destination);
+            }
+            LogDestination::Inherit => {
+                // This is the default behavior for Command.
+            }
+        }
+
+        let status = initdb.arg(&data_dir).status().unwrap();
 
         assert!(status.success());
 
         let ready_socket_path = tmp_dir.path().join("postgresql-ready.sock");
         let ready_socket = UnixDatagram::bind(&ready_socket_path).unwrap();
 
-        let postgres = Command::new("postgres")
+        let postgres = postgres
             // With this environment variable present, postgres sends a ready notification. This
             // interferes with our testing of our own ready notification.
             .env_remove("NOTIFY_SOCKET")
@@ -89,8 +122,11 @@ impl DatabaseContext {
         Ok(())
     }
 
-    pub async fn with<T>(f: impl FnOnce(&mut Self) -> LocalBoxFuture<T>) -> T {
-        let mut ctx = Self::init().await;
+    pub async fn with<T>(
+        f: impl FnOnce(&mut Self) -> LocalBoxFuture<T>,
+        log_destination: LogDestination,
+    ) -> T {
+        let mut ctx = Self::init(log_destination).await;
         let t = f(&mut ctx).await;
         drop(ctx);
         t

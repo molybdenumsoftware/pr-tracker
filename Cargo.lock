@@ -509,6 +509,7 @@ dependencies = [
  "camino",
  "fragile-child",
  "futures",
+ "gix",
  "sqlx",
  "tempfile",
 ]

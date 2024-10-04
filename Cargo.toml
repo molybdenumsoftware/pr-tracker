@@ -14,6 +14,7 @@ camino = { version = "*", features = ["serde1"] }
 confique = { version = "*", default-features = false }
 db-context.path = "crates/db-context"
 derive_more = { version = "1.0.0-beta.6", features = ["from", "deref"] }
+gix = { version = "*", features = ["revision"] }
 pr-tracker-store.path = "crates/store"
 serde = "*"
 tempfile = "*"

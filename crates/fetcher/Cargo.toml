@@ -16,7 +16,7 @@ chrono = { version = "*", features = ["serde"] }
 derive_more.workspace = true
 pr-tracker-fetcher-config = { path = "../fetcher-config" }
 futures = "*"
-gix = { version = "*", features = ["revision"] }
+gix.workspace = true
 graphql_client = { version = "*", features = ["reqwest-rustls", "graphql_query_derive"], default-features = false }
 itertools = "*"
 log = "*"
