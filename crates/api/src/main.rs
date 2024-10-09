@@ -4,10 +4,9 @@ use confique::Config;
 use poem::listener::TcpListener;
 use pr_tracker_api::app;
 use pr_tracker_api_config::Environment;
-use rocket::{figment::Figment, launch};
 
 #[tokio::main]
-async fn main() -> _ {
+async fn main() {
     let config = Environment::builder()
         .env()
         .load()

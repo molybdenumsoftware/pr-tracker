@@ -39,8 +39,8 @@ pub async fn app() -> Result<impl poem::IntoEndpoint, MigrateError> {
 #[poem::handler]
 async fn landed(
     poem::web::Data(db_pool): poem::web::Data<&PgPool>,
-    pr: i32,
-) -> poem::Result<LandedIn> {
+    poem::web::Path(pr): poem::web::Path<i32>,
+) -> poem::Result<poem::web::Json<LandedIn>, LandedError> {
     let mut conn = db_pool.acquire().await.unwrap();
     let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
 
@@ -49,7 +49,7 @@ async fn landed(
         .map(|branch| Branch::new(branch.name()))
         .collect();
 
-    Ok(LandedIn { branches })
+    Ok(Json(LandedIn { branches }))
 }
 
 #[poem::handler]
