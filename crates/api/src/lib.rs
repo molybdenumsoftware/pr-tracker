@@ -40,7 +40,7 @@ pub async fn app() -> Result<impl poem::IntoEndpoint, MigrateError> {
 async fn landed(
     poem::web::Data(db_pool): poem::web::Data<&PgPool>,
     pr: i32,
-) -> Result<LandedIn, LandedError> {
+) -> poem::Result<LandedIn> {
     let mut conn = db_pool.acquire().await.unwrap();
     let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
 
