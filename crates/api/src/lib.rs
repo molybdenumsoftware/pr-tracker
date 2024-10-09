@@ -1,5 +1,5 @@
 #![warn(clippy::pedantic)]
-use poem::EndpointExt;
+use poem::{http::StatusCode, EndpointExt};
 use serde::{Deserialize, Serialize};
 use sqlx::{migrate::MigrateError, Connection, PgConnection, PgPool};
 
@@ -90,32 +90,26 @@ impl From<ForPrError> for LandedError {
 }
 
 impl poem::error::ResponseError for LandedError {
-    fn respond_to(self, request: &'r Request<'_>) -> response::Result<'o> {
+    fn status(&self) -> StatusCode {
         match self {
-            LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => {
-                let status = Status::from_code(400).unwrap();
-                status::Custom(
-                    status,
-                    response::content::RawText("Non positive pull request number."),
-                )
-                .respond_to(request)
-            }
-            LandedError::ForPr(ForPrError::Sqlx(_sqlx_error)) => {
-                let status = Status::from_code(500).unwrap();
-                status::Custom(status, response::content::RawText("Error. Sorry."))
-                    .respond_to(request)
-            }
-            LandedError::ForPr(ForPrError::PrNotFound) => {
-                status::NotFound(response::content::RawText("Pull request not found."))
-                    .respond_to(request)
-            }
+            LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => StatusCode::BAD_REQUEST,
+            LandedError::ForPr(ForPrError::Sqlx(_sqlx_error)) => StatusCode::INTERNAL_SERVER_ERROR,
+            LandedError::ForPr(ForPrError::PrNotFound) => StatusCode::NOT_FOUND,
         }
     }
 
-    fn status(&self) -> poem::http::StatusCode {
-        match self {
-            LandedError::PrNumberNonPositive(_) => todo!(),
-            LandedError::ForPr(_) => todo!(),
-        }
+    fn as_response(&self) -> poem::Response
+    where
+        Self: std::error::Error + Send + Sync + 'static,
+    {
+        let body = match self {
+            LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => {
+                "Non positive pull request number."
+            }
+            LandedError::ForPr(ForPrError::Sqlx(_sqlx_error)) => "Error. Sorry.",
+            LandedError::ForPr(ForPrError::PrNotFound) => "Pull request not found.",
+        };
+
+        poem::Response::builder().status(self.status()).body(body)
     }
 }
