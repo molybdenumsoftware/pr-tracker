@@ -89,7 +89,7 @@ impl From<ForPrError> for LandedError {
     }
 }
 
-impl<'r, 'o: 'r> response::Responder<'r, 'o> for LandedError {
+impl poem::error::ResponseError for LandedError {
     fn respond_to(self, request: &'r Request<'_>) -> response::Result<'o> {
         match self {
             LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => {
@@ -109,6 +109,13 @@ impl<'r, 'o: 'r> response::Responder<'r, 'o> for LandedError {
                 status::NotFound(response::content::RawText("Pull request not found."))
                     .respond_to(request)
             }
+        }
+    }
+
+    fn status(&self) -> poem::http::StatusCode {
+        match self {
+            LandedError::PrNumberNonPositive(_) => todo!(),
+            LandedError::ForPr(_) => todo!(),
         }
     }
 }
