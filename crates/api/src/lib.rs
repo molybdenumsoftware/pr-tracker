@@ -1,5 +1,5 @@
 #![warn(clippy::pedantic)]
-use poem::{http::StatusCode, EndpointExt};
+use poem::{http::StatusCode, web::Json, EndpointExt, Response};
 use serde::{Deserialize, Serialize};
 use sqlx::{migrate::MigrateError, Connection, PgConnection, PgPool};
 
@@ -98,7 +98,7 @@ impl poem::error::ResponseError for LandedError {
         }
     }
 
-    fn as_response(&self) -> poem::Response
+    fn as_response(&self) -> Response
     where
         Self: std::error::Error + Send + Sync + 'static,
     {
@@ -110,6 +110,6 @@ impl poem::error::ResponseError for LandedError {
             LandedError::ForPr(ForPrError::PrNotFound) => "Pull request not found.",
         };
 
-        poem::Response::builder().status(self.status()).body(body)
+        Response::builder().status(self.status()).body(body)
     }
 }
