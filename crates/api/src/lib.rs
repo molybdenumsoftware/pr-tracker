@@ -56,7 +56,6 @@ async fn landed(
 fn health_check() {}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-#[serde(crate = "rocket::serde")]
 pub struct Branch(pub String);
 
 impl Branch {

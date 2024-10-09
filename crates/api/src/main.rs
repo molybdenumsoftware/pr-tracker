@@ -7,7 +7,7 @@ use pr_tracker_api_config::Environment;
 use rocket::{figment::Figment, launch};
 
 #[tokio::main]
-fn main() -> _ {
+async fn main() -> _ {
     let config = Environment::builder()
         .env()
         .load()
