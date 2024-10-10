@@ -1,7 +1,7 @@
 use db_context::LogDestination;
 use futures::future::LocalBoxFuture;
 
-pub struct TestContext<'a, T> {
+pub struct TestContext<'a, T: poem::Endpoint> {
     // sorry, Rust — definitely in use
     // #[allow(dead_code)] // TODO okay now?
     pub db: &'a mut db_context::DatabaseContext,
@@ -10,24 +10,26 @@ pub struct TestContext<'a, T> {
     pub client: poem::test::TestClient<T>,
 }
 
-impl<T> TestContext<'_, T> {
+impl<T: poem::Endpoint> TestContext<'_, T> {
     pub async fn with(
         test: impl for<'a> FnOnce(&'a mut TestContext<'a, T>) -> LocalBoxFuture<()> + 'static,
     ) {
         db_context::DatabaseContext::with(
             |db_context| {
                 async {
-                    let app = pr_tracker_api::app(db_context.db_url());
-                    let rocket = rocket::custom(
-                        rocket::figment::Figment::from(rocket::Config::default())
-                            .merge(("databases.data.url", db_context.db_url()))
-                            .merge(("log_level", rocket::config::LogLevel::Debug)),
-                    )
-                    .attach(app);
+                    let app = pr_tracker_api::app(&db_context.db_url()).await.unwrap();
+                    // <<< let rocket = rocket::custom(
+                    // <<<     rocket::figment::Figment::from(rocket::Config::default())
+                    // <<<         .merge(("databases.data.url", db_context.db_url()))
+                    // <<<         .merge(("log_level", rocket::config::LogLevel::Debug)),
+                    // <<< )
+                    // <<< .attach(app);
+                    // <<<
+                    // <<< let api_client = rocket::local::asynchronous::Client::tracked(rocket)
+                    // <<<     .await
+                    // <<<     .unwrap();
 
-                    let api_client = rocket::local::asynchronous::Client::tracked(rocket)
-                        .await
-                        .unwrap();
+                    let api_client = poem::test::TestClient::new(app);
 
                     let mut this = TestContext {
                         db: db_context,
