@@ -1,7 +1,7 @@
 use db_context::LogDestination;
 use futures::future::LocalBoxFuture;
 
-pub struct TestContext<'a, T: poem::Endpoint> {
+pub struct TestContext<'a, T> {
     // sorry, Rust — definitely in use
     // #[allow(dead_code)] // TODO okay now?
     pub db: &'a mut db_context::DatabaseContext,

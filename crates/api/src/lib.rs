@@ -6,7 +6,7 @@ use sqlx::{migrate::MigrateError, PgPool};
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
 #[must_use]
-pub async fn app(db_url: &str) -> Result<impl poem::IntoEndpoint, MigrateError> {
+pub async fn app<E>(db_url: &str) -> Result<E, MigrateError> {
     let db_pool = PgPool::connect(db_url).await.unwrap(); // TODO handle error (or not)
 
     util::migrate(&db_pool).await?;
