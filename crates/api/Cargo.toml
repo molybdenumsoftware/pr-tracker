@@ -13,7 +13,7 @@ publish = false
 pr-tracker-api-config = { path = "../api-config" }
 camino = "*"
 confique.workspace = true
-poem = "*"
+poem = { version = "*", features = ["test"] }
 pr-tracker-store.workspace = true
 serde.workspace = true
 sqlx = { version = "*", default-features = false, features = ["macros", "migrate"] }
