@@ -18,7 +18,9 @@ async fn main() {
         PR_TRACKER_API_PORT: port,
     } = config;
 
-    Server::new(TcpListener::bind(format!("0.0.0.0:{port}")))
+    let listener = TcpListener::bind(format!("0.0.0.0:{port}"));
+
+    Server::new(listener)
         .run(app().await.unwrap()) // TODO unwrap?
         .await
         .unwrap();
