@@ -1,18 +1,24 @@
 use db_context::LogDestination;
 use futures::future::LocalBoxFuture;
 
-pub struct TestContext<'a, T> {
+pub struct TestContext<'a, E> {
     // sorry, Rust — definitely in use
     // #[allow(dead_code)] // TODO okay now?
     pub db: &'a mut db_context::DatabaseContext,
     // sorry, Rust — definitely in use
     // #[allow(dead_code)] // TODO okay now?
-    pub client: poem::test::TestClient<T>,
+    pub client: poem::test::TestClient<E>,
 }
 
-impl<T: poem::Endpoint> TestContext<'_, T> {
+impl<E, F> TestContext<'_, E>
+where
+    F: for<'a> FnOnce(&'a mut TestContext<'a, E>) -> LocalBoxFuture<()>,
+    E: poem::Endpoint,
+{
     pub async fn with(
-        test: impl for<'a> FnOnce(&'a mut TestContext<'a, T>) -> LocalBoxFuture<()> + 'static,
+        test: T,
+        // <<< test: impl for<'a> FnOnce(&'a mut TestContext<'a, impl poem::Endpoint>) -> LocalBoxFuture<()>
+        // <<< + 'static,
     ) {
         db_context::DatabaseContext::with(
             |db_context| {
