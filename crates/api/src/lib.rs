@@ -1,5 +1,5 @@
 #![warn(clippy::pedantic)]
-use poem::{http::StatusCode, web::Json, EndpointExt, IntoEndpoint, Response};
+use poem::{http::StatusCode, web::Json, Endpoint, EndpointExt, IntoEndpoint, Response};
 use serde::{Deserialize, Serialize};
 use sqlx::{migrate::MigrateError, PgPool};
 
@@ -8,7 +8,11 @@ use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 #[must_use]
 pub async fn app(
     db_url: &str,
-) -> Result<poem::middleware::AddDataEndpoint<poem::Route, sqlx::Pool<sqlx::Postgres>>, MigrateError>
+) -> Result<
+    //poem::middleware::AddDataEndpoint<poem::Route, sqlx::Pool<sqlx::Postgres>>,
+    impl Endpoint,
+    MigrateError,
+> // TODO waaat
 {
     let db_pool = PgPool::connect(db_url).await.unwrap(); // TODO handle error (or not)
 
