@@ -1,7 +1,7 @@
 #![warn(clippy::pedantic)]
 
 use confique::Config;
-use poem::listener::TcpListener;
+use poem::listener::{Listener, TcpListener};
 use poem::Server;
 use pr_tracker_api::app;
 use pr_tracker_api_config::Environment;
@@ -18,10 +18,15 @@ async fn main() {
         PR_TRACKER_API_PORT: port,
     } = config;
 
-    let listener = TcpListener::bind(format!("0.0.0.0:{port}"));
+    let acceptor = TcpListener::bind(format!("0.0.0.0:{port}"))
+        .into_acceptor()
+        .await
+        .unwrap();
 
-    Server::new(listener)
-        .run(app().await.unwrap()) // TODO unwrap?
+    sd_notify::notify(true, &[sd_notify::NotifyState::Ready]).unwrap(); //<<< TODO: give a nicer error message ("failed to notify systemd that this service is ready: {err}");
+
+    Server::new_with_acceptor(acceptor)
+        .run(app(&db_url).await.unwrap()) // TODO unwrap?
         .await
         .unwrap();
 }

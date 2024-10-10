@@ -6,9 +6,8 @@ use sqlx::{migrate::MigrateError, PgPool};
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
 #[must_use]
-pub async fn app() -> Result<impl poem::IntoEndpoint, MigrateError> {
-    let url = ">>> TODO <<<";
-    let db_pool = PgPool::connect(url).await.unwrap(); // TODO handle error (or not)
+pub async fn app(db_url: &str) -> Result<impl poem::IntoEndpoint, MigrateError> {
+    let db_pool = PgPool::connect(db_url).await.unwrap(); // TODO handle error (or not)
 
     util::migrate(&db_pool).await?;
 
@@ -16,24 +15,6 @@ pub async fn app() -> Result<impl poem::IntoEndpoint, MigrateError> {
         .at("/api/v1/healthcheck", poem::get(health_check))
         .at("/api/v1/:pr", poem::get(landed))
         .with(poem::middleware::AddData::new(db_pool)))
-
-    //<<< rocket::fairing::AdHoc::on_ignite("main", |rocket| async {
-    //<<<     let rocket = rocket
-    //<<<         .attach(Data::init())
-    //<<<         .attach(rocket::fairing::AdHoc::try_on_ignite(
-    //<<<             "run migrations",
-    //<<<             run_migrations,
-    //<<<         ));
-    //<<<
-    //<<<     #[cfg(target_family = "unix")]
-    //<<<     let rocket = rocket.attach(rocket::fairing::AdHoc::on_liftoff("sd-notify", |_| {
-    //<<<         if let Err(err) = sd_notify::notify(true, &[sd_notify::NotifyState::Ready]) {
-    //<<<             rocket::error!("failed to notify systemd that this service is ready: {err}");
-    //<<<         }
-    //<<<
-    //<<<         std::future::ready(()).boxed()
-    //<<<     }));
-    //<<< })
 }
 
 #[poem::handler]
