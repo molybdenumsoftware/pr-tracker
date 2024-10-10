@@ -2483,6 +2483,7 @@ dependencies = [
  "camino",
  "confique",
  "db-context",
+ "futures",
  "poem",
  "pr-tracker-api-config",
  "pr-tracker-store",

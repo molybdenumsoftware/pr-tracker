@@ -12,7 +12,7 @@ publish = false
 
 [dependencies]
 derive_more = { workspace = true, features = ["display"] }
-futures = "*"
+futures.workspace = true
 getset = "*"
 sqlx = { version = "*", features = ["postgres", "runtime-tokio"] }
 thiserror.workspace = true
