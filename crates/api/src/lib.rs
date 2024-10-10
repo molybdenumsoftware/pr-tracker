@@ -1,14 +1,14 @@
 #![warn(clippy::pedantic)]
 use poem::{http::StatusCode, web::Json, EndpointExt, Response};
 use serde::{Deserialize, Serialize};
-use sqlx::{migrate::MigrateError, Connection, PgConnection, PgPool};
+use sqlx::{migrate::MigrateError, PgPool};
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
 #[must_use]
 pub async fn app() -> Result<impl poem::IntoEndpoint, MigrateError> {
     let url = ">>> TODO <<<";
-    let db_pool = PgPool::connect(&url).await.unwrap(); // TODO handle error (or not)
+    let db_pool = PgPool::connect(url).await.unwrap(); // TODO handle error (or not)
 
     util::migrate(&db_pool).await?;
 

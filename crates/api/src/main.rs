@@ -2,6 +2,7 @@
 
 use confique::Config;
 use poem::listener::TcpListener;
+use poem::Server;
 use pr_tracker_api::app;
 use pr_tracker_api_config::Environment;
 
@@ -18,6 +19,7 @@ async fn main() {
     } = config;
 
     Server::new(TcpListener::bind(format!("0.0.0.0:{port}")))
-        .run(app())
+        .run(app().await.unwrap()) // TODO unwrap?
         .await
+        .unwrap();
 }
