@@ -1,13 +1,13 @@
 use db_context::LogDestination;
-use rocket::futures::FutureExt;
 
 pub struct TestContext<'a> {
     // sorry, Rust — definitely in use
-    #[allow(dead_code)]
+    // #[allow(dead_code)] // TODO okay now?
     pub db: &'a mut db_context::DatabaseContext,
     // sorry, Rust — definitely in use
-    #[allow(dead_code)]
-    pub client: rocket::local::asynchronous::Client,
+    // #[allow(dead_code)] // TODO okay now?
+    //pub client: rocket::local::asynchronous::Client,
+    pub client: poem::test::TestClient,
 }
 
 impl TestContext<'_> {
