@@ -1,6 +1,6 @@
 use db_context::LogDestination;
 use futures::{future::LocalBoxFuture, FutureExt};
-use poem::{endpoint::BoxEndpoint, EndpointExt};
+use poem::endpoint::BoxEndpoint;
 
 pub struct TestContext<'a> {
     // sorry, Rust — definitely in use
@@ -17,7 +17,7 @@ impl TestContext<'_> {
         // <<< test: impl for<'a> FnOnce(&'a mut TestContext<'a, impl poem::Endpoint>) -> LocalBoxFuture<()>
         // <<< + 'static,
     ) where
-        F: for<'a> FnOnce(&'a mut TestContext<'a>) -> LocalBoxFuture<()>,
+        F: for<'a> FnOnce(&'a mut TestContext<'a>) -> LocalBoxFuture<()> + 'static,
     {
         db_context::DatabaseContext::with(
             |db_context| {
