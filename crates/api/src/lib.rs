@@ -8,7 +8,7 @@ use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 #[must_use]
 pub async fn app<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError> // TODO waaat
 {
-    let db_pool = PgPool::connect(db_url).await.unwrap(); // TODO handle error (or not)
+    let db_pool = PgPool::connect(db_url.as_str()).await.unwrap(); // TODO handle error (or not)
 
     util::migrate(&db_pool).await?;
 
