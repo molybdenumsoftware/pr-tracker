@@ -59,7 +59,9 @@ async fn pr_not_landed() {
 
             let response = ctx.client.get("/api/v1/123").send().await;
             response.assert_status_is_ok();
-            response.assert_json(pr_tracker_api::LandedIn { branches: vec![] }).await;
+            response
+                .assert_json(pr_tracker_api::LandedIn { branches: vec![] })
+                .await;
         }
         .boxed()
     })
@@ -92,9 +94,11 @@ async fn pr_landed() {
             let response = ctx.client.get("/api/v1/2134").send().await;
             response.assert_status_is_ok();
 
-            response.assert_json(pr_tracker_api::LandedIn {
-                branches: vec![pr_tracker_api::Branch("nixos-unstable".to_owned())],
-            }).await;
+            response
+                .assert_json(pr_tracker_api::LandedIn {
+                    branches: vec![pr_tracker_api::Branch("nixos-unstable".to_owned())],
+                })
+                .await;
         }
         .boxed()
     })
