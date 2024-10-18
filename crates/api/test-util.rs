@@ -1,5 +1,5 @@
 use db_context::LogDestination;
-use futures::future::LocalBoxFuture;
+use futures::{future::LocalBoxFuture, FutureExt};
 
 pub struct TestContext<'a, E> {
     // sorry, Rust — definitely in use
@@ -10,13 +10,13 @@ pub struct TestContext<'a, E> {
     pub client: poem::test::TestClient<E>,
 }
 
-impl<E, F> TestContext<'_, E>
+impl<E, F, EE> TestContext<'_, E>
 where
-    F: for<'a> FnOnce(&'a mut TestContext<'a, E>) -> LocalBoxFuture<()>,
+    F: for<'a> FnOnce(&'a mut TestContext<'a, EE>) -> LocalBoxFuture<()>,
     E: poem::Endpoint,
 {
     pub async fn with(
-        test: T,
+        test: F,
         // <<< test: impl for<'a> FnOnce(&'a mut TestContext<'a, impl poem::Endpoint>) -> LocalBoxFuture<()>
         // <<< + 'static,
     ) {
