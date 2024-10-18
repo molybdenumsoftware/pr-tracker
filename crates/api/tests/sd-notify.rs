@@ -13,8 +13,9 @@ async fn notifies() {
     let socket_path = temp_dir.path().join("notify-socket");
     std::env::set_var("NOTIFY_SOCKET", &socket_path);
     let sock = std::os::unix::net::UnixDatagram::bind(&socket_path).unwrap();
-    sock.set_read_timeout(Some(std::time::Duration::from_secs(10)))
+    sock.set_read_timeout(Some(std::time::Duration::from_secs(1)))
         .unwrap();
+        sock.send(b"HELLO").unwrap();
     const EXPECTED: &[u8] = b"READY=1\n";
 
     TestContext::with(move |_| {
