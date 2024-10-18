@@ -4,10 +4,10 @@ use poem::endpoint::BoxEndpoint;
 
 pub struct TestContext<'a> {
     // sorry, Rust — definitely in use
-    // #[allow(dead_code)] // TODO okay now?
+    #[allow(dead_code)]
     pub db: &'a mut db_context::DatabaseContext,
     // sorry, Rust — definitely in use
-    // #[allow(dead_code)] // TODO okay now?
+    #[allow(dead_code)]
     pub client: poem::test::TestClient<BoxEndpoint<'a>>,
 }
 

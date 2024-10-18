@@ -4,7 +4,7 @@
 #[path = "../test-util.rs"]
 mod test_util;
 
-use rocket::futures::{self, FutureExt};
+use futures::{self, FutureExt};
 use test_util::TestContext;
 
 #[tokio::test]

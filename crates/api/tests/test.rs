@@ -8,7 +8,7 @@ use test_util::TestContext;
 #[tokio::test]
 async fn healthcheck_ok() {
     TestContext::with(|ctx| {
-        async {
+        async move {
             let response = ctx.client.get("/api/v1/healthcheck").send().await;
             response.assert_status_is_ok();
         }
@@ -20,7 +20,7 @@ async fn healthcheck_ok() {
 #[tokio::test]
 async fn healthcheck_not_ok() {
     TestContext::with(|ctx| {
-        async {
+        async move {
             ctx.db.kill_db().unwrap();
             let response = ctx.client.get("/api/v1/healthcheck").send().await;
             response.assert_status(StatusCode::SERVICE_UNAVAILABLE);
@@ -33,10 +33,10 @@ async fn healthcheck_not_ok() {
 #[tokio::test]
 async fn pr_not_found() {
     TestContext::with(|ctx| {
-        async {
+        async move {
             let response = ctx.client.get("/api/v1/2134").send().await;
             response.assert_status(StatusCode::NOT_FOUND);
-            response.assert_text("Pull request not found.");
+            response.assert_text("Pull request not found.").await;
         }
         .boxed()
     })
@@ -46,7 +46,7 @@ async fn pr_not_found() {
 #[tokio::test]
 async fn pr_not_landed() {
     TestContext::with(|ctx| {
-        async {
+        async move {
             let mut connection = ctx.db.connection().await.unwrap();
 
             pr_tracker_store::Pr {
@@ -59,7 +59,7 @@ async fn pr_not_landed() {
 
             let response = ctx.client.get("/api/v1/123").send().await;
             response.assert_status_is_ok();
-            response.assert_json(pr_tracker_api::LandedIn { branches: vec![] });
+            response.assert_json(pr_tracker_api::LandedIn { branches: vec![] }).await;
         }
         .boxed()
     })
@@ -69,7 +69,7 @@ async fn pr_not_landed() {
 #[tokio::test]
 async fn pr_landed() {
     TestContext::with(|ctx| {
-        async {
+        async move {
             let connection = &mut ctx.db.connection().await.unwrap();
 
             let branch = pr_tracker_store::Branch::get_or_insert(connection, "nixos-unstable")
@@ -94,7 +94,7 @@ async fn pr_landed() {
 
             response.assert_json(pr_tracker_api::LandedIn {
                 branches: vec![pr_tracker_api::Branch("nixos-unstable".to_owned())],
-            });
+            }).await;
         }
         .boxed()
     })
