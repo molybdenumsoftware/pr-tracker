@@ -17,12 +17,13 @@ impl TestContext<'_> {
         // <<< test: impl for<'a> FnOnce(&'a mut TestContext<'a, impl poem::Endpoint>) -> LocalBoxFuture<()>
         // <<< + 'static,
     ) where
-        F: for<'a> FnOnce(&'a mut TestContext<'a>) -> LocalBoxFuture<()> + 'static,
+        F: FnOnce(TestContext<'_>) -> LocalBoxFuture<()> + 'static,
     {
         db_context::DatabaseContext::with(
             |db_context| {
                 async {
-                    let app = pr_tracker_api::app(&db_context.db_url()).await.unwrap();
+                    let db_url = db_context.db_url();
+                    let app = pr_tracker_api::app(&db_url).await.unwrap();
                     // <<< let rocket = rocket::custom(
                     // <<<     rocket::figment::Figment::from(rocket::Config::default())
                     // <<<         .merge(("databases.data.url", db_context.db_url()))
@@ -36,12 +37,12 @@ impl TestContext<'_> {
 
                     let api_client = poem::test::TestClient::new(app);
 
-                    let mut this = TestContext {
+                    let test_context = TestContext {
                         db: db_context,
                         client: api_client,
                     };
 
-                    test(&mut this).await
+                    test(test_context).await
                 }
                 .boxed_local()
             },
