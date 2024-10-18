@@ -8,7 +8,7 @@ use test_util::TestContext;
 async fn healthcheck_ok() {
     TestContext::with(|ctx| {
         async {
-            let response = ctx.client.get("/api/v1/healthcheck").dispatch().await;
+            let response = ctx.client.get("/api/v1/healthcheck").send().await;
             assert_eq!(response.status(), rocket::http::Status::Ok);
         }
         .boxed()
@@ -21,7 +21,7 @@ async fn healthcheck_not_ok() {
     TestContext::with(|ctx| {
         async {
             ctx.db.kill_db().unwrap();
-            let response = ctx.client.get("/api/v1/healthcheck").dispatch().await;
+            let response = ctx.client.get("/api/v1/healthcheck").send().await;
             assert_eq!(response.status(), rocket::http::Status::ServiceUnavailable);
         }
         .boxed()
@@ -33,7 +33,7 @@ async fn healthcheck_not_ok() {
 async fn pr_not_found() {
     TestContext::with(|ctx| {
         async {
-            let response = ctx.client.get("/api/v1/2134").dispatch().await;
+            let response = ctx.client.get("/api/v1/2134").send().await;
             assert_eq!(response.status(), rocket::http::Status::NotFound);
             assert_eq!(
                 response.into_string().await,
@@ -59,7 +59,7 @@ async fn pr_not_landed() {
             .await
             .unwrap();
 
-            let response = ctx.client.get("/api/v1/123").dispatch().await;
+            let response = ctx.client.get("/api/v1/123").send().await;
             assert_eq!(response.status(), rocket::http::Status::Ok);
 
             assert_eq!(
@@ -98,8 +98,8 @@ async fn pr_landed() {
 
             landing.upsert(connection).await.unwrap();
 
-            let response = ctx.client.get("/api/v1/2134").dispatch().await;
-            assert_eq!(response.status(), rocket::http::Status::Ok);
+            let response = ctx.client.get("/api/v1/2134").send().await;
+            response.assert_status_is_ok();
 
             assert_eq!(
                 response
