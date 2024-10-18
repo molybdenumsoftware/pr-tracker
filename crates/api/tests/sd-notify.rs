@@ -20,6 +20,7 @@ async fn notifies() {
 
     TestContext::with(move |_| {
         let mut buf = [0; EXPECTED.len()];
+        sd_notify::notify(true, &[sd_notify::NotifyState::Ready]).unwrap(); //<<< TODO: give a nicer error message ("failed to notify systemd that this service is ready: {err}");
         sock.recv(&mut buf).unwrap();
         assert_eq!(buf, EXPECTED);
         futures::future::ready(()).boxed_local()

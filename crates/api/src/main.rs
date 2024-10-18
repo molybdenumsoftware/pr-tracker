@@ -23,10 +23,12 @@ async fn main() {
         .await
         .unwrap();
 
+    let endpoint = app(&db_url).await.unwrap();
+
     sd_notify::notify(true, &[sd_notify::NotifyState::Ready]).unwrap(); //<<< TODO: give a nicer error message ("failed to notify systemd that this service is ready: {err}");
 
     Server::new_with_acceptor(acceptor)
-        .run(app(&db_url).await.unwrap()) // TODO unwrap?
+        .run(endpoint) // TODO unwrap?
         .await
         .unwrap();
 }
