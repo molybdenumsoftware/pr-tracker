@@ -8,9 +8,17 @@ use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 #[must_use]
 pub async fn app<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError> // TODO waaat
 {
+
     let db_pool = PgPool::connect(db_url).await.unwrap(); // TODO handle error (or not)
 
     util::migrate(&db_pool).await?;
+
+    let acceptor = TcpListener::bind(format!("0.0.0.0:{port}"))
+        .into_acceptor()
+        .await
+        .unwrap();
+
+    sd_notify::notify(true, &[sd_notify::NotifyState::Ready]).unwrap(); //<<< TODO: give a nicer error message ("failed to notify systemd that this service is ready: {err}");
 
     Ok(poem::Route::new()
         .at("/api/v1/healthcheck", poem::get(health_check))

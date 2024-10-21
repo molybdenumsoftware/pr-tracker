@@ -18,14 +18,7 @@ async fn main() {
         PR_TRACKER_API_PORT: port,
     } = config;
 
-    let acceptor = TcpListener::bind(format!("0.0.0.0:{port}"))
-        .into_acceptor()
-        .await
-        .unwrap();
-
     let endpoint = app(&db_url).await.unwrap();
-
-    sd_notify::notify(true, &[sd_notify::NotifyState::Ready]).unwrap(); //<<< TODO: give a nicer error message ("failed to notify systemd that this service is ready: {err}");
 
     Server::new_with_acceptor(acceptor)
         .run(endpoint) // TODO unwrap?
