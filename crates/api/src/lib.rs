@@ -28,7 +28,7 @@ pub async fn app<'a>(
     Ok((acceptor, endpoint))
 }
 
-async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError> {
+pub async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError> {
     let db_pool = PgPool::connect(db_url).await.unwrap(); // TODO handle error (or not)
     util::migrate(&db_pool).await?;
 

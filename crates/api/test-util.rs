@@ -23,7 +23,7 @@ impl TestContext<'_> {
             |db_context| {
                 async {
                     let db_url = db_context.db_url();
-                    let app = pr_tracker_api::app(&db_url).await.unwrap();
+                    let endpoint = pr_tracker_api::endpoint(&db_url).await.unwrap();
                     // <<< let rocket = rocket::custom(
                     // <<<     rocket::figment::Figment::from(rocket::Config::default())
                     // <<<         .merge(("databases.data.url", db_context.db_url()))
@@ -35,7 +35,7 @@ impl TestContext<'_> {
                     // <<<     .await
                     // <<<     .unwrap();
 
-                    let api_client = poem::test::TestClient::new(app);
+                    let api_client = poem::test::TestClient::new(endpoint);
 
                     let test_context = TestContext {
                         db: db_context,
