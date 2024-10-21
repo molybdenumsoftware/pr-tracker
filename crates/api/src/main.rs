@@ -18,7 +18,7 @@ async fn main() {
         PR_TRACKER_API_PORT: port,
     } = config;
 
-    let endpoint = app(&port, &db_url).await.unwrap();
+    let (acceptor, endpoint) = app(port, &db_url).await.unwrap();
 
     Server::new_with_acceptor(acceptor)
         .run(endpoint) // TODO unwrap?

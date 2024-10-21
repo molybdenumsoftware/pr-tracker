@@ -1,24 +1,36 @@
 #![warn(clippy::pedantic)]
-use poem::{endpoint::BoxEndpoint, http::StatusCode, web::Json, EndpointExt, Response, listener::TcpListener};
+use poem::{
+    endpoint::BoxEndpoint,
+    http::StatusCode,
+    listener::{Listener, TcpAcceptor, TcpListener},
+    web::Json,
+    EndpointExt, Response,
+};
 use serde::{Deserialize, Serialize};
 use sqlx::{migrate::MigrateError, PgPool};
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
 #[must_use]
-pub async fn app<'a>(port: &str, db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError> // TODO waaat:
+pub async fn app<'a>(
+    port: u16,
+    db_url: &str,
+) -> Result<(TcpAcceptor, BoxEndpoint<'a>), MigrateError> // TODO waaat:
 {
-
-    let db_pool = PgPool::connect(db_url).await.unwrap(); // TODO handle error (or not)
-
-    util::migrate(&db_pool).await?;
-
     let acceptor = TcpListener::bind(format!("0.0.0.0:{port}"))
         .into_acceptor()
         .await
         .unwrap();
 
     sd_notify::notify(true, &[sd_notify::NotifyState::Ready]).unwrap(); //<<< TODO: give a nicer error message ("failed to notify systemd that this service is ready: {err}");
+
+    let endpoint = endpoint(db_url).await?;
+    Ok((acceptor, endpoint))
+}
+
+async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError> {
+    let db_pool = PgPool::connect(db_url).await.unwrap(); // TODO handle error (or not)
+    util::migrate(&db_pool).await?;
 
     Ok(poem::Route::new()
         .at("/api/v1/healthcheck", poem::get(health_check))
