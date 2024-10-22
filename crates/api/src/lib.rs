@@ -35,7 +35,7 @@ pub async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError>
     Ok(poem::Route::new()
         .at("/api/v1/healthcheck", poem::get(health_check))
         .at("/api/v1/:pr", poem::get(landed))
-        .with()
+        .with(poem::middleware::AddData::new(db_pool))
         .boxed())
 }
 
