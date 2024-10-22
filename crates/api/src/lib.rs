@@ -35,11 +35,20 @@ pub async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError>
     Ok(poem::Route::new()
         .at("/api/v1/healthcheck", poem::get(health_check))
         .at("/api/v1/:pr", poem::get(landed))
-        .with(poem::middleware::AddData::new(db_pool))
+        .with()
         .boxed())
 }
 
 struct DbConnection(PoolConnection<Postgres>);
+
+impl<'a> poem::FromRequest<'a> for DbConnection {
+    async fn from_request(
+        req: &'a poem::Request,
+        body: &mut poem::RequestBody,
+    ) -> poem::Result<Self> {
+
+    }
+}
 // <<< poem::web::Data(db_pool): poem::web::Data<&PgPool>,
 // <<< let mut conn = db_pool.acquire().await.unwrap(); // TODO: don't panic
 
