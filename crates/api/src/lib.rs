@@ -7,7 +7,7 @@ use poem::{
     EndpointExt, Response,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{migrate::MigrateError, PgPool};
+use sqlx::{migrate::MigrateError, pool::PoolConnection, PgPool, Postgres};
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
@@ -39,12 +39,15 @@ pub async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError>
         .boxed())
 }
 
+struct DbConnection(PoolConnection<Postgres>);
+// <<< poem::web::Data(db_pool): poem::web::Data<&PgPool>,
+// <<< let mut conn = db_pool.acquire().await.unwrap(); // TODO: don't panic
+
 #[poem::handler]
 async fn landed(
-    poem::web::Data(db_pool): poem::web::Data<&PgPool>,
     poem::web::Path(pr): poem::web::Path<i32>,
+    DbConnection(mut conn): DbConnection,
 ) -> poem::Result<poem::web::Json<LandedIn>, LandedError> {
-    let mut conn = db_pool.acquire().await.unwrap();
     let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
 
     let branches = landings
