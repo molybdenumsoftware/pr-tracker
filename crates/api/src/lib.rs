@@ -56,12 +56,12 @@ async fn landed(
 }
 
 #[poem::handler]
-async fn health_check(poem::web::Data(db_pool): poem::web::Data<&PgPool>) -> poem::Result<()> {
+async fn health_check(poem::web::Data(db_pool): poem::web::Data<&PgPool>) -> StatusCode {
     if let Err(_) = db_pool.acquire().await {
-        return poem::Err(());
+        StatusCode::SERVICE_UNAVAILABLE
+    } else {
+        StatusCode::OK
     }
-
-    Ok(())
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
