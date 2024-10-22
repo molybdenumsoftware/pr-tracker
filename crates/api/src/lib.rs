@@ -56,8 +56,12 @@ async fn landed(
 }
 
 #[poem::handler]
-fn health_check() {
-    panic!("yooo"); //<<<
+async fn health_check(poem::web::Data(db_pool): poem::web::Data<&PgPool>) -> poem::Result<()> {
+    if let Err(_) = db_pool.acquire().await {
+        return poem::Err(());
+    }
+
+    Ok(())
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
