@@ -56,7 +56,9 @@ async fn landed(
 }
 
 #[poem::handler]
-fn health_check() {}
+fn health_check() {
+    panic!("yooo"); //<<<
+}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Branch(pub String);
