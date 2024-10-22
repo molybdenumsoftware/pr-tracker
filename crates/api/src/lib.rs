@@ -57,7 +57,7 @@ async fn landed(
 
 #[poem::handler]
 async fn health_check(poem::web::Data(db_pool): poem::web::Data<&PgPool>) -> StatusCode {
-    if let Err(_) = db_pool.acquire().await {
+    if db_pool.acquire().await.is_err() {
         StatusCode::SERVICE_UNAVAILABLE
     } else {
         StatusCode::OK
