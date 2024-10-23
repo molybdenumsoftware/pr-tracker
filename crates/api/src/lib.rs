@@ -7,7 +7,7 @@ use poem::{
     Endpoint, EndpointExt, Response,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{migrate::MigrateError, pool::PoolConnection, PgPool, Postgres};
+use sqlx::{migrate::MigrateError, pool::PoolConnection, PgPool, Pool, Postgres};
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
@@ -36,17 +36,17 @@ pub async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError>
         .at("/api/v1/healthcheck", poem::get(health_check))
         .at("/api/v1/:pr", poem::get(landed))
         // <<< .with(poem::middleware::AddData::new(db_pool))
-        .with()
+        .with(DbConnection(db_pool))
         .boxed())
 }
 
-struct DbConnection(PoolConnection<Postgres>);
+struct DbConnection(Pool<Postgres>);
 
 impl<E> poem::Middleware<E> for DbConnection
 where
     E: Endpoint,
 {
-    type Output = DbConnectionEndpoint;
+    type Output = DbConnectionEndpoint<E>;
 
     fn transform(&self, ep: E) -> Self::Output {
         todo!()
@@ -57,13 +57,17 @@ pub struct DbConnectionEndpoint<E> {
     inner: E,
 }
 
-impl<'a> poem::FromRequest<'a> for DbConnection {
-    async fn from_request(
-        req: &'a poem::Request,
-        body: &mut poem::RequestBody,
-    ) -> poem::Result<Self> {
+impl<E> Endpoint for DbConnectionEndpoint<E>
+where
+    E: Endpoint,
+{
+    type Output = E::Output;
+
+    async fn call(&self, req: poem::Request) -> poem::Result<Self::Output> {
+        self.inner.call(req).await
     }
 }
+
 // <<< poem::web::Data(db_pool): poem::web::Data<&PgPool>,
 // <<< let mut conn = db_pool.acquire().await.unwrap(); // TODO: don't panic
 
