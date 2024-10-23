@@ -4,7 +4,7 @@ use poem::{
     http::StatusCode,
     listener::{Listener, TcpAcceptor, TcpListener},
     web::Json,
-    EndpointExt, Response,
+    Endpoint, EndpointExt, Response,
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{migrate::MigrateError, pool::PoolConnection, PgPool, Postgres};
@@ -35,19 +35,26 @@ pub async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError>
     Ok(poem::Route::new()
         .at("/api/v1/healthcheck", poem::get(health_check))
         .at("/api/v1/:pr", poem::get(landed))
-        //.with(poem::middleware::AddData::new(db_pool))
+        // <<< .with(poem::middleware::AddData::new(db_pool))
         .with()
         .boxed())
 }
 
 struct DbConnection(PoolConnection<Postgres>);
 
-impl poem::Middleware for DbConnection {
-    type Output = ;
+impl<E> poem::Middleware<E> for DbConnection
+where
+    E: Endpoint,
+{
+    type Output = DbConnectionEndpoint;
 
     fn transform(&self, ep: E) -> Self::Output {
         todo!()
     }
+}
+
+pub struct DbConnectionEndpoint<E> {
+    inner: E,
 }
 
 impl<'a> poem::FromRequest<'a> for DbConnection {
@@ -55,7 +62,6 @@ impl<'a> poem::FromRequest<'a> for DbConnection {
         req: &'a poem::Request,
         body: &mut poem::RequestBody,
     ) -> poem::Result<Self> {
-
     }
 }
 // <<< poem::web::Data(db_pool): poem::web::Data<&PgPool>,
