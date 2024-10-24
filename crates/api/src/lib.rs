@@ -7,7 +7,7 @@ use poem::{
     Endpoint, EndpointExt, Response,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{migrate::MigrateError, pool::PoolConnection, PgPool, Pool, Postgres};
+use sqlx::{migrate::MigrateError, pool::PoolConnection, Acquire, PgPool, Pool, Postgres};
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
@@ -35,38 +35,73 @@ pub async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError>
     Ok(poem::Route::new()
         .at("/api/v1/healthcheck", poem::get(health_check))
         .at("/api/v1/:pr", poem::get(landed))
-        // <<< .with(poem::middleware::AddData::new(db_pool))
-        .with(DbConnection(db_pool))
+        .with(poem::middleware::AddData::new(db_pool))
+        // <<< .with(DbPoolMiddleware(db_pool))
         .boxed())
 }
 
-struct DbConnection(Pool<Postgres>);
+// <<< struct DbPoolMiddleware(Pool<Postgres>);
+// <<<
+// <<< impl<E> poem::Middleware<E> for DbPoolMiddleware
+// <<< where
+// <<<     E: Endpoint,
+// <<< {
+// <<<     type Output = DbPoolEndpoint<E>;
+// <<<
+// <<<     fn transform(&self, ep: E) -> Self::Output {
+// <<<         todo!()
+// <<<     }
+// <<< }
+// <<<
+// <<< pub struct DbPoolEndpoint<E> {
+// <<<     inner: E,
+// <<< }
+// <<<
+// <<< impl<E> Endpoint for DbPoolEndpoint<E>
+// <<< where
+// <<<     E: Endpoint,
+// <<< {
+// <<<     type Output = E::Output;
+// <<<
+// <<<     async fn call(&self, req: poem::Request) -> poem::Result<Self::Output> {
+// <<<         // >>> TODO: stash pool on req.extensions <<<
+// <<<         self.inner.call(req).await
+// <<<     }
+// <<< }
+// <<<
 
-impl<E> poem::Middleware<E> for DbConnection
-where
-    E: Endpoint,
-{
-    type Output = DbConnectionEndpoint<E>;
+// <<< impl<T> Deref for DbConnection<T> {
+// <<<     type Target = T;
+// <<<
+// <<<     fn deref(&self) -> &Self::Target {
+// <<<         &self.0
+// <<<     }
+// <<< }
 
-    fn transform(&self, ep: E) -> Self::Output {
-        todo!()
+pub struct DbConnection(PoolConnection<Postgres>);
+
+impl<'a> poem::FromRequest<'a> for DbConnection {
+    async fn from_request(
+        req: &'a poem::Request,
+        _body: &mut poem::RequestBody,
+    ) -> poem::Result<Self> {
+        let pool = req.extensions().get::<Pool<Postgres>>().unwrap();
+        Ok(DbConnection(
+            pool.acquire().await.unwrap(), // TODO: return result instead
+                                           // <<< .ok_or_else(|| GetDataError(std::any::type_name::<T>()))?,
+        ))
     }
 }
 
-pub struct DbConnectionEndpoint<E> {
-    inner: E,
-}
-
-impl<E> Endpoint for DbConnectionEndpoint<E>
-where
-    E: Endpoint,
-{
-    type Output = E::Output;
-
-    async fn call(&self, req: poem::Request) -> poem::Result<Self::Output> {
-        self.inner.call(req).await
-    }
-}
+// <<< impl<'a, T: Send + Sync + 'static> poem::FromRequest<'a> for DbConnection {
+// <<<     async fn from_request(req: &'a Request, _body: &mut RequestBody) -> Result<Self> {
+// <<<         Ok(DbConnection(
+// <<<             req.extensions()
+// <<<                 .get::<T>()
+// <<<                 .ok_or_else(|| GetDataError(std::any::type_name::<T>()))?,
+// <<<         ))
+// <<<     }
+// <<< }
 
 // <<< poem::web::Data(db_pool): poem::web::Data<&PgPool>,
 // <<< let mut conn = db_pool.acquire().await.unwrap(); // TODO: don't panic
@@ -74,7 +109,7 @@ where
 #[poem::handler]
 async fn landed(
     poem::web::Path(pr): poem::web::Path<i32>,
-    poem::web::Data(mut conn): poem::web::Data<&PoolConnection<Postgres>>,
+    DbConnection(mut conn): DbConnection,
 ) -> poem::Result<poem::web::Json<LandedIn>, LandedError> {
     let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
 
@@ -87,13 +122,7 @@ async fn landed(
 }
 
 #[poem::handler]
-async fn health_check(poem::web::Data(db_pool): poem::web::Data<&PgPool>) -> StatusCode {
-    if db_pool.acquire().await.is_err() {
-        StatusCode::SERVICE_UNAVAILABLE
-    } else {
-        StatusCode::OK
-    }
-}
+fn health_check(_: DbConnection) {}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Branch(pub String);
