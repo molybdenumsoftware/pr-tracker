@@ -10,6 +10,7 @@ license = "AGPL-3.0-only"
 repository = "https://github.com/molybdenumsoftware/pr-tracker"
 
 [workspace.dependencies]
+anyhow = { version = "*", features = ["backtrace"] }
 camino = { version = "*", features = ["serde1"] }
 confique = { version = "*", default-features = false }
 db-context.path = "crates/db-context"

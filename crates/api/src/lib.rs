@@ -1,4 +1,5 @@
 #![warn(clippy::pedantic)]
+use anyhow::Context;
 use poem::{
     endpoint::BoxEndpoint,
     http::StatusCode,
@@ -12,32 +13,29 @@ use sqlx::{migrate::MigrateError, pool::PoolConnection, Acquire, PgPool, Pool, P
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
 #[must_use]
-pub async fn app<'a>(
-    port: u16,
-    db_url: &str,
-) -> Result<(TcpAcceptor, BoxEndpoint<'a>), MigrateError> // TODO waaat:
-{
+pub async fn app<'a>(port: u16, db_url: &str) -> (TcpAcceptor, BoxEndpoint<'a>) {
     let acceptor = TcpListener::bind(format!("0.0.0.0:{port}"))
         .into_acceptor()
         .await
         .unwrap();
 
-    sd_notify::notify(true, &[sd_notify::NotifyState::Ready]).unwrap(); //<<< TODO: give a nicer error message ("failed to notify systemd that this service is ready: {err}");
+    sd_notify::notify(true, &[sd_notify::NotifyState::Ready])
+        .context("failed to notify systemd that this service is ready")
+        .unwrap();
 
-    let endpoint = endpoint(db_url).await?;
-    Ok((acceptor, endpoint))
+    let endpoint = endpoint(db_url).await;
+    (acceptor, endpoint)
 }
 
-pub async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError> {
-    let db_pool = PgPool::connect(db_url).await.unwrap(); // TODO handle error (or not)
-    util::migrate(&db_pool).await?;
+pub async fn endpoint<'a>(db_url: &str) -> BoxEndpoint<'a> {
+    let db_pool = PgPool::connect(db_url).await.unwrap();
+    util::migrate(&db_pool).await.unwrap();
 
-    Ok(poem::Route::new()
+    poem::Route::new()
         .at("/api/v1/healthcheck", poem::get(health_check))
         .at("/api/v1/:pr", poem::get(landed))
         .with(poem::middleware::AddData::new(db_pool))
-        // <<< .with(DbPoolMiddleware(db_pool))
-        .boxed())
+        .boxed()
 }
 
 pub struct DbConnection(PoolConnection<Postgres>);
@@ -47,7 +45,7 @@ impl<'a> poem::FromRequest<'a> for DbConnection {
         req: &'a poem::Request,
         _body: &mut poem::RequestBody,
     ) -> poem::Result<Self> {
-        let pool = req.extensions().get::<Pool<Postgres>>().unwrap();
+        let pool = req.extensions().get::<Pool<Postgres>>().expect("Could not find a db pool on `req.extensions`. Perhaps you forgot to register an `AddData` middleware that adds it?");
         let conn = pool
             .acquire()
             .await

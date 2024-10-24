@@ -12,28 +12,15 @@ pub struct TestContext<'a> {
 }
 
 impl TestContext<'_> {
-    pub async fn with<F>(
-        test: F,
-        // <<< test: impl for<'a> FnOnce(&'a mut TestContext<'a, impl poem::Endpoint>) -> LocalBoxFuture<()>
-        // <<< + 'static,
-    ) where
+    pub async fn with<F>(test: F)
+    where
         F: FnOnce(TestContext<'_>) -> LocalBoxFuture<()> + 'static,
     {
         db_context::DatabaseContext::with(
             |db_context| {
                 async {
                     let db_url = db_context.db_url();
-                    let endpoint = pr_tracker_api::endpoint(&db_url).await.unwrap();
-                    // <<< let rocket = rocket::custom(
-                    // <<<     rocket::figment::Figment::from(rocket::Config::default())
-                    // <<<         .merge(("databases.data.url", db_context.db_url()))
-                    // <<<         .merge(("log_level", rocket::config::LogLevel::Debug)),
-                    // <<< )
-                    // <<< .attach(app);
-                    // <<<
-                    // <<< let api_client = rocket::local::asynchronous::Client::tracked(rocket)
-                    // <<<     .await
-                    // <<<     .unwrap();
+                    let endpoint = pr_tracker_api::endpoint(&db_url).await;
 
                     let api_client = poem::test::TestClient::new(endpoint);
 
