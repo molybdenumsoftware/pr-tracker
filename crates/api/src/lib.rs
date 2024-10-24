@@ -40,44 +40,6 @@ pub async fn endpoint<'a>(db_url: &str) -> Result<BoxEndpoint<'a>, MigrateError>
         .boxed())
 }
 
-// <<< struct DbPoolMiddleware(Pool<Postgres>);
-// <<<
-// <<< impl<E> poem::Middleware<E> for DbPoolMiddleware
-// <<< where
-// <<<     E: Endpoint,
-// <<< {
-// <<<     type Output = DbPoolEndpoint<E>;
-// <<<
-// <<<     fn transform(&self, ep: E) -> Self::Output {
-// <<<         todo!()
-// <<<     }
-// <<< }
-// <<<
-// <<< pub struct DbPoolEndpoint<E> {
-// <<<     inner: E,
-// <<< }
-// <<<
-// <<< impl<E> Endpoint for DbPoolEndpoint<E>
-// <<< where
-// <<<     E: Endpoint,
-// <<< {
-// <<<     type Output = E::Output;
-// <<<
-// <<<     async fn call(&self, req: poem::Request) -> poem::Result<Self::Output> {
-// <<<         // >>> TODO: stash pool on req.extensions <<<
-// <<<         self.inner.call(req).await
-// <<<     }
-// <<< }
-// <<<
-
-// <<< impl<T> Deref for DbConnection<T> {
-// <<<     type Target = T;
-// <<<
-// <<<     fn deref(&self) -> &Self::Target {
-// <<<         &self.0
-// <<<     }
-// <<< }
-
 pub struct DbConnection(PoolConnection<Postgres>);
 
 impl<'a> poem::FromRequest<'a> for DbConnection {
@@ -86,25 +48,13 @@ impl<'a> poem::FromRequest<'a> for DbConnection {
         _body: &mut poem::RequestBody,
     ) -> poem::Result<Self> {
         let pool = req.extensions().get::<Pool<Postgres>>().unwrap();
-        Ok(DbConnection(
-            pool.acquire().await.unwrap(), // TODO: return result instead
-                                           // <<< .ok_or_else(|| GetDataError(std::any::type_name::<T>()))?,
-        ))
+        let conn = pool
+            .acquire()
+            .await
+            .map_err(poem::error::ServiceUnavailable)?;
+        Ok(DbConnection(conn))
     }
 }
-
-// <<< impl<'a, T: Send + Sync + 'static> poem::FromRequest<'a> for DbConnection {
-// <<<     async fn from_request(req: &'a Request, _body: &mut RequestBody) -> Result<Self> {
-// <<<         Ok(DbConnection(
-// <<<             req.extensions()
-// <<<                 .get::<T>()
-// <<<                 .ok_or_else(|| GetDataError(std::any::type_name::<T>()))?,
-// <<<         ))
-// <<<     }
-// <<< }
-
-// <<< poem::web::Data(db_pool): poem::web::Data<&PgPool>,
-// <<< let mut conn = db_pool.acquire().await.unwrap(); // TODO: don't panic
 
 #[poem::handler]
 async fn landed(
