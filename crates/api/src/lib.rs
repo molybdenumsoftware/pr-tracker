@@ -74,7 +74,7 @@ where
 #[poem::handler]
 async fn landed(
     poem::web::Path(pr): poem::web::Path<i32>,
-    DbConnection(mut conn): DbConnection,
+    poem::web::Data(mut conn): poem::web::Data<&PoolConnection<Postgres>>,
 ) -> poem::Result<poem::web::Json<LandedIn>, LandedError> {
     let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
 
