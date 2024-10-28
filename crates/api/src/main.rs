@@ -1,14 +1,16 @@
 #![warn(clippy::pedantic)]
-// required because rocket::launch, remove if clippy permits.
-#![allow(clippy::no_effect_underscore_binding)]
 
+use anyhow::Context;
 use confique::Config;
-use pr_tracker_api::app;
+use poem::{
+    listener::{Listener, TcpListener},
+    Server,
+};
+use pr_tracker_api::endpoint;
 use pr_tracker_api_config::Environment;
-use rocket::{figment::Figment, launch};
 
-#[launch]
-fn rocket() -> _ {
+#[tokio::main]
+async fn main() {
     let config = Environment::builder()
         .env()
         .load()
@@ -19,9 +21,22 @@ fn rocket() -> _ {
         PR_TRACKER_API_PORT: port,
     } = config;
 
-    let figment = Figment::from(rocket::Config::default())
-        .merge(("port", port))
-        .merge(("databases.data.url", db_url));
+    let addr = format!("0.0.0.0:{port}");
+    let acceptor = TcpListener::bind(&addr)
+        .into_acceptor()
+        .await
+        .with_context(|| format!("failed to bind on {addr}"))
+        .unwrap();
 
-    rocket::custom(figment).attach(app())
+    sd_notify::notify(true, &[sd_notify::NotifyState::Ready])
+        .context("failed to notify systemd that this service is ready")
+        .unwrap();
+
+    let endpoint = endpoint(&db_url).await;
+
+    Server::new_with_acceptor(acceptor)
+        .run(endpoint)
+        .await
+        .context("server crashed")
+        .unwrap();
 }

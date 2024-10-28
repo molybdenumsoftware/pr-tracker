@@ -15,4 +15,4 @@ futures = "*"
 gix.workspace = true
 sqlx = { version = "*", features = ["postgres", "runtime-tokio"] }
 tempfile = "*"
-fragile-child.path = "../fragile-child"
+fragile-child.workspace = true

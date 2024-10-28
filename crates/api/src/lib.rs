@@ -1,61 +1,56 @@
 #![warn(clippy::pedantic)]
-// required because rocket::routes, remove if clippy permits.
-#![allow(clippy::no_effect_underscore_binding)]
+use std::time::Duration;
+
+use poem::{endpoint::BoxEndpoint, http::StatusCode, web::Json, EndpointExt, Response};
+use serde::{Deserialize, Serialize};
+use sqlx::{
+    pool::{PoolConnection, PoolOptions},
+    Pool, Postgres,
+};
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
-use rocket::{
-    futures::FutureExt,
-    http::Status,
-    response::{self, status},
-    serde::{json::Json, Deserialize, Serialize},
-    Request, Rocket,
-};
-use rocket_db_pools::{Connection, Database};
 
-async fn run_migrations(rocket: Rocket<rocket::Build>) -> rocket::fairing::Result {
-    let Some(db) = Data::fetch(&rocket) else {
-        rocket::error!("Failed to connect to the database");
-        return Err(rocket);
-    };
+/// # Panics
+/// See implementation.
+pub async fn endpoint<'a>(db_url: &str) -> BoxEndpoint<'a> {
+    let db_pool = PoolOptions::<Postgres>::new()
+        .acquire_timeout(Duration::from_secs(5))
+        .connect(db_url)
+        .await
+        .unwrap();
 
-    let Err(e) = util::migrate(&db.0).await else {
-        return Ok(rocket);
-    };
+    util::migrate(&db_pool).await.unwrap();
 
-    rocket::error!("Failed to run database migrations: {e}");
-    Err(rocket)
+    poem::Route::new()
+        .at("/api/v1/healthcheck", poem::get(health_check))
+        .at("/api/v1/:pr", poem::get(landed))
+        .with(poem::middleware::AddData::new(db_pool))
+        .boxed()
 }
 
-#[must_use]
-pub fn app() -> rocket::fairing::AdHoc {
-    rocket::fairing::AdHoc::on_ignite("main", |rocket| async {
-        let rocket = rocket
-            .attach(Data::init())
-            .attach(rocket::fairing::AdHoc::try_on_ignite(
-                "run migrations",
-                run_migrations,
-            ));
+pub struct DbConnection(PoolConnection<Postgres>);
 
-        #[cfg(target_family = "unix")]
-        let rocket = rocket.attach(rocket::fairing::AdHoc::on_liftoff("sd-notify", |_| {
-            if let Err(err) = sd_notify::notify(true, &[sd_notify::NotifyState::Ready]) {
-                rocket::error!("failed to notify systemd that this service is ready: {err}");
-            }
+impl<'a> poem::FromRequest<'a> for DbConnection {
+    async fn from_request(
+        req: &'a poem::Request,
+        _body: &mut poem::RequestBody,
+    ) -> poem::Result<Self> {
+        let pool = req.extensions()
+            .get::<Pool<Postgres>>()
+            .expect("Could not find a db pool on `req.extensions`. Perhaps you forgot to register an `AddData` middleware that adds it?");
+        let pool_connection = pool.acquire().await;
+        let conn = pool_connection.map_err(poem::error::ServiceUnavailable)?;
 
-            std::future::ready(()).boxed()
-        }));
-
-        rocket.mount("/", rocket::routes![health_check, landed])
-    })
+        Ok(DbConnection(conn))
+    }
 }
 
-#[derive(rocket_db_pools::Database, Debug)]
-#[database("data")]
-struct Data(sqlx::Pool<sqlx::Postgres>);
-
-#[rocket::get("/api/v1/<pr>")]
-async fn landed(mut db: Connection<Data>, pr: i32) -> Result<Json<LandedIn>, LandedError> {
-    let landings = Landing::for_pr(&mut db, pr.try_into()?).await?;
+#[poem::handler]
+async fn landed(
+    poem::web::Path(pr): poem::web::Path<i32>,
+    DbConnection(mut conn): DbConnection,
+) -> poem::Result<poem::web::Json<LandedIn>, LandedError> {
+    let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
 
     let branches = landings
         .into_iter()
@@ -65,12 +60,10 @@ async fn landed(mut db: Connection<Data>, pr: i32) -> Result<Json<LandedIn>, Lan
     Ok(Json(LandedIn { branches }))
 }
 
-#[rocket::get("/api/v1/healthcheck")]
-#[allow(clippy::needless_pass_by_value)]
-fn health_check(_db: Connection<Data>) {}
+#[poem::handler]
+fn health_check(_: DbConnection) {}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-#[serde(crate = "rocket::serde")]
 pub struct Branch(pub String);
 
 impl Branch {
@@ -80,7 +73,6 @@ impl Branch {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-#[serde(crate = "rocket::serde")]
 pub struct LandedIn {
     pub branches: Vec<Branch>,
 }
@@ -105,26 +97,27 @@ impl From<ForPrError> for LandedError {
     }
 }
 
-impl<'r, 'o: 'r> response::Responder<'r, 'o> for LandedError {
-    fn respond_to(self, request: &'r Request<'_>) -> response::Result<'o> {
+impl poem::error::ResponseError for LandedError {
+    fn status(&self) -> StatusCode {
         match self {
-            LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => {
-                let status = Status::from_code(400).unwrap();
-                status::Custom(
-                    status,
-                    response::content::RawText("Non positive pull request number."),
-                )
-                .respond_to(request)
-            }
-            LandedError::ForPr(ForPrError::Sqlx(_sqlx_error)) => {
-                let status = Status::from_code(500).unwrap();
-                status::Custom(status, response::content::RawText("Error. Sorry."))
-                    .respond_to(request)
-            }
-            LandedError::ForPr(ForPrError::PrNotFound) => {
-                status::NotFound(response::content::RawText("Pull request not found."))
-                    .respond_to(request)
-            }
+            LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => StatusCode::BAD_REQUEST,
+            LandedError::ForPr(ForPrError::Sqlx(_sqlx_error)) => StatusCode::INTERNAL_SERVER_ERROR,
+            LandedError::ForPr(ForPrError::PrNotFound) => StatusCode::NOT_FOUND,
         }
+    }
+
+    fn as_response(&self) -> Response
+    where
+        Self: std::error::Error + Send + Sync + 'static,
+    {
+        let body = match self {
+            LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => {
+                "Non positive pull request number."
+            }
+            LandedError::ForPr(ForPrError::Sqlx(_sqlx_error)) => "Error. Sorry.",
+            LandedError::ForPr(ForPrError::PrNotFound) => "Pull request not found.",
+        };
+
+        Response::builder().status(self.status()).body(body)
     }
 }

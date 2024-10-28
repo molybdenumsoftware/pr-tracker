@@ -1,5 +1,6 @@
 use db_context::LogDestination;
-use rocket::futures::FutureExt;
+use futures::{future::LocalBoxFuture, FutureExt};
+use poem::endpoint::BoxEndpoint;
 
 pub struct TestContext<'a> {
     // sorry, Rust — definitely in use
@@ -7,34 +8,25 @@ pub struct TestContext<'a> {
     pub db: &'a mut db_context::DatabaseContext,
     // sorry, Rust — definitely in use
     #[allow(dead_code)]
-    pub client: rocket::local::asynchronous::Client,
+    pub client: poem::test::TestClient<BoxEndpoint<'a>>,
 }
 
 impl TestContext<'_> {
-    pub async fn with(
-        test: impl for<'a> FnOnce(&'a mut TestContext<'a>) -> rocket::futures::future::LocalBoxFuture<()>
-            + 'static,
-    ) {
+    pub async fn with(test: impl FnOnce(TestContext<'_>) -> LocalBoxFuture<()> + 'static) {
         db_context::DatabaseContext::with(
             |db_context| {
                 async {
-                    let rocket = rocket::custom(
-                        rocket::figment::Figment::from(rocket::Config::default())
-                            .merge(("databases.data.url", db_context.db_url()))
-                            .merge(("log_level", rocket::config::LogLevel::Debug)),
-                    )
-                    .attach(pr_tracker_api::app());
+                    let db_url = db_context.db_url();
+                    let endpoint = pr_tracker_api::endpoint(&db_url).await;
 
-                    let api_client = rocket::local::asynchronous::Client::tracked(rocket)
-                        .await
-                        .unwrap();
+                    let api_client = poem::test::TestClient::new(endpoint);
 
-                    let mut this = TestContext {
+                    let this = TestContext {
                         db: db_context,
                         client: api_client,
                     };
 
-                    test(&mut this).await
+                    test(this).await
                 }
                 .boxed_local()
             },
