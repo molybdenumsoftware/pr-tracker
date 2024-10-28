@@ -1,15 +1,16 @@
 #[path = "../test-util.rs"]
 mod test_util;
 
-use rocket::futures::FutureExt;
+use futures::FutureExt;
+use poem::http::StatusCode;
 use test_util::TestContext;
 
 #[tokio::test]
 async fn healthcheck_ok() {
     TestContext::with(|ctx| {
-        async {
-            let response = ctx.client.get("/api/v1/healthcheck").dispatch().await;
-            assert_eq!(response.status(), rocket::http::Status::Ok);
+        async move {
+            let response = ctx.client.get("/api/v1/healthcheck").send().await;
+            response.assert_status_is_ok();
         }
         .boxed()
     })
@@ -19,10 +20,10 @@ async fn healthcheck_ok() {
 #[tokio::test]
 async fn healthcheck_not_ok() {
     TestContext::with(|ctx| {
-        async {
+        async move {
             ctx.db.kill_db().unwrap();
-            let response = ctx.client.get("/api/v1/healthcheck").dispatch().await;
-            assert_eq!(response.status(), rocket::http::Status::ServiceUnavailable);
+            let response = ctx.client.get("/api/v1/healthcheck").send().await;
+            response.assert_status(StatusCode::SERVICE_UNAVAILABLE);
         }
         .boxed()
     })
@@ -32,13 +33,10 @@ async fn healthcheck_not_ok() {
 #[tokio::test]
 async fn pr_not_found() {
     TestContext::with(|ctx| {
-        async {
-            let response = ctx.client.get("/api/v1/2134").dispatch().await;
-            assert_eq!(response.status(), rocket::http::Status::NotFound);
-            assert_eq!(
-                response.into_string().await,
-                Some("Pull request not found.".into())
-            );
+        async move {
+            let response = ctx.client.get("/api/v1/2134").send().await;
+            response.assert_status(StatusCode::NOT_FOUND);
+            response.assert_text("Pull request not found.").await;
         }
         .boxed()
     })
@@ -48,7 +46,7 @@ async fn pr_not_found() {
 #[tokio::test]
 async fn pr_not_landed() {
     TestContext::with(|ctx| {
-        async {
+        async move {
             let mut connection = ctx.db.connection().await.unwrap();
 
             pr_tracker_store::Pr {
@@ -59,16 +57,11 @@ async fn pr_not_landed() {
             .await
             .unwrap();
 
-            let response = ctx.client.get("/api/v1/123").dispatch().await;
-            assert_eq!(response.status(), rocket::http::Status::Ok);
-
-            assert_eq!(
-                response
-                    .into_json::<pr_tracker_api::LandedIn>()
-                    .await
-                    .unwrap(),
-                pr_tracker_api::LandedIn { branches: vec![] }
-            );
+            let response = ctx.client.get("/api/v1/123").send().await;
+            response.assert_status_is_ok();
+            response
+                .assert_json(pr_tracker_api::LandedIn { branches: vec![] })
+                .await;
         }
         .boxed()
     })
@@ -78,7 +71,7 @@ async fn pr_not_landed() {
 #[tokio::test]
 async fn pr_landed() {
     TestContext::with(|ctx| {
-        async {
+        async move {
             let connection = &mut ctx.db.connection().await.unwrap();
 
             let branch = pr_tracker_store::Branch::get_or_insert(connection, "nixos-unstable")
@@ -98,18 +91,14 @@ async fn pr_landed() {
 
             landing.upsert(connection).await.unwrap();
 
-            let response = ctx.client.get("/api/v1/2134").dispatch().await;
-            assert_eq!(response.status(), rocket::http::Status::Ok);
+            let response = ctx.client.get("/api/v1/2134").send().await;
+            response.assert_status_is_ok();
 
-            assert_eq!(
-                response
-                    .into_json::<pr_tracker_api::LandedIn>()
-                    .await
-                    .unwrap(),
-                pr_tracker_api::LandedIn {
-                    branches: vec![pr_tracker_api::Branch("nixos-unstable".to_owned())]
-                }
-            );
+            response
+                .assert_json(pr_tracker_api::LandedIn {
+                    branches: vec![pr_tracker_api::Branch("nixos-unstable".to_owned())],
+                })
+                .await;
         }
         .boxed()
     })

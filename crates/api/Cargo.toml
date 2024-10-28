@@ -10,15 +10,17 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow.workspace = true
 pr-tracker-api-config = { path = "../api-config" }
 camino = "*"
 confique.workspace = true
+futures.workspace = true
+poem = { version = "*", features = ["test"] }
 pr-tracker-store.workspace = true
-rocket = { version = "*", features = ["json"] }
-rocket_db_pools = { version = "*", features = ["sqlx_postgres"] }
 serde.workspace = true
 sqlx = { version = "*", default-features = false, features = ["macros", "migrate"] }
 thiserror.workspace = true
+tokio = "*"
 util.workspace = true
 
 [target.'cfg(target_family = "unix")'.dependencies]
@@ -26,5 +28,5 @@ sd-notify = "*"
 
 [dev-dependencies]
 db-context.workspace = true
+fragile-child.workspace = true
 tempfile.workspace = true
-tokio = "*"
