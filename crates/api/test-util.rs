@@ -3,15 +3,15 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use poem::endpoint::BoxEndpoint;
 
 #[derive(getset::Getters, getset::MutGetters)]
-pub struct TestContext<'a> {
+pub struct TestContext {
     #[getset(get = "pub", get_mut = "pub")]
     db: db_context::DatabaseContext,
     #[getset(get = "pub")]
-    client: poem::test::TestClient<BoxEndpoint<'a>>,
+    client: poem::test::TestClient<BoxEndpoint<'static>>,
 }
 
-impl TestContext<'_> {
-    pub async fn with(test: impl FnOnce(TestContext<'_>) -> LocalBoxFuture<()> + 'static) {
+impl TestContext {
+    pub async fn with(test: impl FnOnce(TestContext) -> LocalBoxFuture<'static, ()> + 'static) {
         db_context::DatabaseContext::with(
             |db_context| {
                 async {
