@@ -6,7 +6,7 @@ use std::process::Command;
 async fn main() {
     DatabaseContext::with(
         |ctx| {
-            async {
+            async move {
                 let pool = ctx.pool().await.unwrap();
                 util::migrate(&pool).await.unwrap();
 

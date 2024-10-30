@@ -12,7 +12,7 @@ use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
 /// # Panics
 /// See implementation.
-pub async fn endpoint<'a>(db_url: &str) -> BoxEndpoint<'a> {
+pub async fn endpoint(db_url: &str) -> BoxEndpoint<'static> {
     let db_pool = PoolOptions::<Postgres>::new()
         .acquire_timeout(Duration::from_secs(5))
         .connect(db_url)

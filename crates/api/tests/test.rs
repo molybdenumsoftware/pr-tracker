@@ -9,7 +9,7 @@ use test_util::TestContext;
 async fn healthcheck_ok() {
     TestContext::with(|ctx| {
         async move {
-            let response = ctx.client.get("/api/v1/healthcheck").send().await;
+            let response = ctx.client().get("/api/v1/healthcheck").send().await;
             response.assert_status_is_ok();
         }
         .boxed()
@@ -19,10 +19,10 @@ async fn healthcheck_ok() {
 
 #[tokio::test]
 async fn healthcheck_not_ok() {
-    TestContext::with(|ctx| {
+    TestContext::with(|mut ctx| {
         async move {
-            ctx.db.kill_db().unwrap();
-            let response = ctx.client.get("/api/v1/healthcheck").send().await;
+            ctx.db_mut().kill_db().unwrap();
+            let response = ctx.client().get("/api/v1/healthcheck").send().await;
             response.assert_status(StatusCode::SERVICE_UNAVAILABLE);
         }
         .boxed()
@@ -34,7 +34,7 @@ async fn healthcheck_not_ok() {
 async fn pr_not_found() {
     TestContext::with(|ctx| {
         async move {
-            let response = ctx.client.get("/api/v1/2134").send().await;
+            let response = ctx.client().get("/api/v1/2134").send().await;
             response.assert_status(StatusCode::NOT_FOUND);
             response.assert_text("Pull request not found.").await;
         }
@@ -47,7 +47,7 @@ async fn pr_not_found() {
 async fn pr_not_landed() {
     TestContext::with(|ctx| {
         async move {
-            let mut connection = ctx.db.connection().await.unwrap();
+            let mut connection = ctx.db().connection().await.unwrap();
 
             pr_tracker_store::Pr {
                 number: 123.try_into().unwrap(),
@@ -57,7 +57,7 @@ async fn pr_not_landed() {
             .await
             .unwrap();
 
-            let response = ctx.client.get("/api/v1/123").send().await;
+            let response = ctx.client().get("/api/v1/123").send().await;
             response.assert_status_is_ok();
             response
                 .assert_json(pr_tracker_api::LandedIn { branches: vec![] })
@@ -72,7 +72,7 @@ async fn pr_not_landed() {
 async fn pr_landed() {
     TestContext::with(|ctx| {
         async move {
-            let connection = &mut ctx.db.connection().await.unwrap();
+            let connection = &mut ctx.db().connection().await.unwrap();
 
             let branch = pr_tracker_store::Branch::get_or_insert(connection, "nixos-unstable")
                 .await
@@ -91,7 +91,7 @@ async fn pr_landed() {
 
             landing.upsert(connection).await.unwrap();
 
-            let response = ctx.client.get("/api/v1/2134").send().await;
+            let response = ctx.client().get("/api/v1/2134").send().await;
             response.assert_status_is_ok();
 
             response

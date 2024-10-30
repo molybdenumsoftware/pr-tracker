@@ -6,7 +6,7 @@ use std::process::{self, Command};
 async fn main() {
     let code = DatabaseContext::with(
         |database_ctx| {
-            async {
+            async move {
                 let pool = database_ctx.pool().await.unwrap();
                 util::migrate(&pool).await.unwrap();
                 let db_url = database_ctx.db_url();

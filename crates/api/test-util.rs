@@ -2,17 +2,16 @@ use db_context::LogDestination;
 use futures::{future::LocalBoxFuture, FutureExt};
 use poem::endpoint::BoxEndpoint;
 
-pub struct TestContext<'a> {
-    // sorry, Rust — definitely in use
-    #[allow(dead_code)]
-    pub db: &'a mut db_context::DatabaseContext,
-    // sorry, Rust — definitely in use
-    #[allow(dead_code)]
-    pub client: poem::test::TestClient<BoxEndpoint<'a>>,
+#[derive(getset::Getters, getset::MutGetters)]
+pub struct TestContext {
+    #[getset(get = "pub", get_mut = "pub")]
+    db: db_context::DatabaseContext,
+    #[getset(get = "pub")]
+    client: poem::test::TestClient<BoxEndpoint<'static>>,
 }
 
-impl TestContext<'_> {
-    pub async fn with(test: impl FnOnce(TestContext<'_>) -> LocalBoxFuture<()> + 'static) {
+impl TestContext {
+    pub async fn with(test: impl FnOnce(TestContext) -> LocalBoxFuture<'static, ()> + 'static) {
         db_context::DatabaseContext::with(
             |db_context| {
                 async {

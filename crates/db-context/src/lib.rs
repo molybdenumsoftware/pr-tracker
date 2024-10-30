@@ -123,12 +123,10 @@ impl DatabaseContext {
     }
 
     pub async fn with<T>(
-        f: impl FnOnce(&mut Self) -> LocalBoxFuture<T>,
+        f: impl FnOnce(Self) -> LocalBoxFuture<'static, T>,
         log_destination: LogDestination,
     ) -> T {
-        let mut ctx = Self::init(log_destination).await;
-        let t = f(&mut ctx).await;
-        drop(ctx);
-        t
+        let ctx = Self::init(log_destination).await;
+        f(ctx).await
     }
 }

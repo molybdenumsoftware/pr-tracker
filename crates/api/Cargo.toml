@@ -29,4 +29,5 @@ sd-notify = "*"
 [dev-dependencies]
 db-context.workspace = true
 fragile-child.workspace = true
+getset.workspace = true
 tempfile.workspace = true
