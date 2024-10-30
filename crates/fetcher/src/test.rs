@@ -105,8 +105,8 @@ impl MockPr {
     }
 }
 
-struct TestContext<'a> {
-    db_context: &'a DatabaseContext,
+struct TestContext {
+    db_context: DatabaseContext,
     tempdir: TempDir,
     pull_requests: BTreeSet<MockPr>,
     pull_request_mtime_counter: u32,
@@ -115,10 +115,8 @@ struct TestContext<'a> {
     queried_cursors: Vec<Option<GithubPrQueryCursor>>,
 }
 
-impl TestContext<'_> {
-    async fn with(
-        test: impl for<'a, 'b> FnOnce(&'b mut TestContext<'a>) -> LocalBoxFuture<'b, ()> + 'static,
-    ) {
+impl TestContext {
+    async fn with(test: impl FnOnce(TestContext) -> LocalBoxFuture<'static, ()> + 'static) {
         once_cell::sync::Lazy::get(&LOGGER);
 
         DatabaseContext::with(
@@ -133,7 +131,7 @@ impl TestContext<'_> {
                         .await
                         .unwrap();
 
-                    let mut test_context = TestContext {
+                    let test_context = TestContext {
                         db_context,
                         tempdir,
                         pull_requests: BTreeSet::new(),
@@ -147,8 +145,7 @@ impl TestContext<'_> {
                         .isolated_git(["commit", "--allow-empty", "-m", "init"])
                         .await;
 
-                    test(&mut test_context).await;
-                    drop(test_context);
+                    test(test_context).await;
                 }
                 .boxed_local()
             },
@@ -256,7 +253,7 @@ impl TestContext<'_> {
     }
 }
 
-impl<'a> GithubClient for &mut TestContext<'a> {
+impl GithubClient for &mut TestContext {
     async fn query_pull_requests(
         &mut self,
         cursor: Option<GithubPrQueryCursor>,
@@ -293,7 +290,7 @@ impl<'a> GithubClient for &mut TestContext<'a> {
 
 #[tokio::test]
 async fn story() {
-    TestContext::with(|context| {
+    TestContext::with(|mut context| {
         async move {
             let branch_patterns = &[WildMatch::new("*")];
 
@@ -393,7 +390,7 @@ async fn story() {
 
 #[tokio::test]
 async fn branch_patterns() {
-    TestContext::with(|context| {
+    TestContext::with(|mut context| {
         async move {
             context.create_branch("release-1", "main").await;
             context.create_branch("release-10", "main").await; // for the asterisk
@@ -423,7 +420,7 @@ async fn branch_patterns() {
 
 #[tokio::test]
 async fn github_client_pagination() {
-    TestContext::with(|context| {
+    TestContext::with(|mut context| {
         async move {
             let branch_patterns = [WildMatch::new("main")];
             let pr_1 = &context.pr_against("main");

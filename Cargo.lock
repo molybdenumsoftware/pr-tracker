@@ -2486,6 +2486,7 @@ dependencies = [
  "db-context",
  "fragile-child",
  "futures",
+ "getset",
  "poem",
  "pr-tracker-api-config",
  "pr-tracker-store",
