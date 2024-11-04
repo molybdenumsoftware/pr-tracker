@@ -82,15 +82,26 @@ enum LandedError {
     #[error(transparent)]
     PrNumberNonPositive(#[from] PrNumberNonPositiveError),
     #[error(transparent)]
-    ForPr(#[from] ForPrError),
+    Sqlx(sqlx::Error),
+    #[error("Pull request not found.")]
+    PrNotFound,
+}
+
+impl From<ForPrError> for LandedError {
+    fn from(value: ForPrError) -> Self {
+        match value {
+            ForPrError::Sqlx(e) => Self::Sqlx(e),
+            ForPrError::PrNotFound => Self::PrNotFound,
+        }
+    }
 }
 
 impl poem::error::ResponseError for LandedError {
     fn status(&self) -> StatusCode {
         match self {
             LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => StatusCode::BAD_REQUEST,
-            LandedError::ForPr(ForPrError::Sqlx(_sqlx_error)) => StatusCode::INTERNAL_SERVER_ERROR,
-            LandedError::ForPr(ForPrError::PrNotFound) => StatusCode::NOT_FOUND,
+            LandedError::Sqlx(_sqlx_error) => StatusCode::INTERNAL_SERVER_ERROR,
+            LandedError::PrNotFound => StatusCode::NOT_FOUND,
         }
     }
 
@@ -100,10 +111,10 @@ impl poem::error::ResponseError for LandedError {
     {
         let body = match self {
             LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => {
-                "Non positive pull request number."
+                "Non positive pull request number.".to_owned()
             }
-            LandedError::ForPr(ForPrError::Sqlx(_sqlx_error)) => "Error. Sorry.",
-            LandedError::ForPr(ForPrError::PrNotFound) => "Pull request not found.",
+            LandedError::Sqlx(_sqlx_error) => "Error. Sorry.".to_owned(),
+            LandedError::PrNotFound => self.to_string(),
         };
 
         Response::builder().status(self.status()).body(body)
