@@ -80,21 +80,9 @@ pub struct LandedIn {
 #[derive(Debug, thiserror::Error)]
 enum LandedError {
     #[error(transparent)]
-    PrNumberNonPositive(PrNumberNonPositiveError),
+    PrNumberNonPositive(#[from] PrNumberNonPositiveError),
     #[error(transparent)]
-    ForPr(ForPrError),
-}
-
-impl From<PrNumberNonPositiveError> for LandedError {
-    fn from(value: PrNumberNonPositiveError) -> Self {
-        Self::PrNumberNonPositive(value)
-    }
-}
-
-impl From<ForPrError> for LandedError {
-    fn from(value: ForPrError) -> Self {
-        Self::ForPr(value)
-    }
+    ForPr(#[from] ForPrError),
 }
 
 impl poem::error::ResponseError for LandedError {
