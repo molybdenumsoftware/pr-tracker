@@ -99,10 +99,13 @@ pub struct LandedIn {
 #[derive(Debug, thiserror::Error, ApiResponse)]
 enum LandedError {
     #[error(transparent)]
+    #[oai(status = 400)]
     PrNumberNonPositive(#[from] PrNumberNonPositiveError),
     #[error(transparent)]
+    #[oai(status = 500)]
     Sqlx(sqlx::Error),
     #[error("Pull request not found.")]
+    #[oai(status = 404)]
     PrNotFound,
 }
 
