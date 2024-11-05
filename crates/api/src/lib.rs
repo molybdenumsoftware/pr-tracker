@@ -98,12 +98,12 @@ pub struct LandedIn {
 
 #[derive(Debug, thiserror::Error, ApiResponse)]
 enum LandedError {
-    #[error(transparent)]
+    #[error("PR not found. <<< ")]
     #[oai(status = 400)]
-    PrNumberNonPositive(#[from] PrNumberNonPositiveError),
-    #[error(transparent)]
+    PrNumberNonPositive,
+    #[error("Error. Sorry.")]
     #[oai(status = 500)]
-    Sqlx(sqlx::Error),
+    Sqlx,
     #[error("Pull request not found.")]
     #[oai(status = 404)]
     PrNotFound,
@@ -112,7 +112,7 @@ enum LandedError {
 impl From<ForPrError> for LandedError {
     fn from(value: ForPrError) -> Self {
         match value {
-            ForPrError::Sqlx(e) => Self::Sqlx(e),
+            ForPrError::Sqlx(_) => Self::Sqlx,
             ForPrError::PrNotFound => Self::PrNotFound,
         }
     }
