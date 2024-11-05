@@ -1,8 +1,8 @@
 #![warn(clippy::pedantic)]
 use std::time::Duration;
 
-use poem::{endpoint::BoxEndpoint, http::StatusCode, web::Json, EndpointExt, Response};
-use poem_openapi::{types::ToJSON, ApiResponse, OpenApi, OpenApiService};
+use poem::{endpoint::BoxEndpoint, EndpointExt};
+use poem_openapi::{ApiResponse, OpenApi, OpenApiService};
 use serde::{Deserialize, Serialize};
 use sqlx::{
     pool::{PoolConnection, PoolOptions},
@@ -79,6 +79,7 @@ impl Api {
     }
 
     #[oai(path = "/healthcheck", method = "get")]
+    #[allow(clippy::unused_async)]
     async fn health_check(&self, _db: DbConnection) {}
 }
 
@@ -98,7 +99,7 @@ pub struct LandedIn {
 
 #[derive(Debug, thiserror::Error, ApiResponse)]
 enum LandedError {
-    #[error("PR not found. <<< ")]
+    #[error("Pull request number non-positive.")]
     #[oai(status = 400)]
     PrNumberNonPositive,
     #[error("Error. Sorry.")]
@@ -107,6 +108,12 @@ enum LandedError {
     #[error("Pull request not found.")]
     #[oai(status = 404)]
     PrNotFound,
+}
+
+impl From<PrNumberNonPositiveError> for LandedError {
+    fn from(_: PrNumberNonPositiveError) -> Self {
+        Self::PrNumberNonPositive
+    }
 }
 
 impl From<ForPrError> for LandedError {
