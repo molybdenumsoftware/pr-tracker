@@ -1,18 +1,10 @@
 #[path = "../test-util.rs"]
+#[macro_use]
 mod test_util;
 
 use futures::FutureExt;
 use poem::http::StatusCode;
 use test_util::TestContext;
-
-macro_rules! test {
-    ($name:ident, $test:expr) => {
-        #[tokio::test]
-        async fn $name() {
-            TestContext::with(|ctx| async { $test(ctx).await }.boxed()).await;
-        }
-    };
-}
 
 test![healthcheck_ok, |ctx: TestContext| async move {
     let response = ctx.client().get("/api/v1/healthcheck").send().await;

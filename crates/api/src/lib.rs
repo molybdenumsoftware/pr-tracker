@@ -2,6 +2,7 @@
 use std::time::Duration;
 
 use poem::{endpoint::BoxEndpoint, http::StatusCode, web::Json, EndpointExt, Response};
+use poem_openapi::{types::ToJSON, ApiResponse, OpenApi, OpenApiService};
 use serde::{Deserialize, Serialize};
 use sqlx::{
     pool::{PoolConnection, PoolOptions},
@@ -19,11 +20,23 @@ pub async fn endpoint(db_url: &str) -> BoxEndpoint<'static> {
         .await
         .unwrap();
 
+    let api_service = OpenApiService::new(
+        Api,
+        "Hello World", // TODO <<<
+        "1.0",         // TODO <<<
+    )
+    .server(
+        "http://localhost:3000/api", // TODO <<<
+    );
+    let ui = api_service.swagger_ui();
+
     util::migrate(&db_pool).await.unwrap();
 
     poem::Route::new()
-        .at("/api/v1/healthcheck", poem::get(health_check))
-        .at("/api/v1/:pr", poem::get(landed))
+        .nest("/api/v1", api_service)
+        .nest("/", ui)
+        //        .at("/api/v1/healthcheck", poem::get(health_check))
+        //        .at("/api/v1/:pr", poem::get(landed))
         .with(poem::middleware::AddData::new(db_pool))
         .boxed()
 }
@@ -45,25 +58,31 @@ impl<'a> poem::FromRequest<'a> for DbConnection {
     }
 }
 
-#[poem::handler]
-async fn landed(
-    poem::web::Path(pr): poem::web::Path<i32>,
-    DbConnection(mut conn): DbConnection,
-) -> poem::Result<poem::web::Json<LandedIn>, LandedError> {
-    let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
+struct Api;
 
-    let branches = landings
-        .into_iter()
-        .map(|branch| Branch::new(branch.name()))
-        .collect();
+#[OpenApi]
+impl Api {
+    #[oai(path = "/:pr", method = "get")]
+    async fn landed(
+        &self,
+        poem::web::Path(pr): poem::web::Path<i32>,
+        DbConnection(mut conn): DbConnection,
+    ) -> poem::Result<poem_openapi::payload::Json<LandedIn>, LandedError> {
+        let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
 
-    Ok(Json(LandedIn { branches }))
+        let branches = landings
+            .into_iter()
+            .map(|branch| Branch::new(branch.name()))
+            .collect();
+
+        Ok(poem_openapi::payload::Json(LandedIn { branches }))
+    }
+
+    #[oai(path = "/healthcheck", method = "get")]
+    async fn health_check(&self, _db: DbConnection) {}
 }
 
-#[poem::handler]
-fn health_check(_: DbConnection) {}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, poem_openapi::NewType)]
 pub struct Branch(pub String);
 
 impl Branch {
@@ -72,12 +91,12 @@ impl Branch {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, poem_openapi::Object)]
 pub struct LandedIn {
     pub branches: Vec<Branch>,
 }
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, thiserror::Error, ApiResponse)]
 enum LandedError {
     #[error(transparent)]
     PrNumberNonPositive(#[from] PrNumberNonPositiveError),

@@ -16,6 +16,7 @@ camino = "*"
 confique.workspace = true
 futures.workspace = true
 poem = { version = "*", features = ["test"] }
+poem-openapi = { version = "*", features = ["swagger-ui"]}
 pr-tracker-store.workspace = true
 serde.workspace = true
 sqlx = { version = "*", default-features = false, features = ["macros", "migrate"] }

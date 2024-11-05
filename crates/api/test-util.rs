@@ -34,3 +34,12 @@ impl TestContext {
         .await;
     }
 }
+
+macro_rules! test {
+    ($name:ident, $test:expr) => {
+        #[tokio::test]
+        async fn $name() {
+            TestContext::with(|ctx| async { $test(ctx).await }.boxed()).await;
+        }
+    };
+}
