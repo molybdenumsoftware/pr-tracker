@@ -33,8 +33,8 @@ pub async fn endpoint(db_url: &str) -> BoxEndpoint<'static> {
     util::migrate(&db_pool).await.unwrap();
 
     poem::Route::new()
-        .nest("/api/v1", api_service)
-        .nest("/", ui)
+        .at("/", api_service)
+        .nest("/doc/swagger", ui)
         //        .at("/api/v1/healthcheck", poem::get(health_check))
         //        .at("/api/v1/:pr", poem::get(landed))
         .with(poem::middleware::AddData::new(db_pool))
@@ -60,7 +60,7 @@ impl<'a> poem::FromRequest<'a> for DbConnection {
 
 struct Api;
 
-#[OpenApi]
+#[OpenApi(prefix_path = "/api/v1")]
 impl Api {
     #[oai(path = "/:pr", method = "get")]
     async fn landed(
