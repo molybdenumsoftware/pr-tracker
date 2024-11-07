@@ -19,7 +19,7 @@ In order to provide an API that answers this question the following are obtained
 
 From these, all landings are deduced and stored in a (PostgreSQL) database.
 
-It is assumed that in the tracked branches, history is never rewritten. 
+It is assumed that in the tracked branches, history is never rewritten.
 
 Two programs are provided:
 

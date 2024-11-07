@@ -12,6 +12,6 @@ plugins:
       prepareCmd: bump-version ${nextRelease.version}
   - - "@semantic-release/git"
     - assets:
-      - CHANGELOG.md
-      - Cargo.lock
-      - Cargo.toml
+        - CHANGELOG.md
+        - Cargo.lock
+        - Cargo.toml
