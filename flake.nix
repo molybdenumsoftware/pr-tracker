@@ -38,5 +38,5 @@
       ];
     });
 
-  nixConfig.extra-experimental-features = ["pipe-operators"];
+  nixConfig.extra-experimental-features = ["pipe-operators" "no-url-literals"];
 }

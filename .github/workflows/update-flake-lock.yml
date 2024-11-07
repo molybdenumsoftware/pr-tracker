@@ -20,7 +20,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
         with:
           extra-conf: |
-            experimental-features = pipe-operators
+            experimental-features = no-url-literals pipe-operators
       - uses: DeterminateSystems/update-flake-lock@main
         id: update
         with:
