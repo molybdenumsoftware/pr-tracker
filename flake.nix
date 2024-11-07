@@ -19,7 +19,6 @@
   outputs = inputs:
     inputs.flake-parts.lib.mkFlake {inherit inputs;} ({inputs, ...}: {
       systems = import inputs.systems;
-      _module.args.GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
       imports = [
         ./modules/crate-utils.nix
         ./modules/clippy.nix

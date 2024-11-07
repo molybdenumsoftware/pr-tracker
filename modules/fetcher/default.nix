@@ -1,5 +1,11 @@
-{GITHUB_GRAPHQL_SCHEMA, ...}: {
+{
+  inputs,
+  GITHUB_GRAPHQL_SCHEMA,
+  ...
+}: {
   imports = [./nixos-module.nix];
+
+  _module.args.GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
 
   perSystem = {
     self',
