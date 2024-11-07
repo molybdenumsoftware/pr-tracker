@@ -1,4 +1,4 @@
-({
+{
   lib,
   GITHUB_GRAPHQL_SCHEMA,
   ...
@@ -28,4 +28,4 @@
       SQLX_OFFLINE = "true";
     };
   };
-})
+}
