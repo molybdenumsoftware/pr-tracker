@@ -1,16 +1,14 @@
+[dependencies]
+futures = "*"
+sqlx = {version = "*", features = ["postgres", "runtime-tokio"]}
+tokio = {version = "*", features = ["process", "macros", "rt", "rt-multi-thread"]}
+db-context.workspace = true
+
 [package]
 name = "util"
-version.workspace = true
+publish = false
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-publish = false
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-db-context.workspace = true
-futures = "*"
-sqlx = { version = "*", features = ["postgres", "runtime-tokio"] }
-tokio = { version = "*", features = ["process", "macros", "rt", "rt-multi-thread"] }
+version.workspace = true

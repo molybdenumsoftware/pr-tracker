@@ -1,13 +1,13 @@
-[package]
-name = "pr-tracker-fetcher-config"
-version.workspace = true
-authors.workspace = true
-edition.workspace = true
-license.workspace = true
-repository.workspace = true
-publish = false
-
 [dependencies]
 camino.workspace = true
 confique.workspace = true
 serde.workspace = true
+
+[package]
+name = "pr-tracker-fetcher-config"
+publish = false
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true

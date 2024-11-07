@@ -1,37 +1,35 @@
+[dependencies]
+chrono = {version = "*", features = ["serde"]}
+pr-tracker-fetcher-config = {path = "../fetcher-config"}
+futures = "*"
+graphql_client = {version = "*", features = ["reqwest-rustls", "graphql_query_derive"], default-features = false}
+itertools = "*"
+log = "*"
+env_logger = "*"
+reqwest = {version = "*", default-features = false, features = ["rustls"]}
+tokio = {version = "*", features = ["process", "macros", "rt", "rt-multi-thread"]}
+wildmatch = {version = "*", features = ["serde"]}
+sqlx-core = "*"
+serde_json = "*"
+anyhow.workspace = true
+camino.workspace = true
+confique.workspace = true
+derive_more.workspace = true
+gix.workspace = true
+pr-tracker-store.workspace = true
+serde.workspace = true
+util.workspace = true
+
+[dev-dependencies]
+once_cell = "*"
+db-context.workspace = true
+tempfile.workspace = true
+
 [package]
 name = "pr-tracker-fetcher"
-version.workspace = true
+publish = false
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-publish = false
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-anyhow.workspace = true
-camino.workspace = true
-chrono = { version = "*", features = ["serde"] }
-derive_more.workspace = true
-pr-tracker-fetcher-config = { path = "../fetcher-config" }
-futures = "*"
-gix.workspace = true
-graphql_client = { version = "*", features = ["reqwest-rustls", "graphql_query_derive"], default-features = false }
-itertools = "*"
-log = "*"
-env_logger = "*"
-pr-tracker-store.workspace = true
-reqwest = { version = "*", default-features = false, features = ["rustls"] }
-serde.workspace = true
-tokio = { version = "*", features = ["process", "macros", "rt", "rt-multi-thread"] }
-util.workspace = true
-wildmatch = { version = "*", features = ["serde"] }
-sqlx-core = "*"
-serde_json = "*"
-confique.workspace = true
-
-[dev-dependencies]
-db-context.workspace = true
-once_cell = "*"
-tempfile.workspace = true
+version.workspace = true

@@ -1,6 +1,27 @@
+[profile.release]
+debug = true
+strip = "none"
+split-debuginfo = "off"
+
 [workspace]
 members = ["crates/*"]
 resolver = "2"
+
+[workspace.dependencies]
+anyhow = {version = "*", features = ["backtrace"]}
+camino = {version = "*", features = ["serde1"]}
+confique = {version = "*", default-features = false}
+derive_more = {version = "1.0.0-beta.6", features = ["from", "deref"]}
+futures = "*"
+getset = "*"
+gix = {version = "*", features = ["revision"]}
+serde = "*"
+tempfile = "*"
+thiserror = "*"
+db-context.path = "crates/db-context"
+fragile-child.path = "crates/fragile-child"
+pr-tracker-store.path = "crates/store"
+util.path = "crates/util"
 
 [workspace.package]
 version = "4.1.1"
@@ -8,24 +29,3 @@ authors = ["Molybdenum Software"]
 edition = "2021"
 license = "AGPL-3.0-only"
 repository = "https://github.com/molybdenumsoftware/pr-tracker"
-
-[workspace.dependencies]
-anyhow = { version = "*", features = ["backtrace"] }
-camino = { version = "*", features = ["serde1"] }
-confique = { version = "*", default-features = false }
-db-context.path = "crates/db-context"
-derive_more = { version = "1.0.0-beta.6", features = ["from", "deref"] }
-fragile-child.path = "crates/fragile-child"
-futures = "*"
-getset = "*"
-gix = { version = "*", features = ["revision"] }
-pr-tracker-store.path = "crates/store"
-serde = "*"
-tempfile = "*"
-thiserror = "*"
-util.path = "crates/util"
-
-[profile.release]
-debug = true
-strip = "none"
-split-debuginfo = "off"

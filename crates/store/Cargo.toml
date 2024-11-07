@@ -1,18 +1,15 @@
+[dependencies]
+derive_more = {workspace = true, features = ["display"]}
+sqlx = {version = "*", features = ["postgres", "runtime-tokio"]}
+futures.workspace = true
+getset.workspace = true
+thiserror.workspace = true
+
 [package]
 name = "pr-tracker-store"
-version.workspace = true
+publish = false
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-publish = false
-
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-derive_more = { workspace = true, features = ["display"] }
-futures.workspace = true
-getset.workspace = true
-sqlx = { version = "*", features = ["postgres", "runtime-tokio"] }
-thiserror.workspace = true
+version.workspace = true

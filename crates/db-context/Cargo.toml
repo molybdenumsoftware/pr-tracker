@@ -1,18 +1,16 @@
+[dependencies]
+camino = "*"
+futures = "*"
+sqlx = {version = "*", features = ["postgres", "runtime-tokio"]}
+tempfile = "*"
+fragile-child.workspace = true
+gix.workspace = true
+
 [package]
 name = "db-context"
-version.workspace = true
+publish = false
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-publish = false
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-camino = "*"
-futures = "*"
-gix.workspace = true
-sqlx = { version = "*", features = ["postgres", "runtime-tokio"] }
-tempfile = "*"
-fragile-child.workspace = true
+version.workspace = true

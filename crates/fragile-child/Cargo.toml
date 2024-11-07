@@ -1,8 +1,8 @@
 [package]
 name = "fragile-child"
-version.workspace = true
 publish = false
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+version.workspace = true
