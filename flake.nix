@@ -35,4 +35,6 @@
         ./modules/filter-options.nix
       ];
     });
+
+  nixConfig.extra-experimental-features = ["pipe-operators"];
 }
