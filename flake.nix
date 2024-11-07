@@ -33,6 +33,8 @@
         ./modules/private-nixos-modules
         ./modules/program-docs.nix
         ./modules/release
+        ./modules/store.nix
+        ./modules/util.nix
       ];
     });
 

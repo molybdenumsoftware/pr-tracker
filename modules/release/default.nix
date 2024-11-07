@@ -38,5 +38,10 @@
       type = "app";
       program = lib.getExe release;
     };
+
+    treefmt.settings.global.excludes = [
+      "CHANGELOG.md"
+      "modules/release/semantic-release-with-plugins/package-lock.json"
+    ];
   };
 }
