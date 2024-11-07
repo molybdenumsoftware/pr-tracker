@@ -4,7 +4,9 @@
   ];
   perSystem.treefmt = {
     projectRootFile = "flake.nix";
-    programs.alejandra.enable = true;
-    programs.rustfmt.enable = true;
+    programs = {
+      alejandra.enable = true;
+      rustfmt.enable = true;
+    };
   };
 }
