@@ -20,19 +20,19 @@
     inputs.flake-parts.lib.mkFlake {inherit inputs;} ({inputs, ...}: {
       systems = import inputs.systems;
       imports = [
-        ./modules/crate-utils.nix
-        ./modules/clippy.nix
-        ./modules/nixos-modules-lib.nix
         ./modules/api
+        ./modules/clippy.nix
+        ./modules/crate-utils.nix
+        ./modules/dev-shell.nix
         ./modules/fetcher
+        ./modules/filter-options.nix
+        ./modules/formatting.nix
+        ./modules/integration-tests
+        ./modules/nixos-manual
+        ./modules/nixos-modules-lib.nix
         ./modules/private-nixos-modules
         ./modules/program-docs.nix
-        ./modules/nixos-manual
-        ./modules/integration-tests
-        ./modules/dev-shell.nix
-        ./modules/formatting.nix
         ./modules/release
-        ./modules/filter-options.nix
       ];
     });
 

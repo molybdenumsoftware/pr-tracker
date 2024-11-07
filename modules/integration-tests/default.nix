@@ -1,7 +1,7 @@
 {
   imports = [
-    ./create-locally.nix
     ./api
+    ./create-locally.nix
     ./fetcher
   ];
 }

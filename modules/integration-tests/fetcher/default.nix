@@ -14,7 +14,7 @@
   };
 
   imports = [
-    ./tcp-db.nix
     ./default-package.nix
+    ./tcp-db.nix
   ];
 }
