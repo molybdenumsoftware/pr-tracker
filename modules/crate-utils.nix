@@ -9,8 +9,8 @@
     ...
   }: let
     craneLib = inputs.crane.mkLib pkgs;
-    fenix = inputs'.fenix.packages;
-    crane = craneLib.overrideToolchain fenix.stable.toolchain;
+    toolchain = inputs'.fenix.packages.stable.toolchain;
+    crane = craneLib.overrideToolchain toolchain;
 
     src = lib.fileset.toSource {
       root = ../.;
@@ -27,7 +27,7 @@
       cleanedArgs = removeAttrs args ["dir"];
 
       cargoToml = src + "/crates/${dir}/Cargo.toml";
-      inherit (craneLib.crateNameFromCargoToml {inherit cargoToml;}) pname;
+      inherit (crane.crateNameFromCargoToml {inherit cargoToml;}) pname;
 
       cargoExtraArgs = "--package ${pname}";
 
@@ -49,8 +49,13 @@
         cargoArtifacts
         buildWorkspacePackage
         src
-        craneLib
+        crane
         ;
+    };
+
+    treefmt.programs.rustfmt = {
+      enable = true;
+      package = toolchain;
     };
   };
 }

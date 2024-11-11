@@ -1,12 +1,12 @@
 {GITHUB_GRAPHQL_SCHEMA, ...}: {
   perSystem = {
-    craneLib,
+    crane,
     src,
     cargoArtifacts,
     self',
     ...
   }: {
-    packages.program-docs = craneLib.cargoDoc {
+    packages.program-docs = crane.cargoDoc {
       inherit src cargoArtifacts GITHUB_GRAPHQL_SCHEMA;
 
       pname = "pr-tracker-program-docs";
