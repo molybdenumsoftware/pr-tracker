@@ -19,15 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
-        with:
-          extra-conf: |
-            experimental-features = no-url-literals pipe-operators
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: |
-          nix build .#program-docs
+          nix --accept-flake-config build .#program-docs
           mkdir docs
           cp -r result/share/doc docs/programs
-          nix build .#nixos-manual
+          nix --accept-flake-config build .#nixos-manual
           cp -r result docs/nixos-modules
       - uses: actions/upload-pages-artifact@v3
         with:

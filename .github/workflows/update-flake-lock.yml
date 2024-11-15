@@ -18,9 +18,6 @@ jobs:
           private-key: ${{ secrets.PRIVATE_KEY }}
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
-        with:
-          extra-conf: |
-            experimental-features = no-url-literals pipe-operators
       - uses: DeterminateSystems/update-flake-lock@main
         id: update
         with:
