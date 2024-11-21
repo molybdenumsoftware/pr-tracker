@@ -1,8 +1,13 @@
 {
   lib,
+  inputs,
   GITHUB_GRAPHQL_SCHEMA,
   ...
 }: {
+  imports = [
+    inputs.devshell.flakeModule
+  ];
+
   perSystem = {
     pkgs,
     self',
@@ -21,11 +26,13 @@
       })
     ];
   in {
-    devShells.default = pkgs.mkShell {
-      inherit GITHUB_GRAPHQL_SCHEMA;
-      inputsFrom = lib.attrValues self'.packages;
-      packages = [pkgs.sqlx-cli] ++ devUtils;
-      SQLX_OFFLINE = "true";
+    devshells.default = {
+      env = lib.attrsToList {
+        inherit GITHUB_GRAPHQL_SCHEMA;
+        SQLX_OFFLINE = "true";
+      };
+      devshell.packagesFrom = lib.attrValues self'.packages;
+      devshell.packages = [pkgs.sqlx-cli] ++ devUtils;
     };
   };
 }
