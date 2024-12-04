@@ -1,20 +1,31 @@
-{GITHUB_GRAPHQL_SCHEMA, ...}: {
+{
+  self,
+  lib,
+  GITHUB_GRAPHQL_SCHEMA,
+  ...
+}: {
   perSystem = {
-    crane,
-    src,
-    cargoArtifacts,
-    self',
+    config,
+    pkgs,
     ...
   }: {
-    packages.program-docs = crane.cargoDoc {
-      inherit src cargoArtifacts GITHUB_GRAPHQL_SCHEMA;
-
-      pname = "pr-tracker-program-docs";
-      version = "unversioned";
-
-      cargoDocExtraArgs = "--package pr-tracker-fetcher-config --package pr-tracker-api-config --no-deps";
-    };
-
-    checks."packages/program-docs" = self'.packages.program-docs;
+    packages.program-docs = config.nci.outputs.pr-tracker-fetcher.docs;
+    checks.program-docs = config.packages.program-docs;
+    # <<< packages.program-docs = config.nci.lib.buildCrate {
+    # <<<   src = lib.traceValSeqN 1 (lib.attrNames config.nci.outputs.default) config.nci.projects.default.path;
+    # <<<   drvConfig = {
+    # <<<     env = {inherit GITHUB_GRAPHQL_SCHEMA;};
+    # <<<     rust-crane = {
+    # <<<       buildCommand = "doc";
+    # <<<       buildFlags = [
+    # <<<         "--package"
+    # <<<         "pr-tracker-fetcher-config"
+    # <<<         "--package"
+    # <<<         "pr-tracker-api-config"
+    # <<<         "--no-deps"
+    # <<<       ];
+    # <<<     };
+    # <<<   };
+    # <<< };
   };
 }

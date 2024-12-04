@@ -1,13 +1,5 @@
-{
-  lib,
-  GITHUB_GRAPHQL_SCHEMA,
-  ...
-}: {
-  perSystem = {
-    pkgs,
-    self',
-    ...
-  }: let
+{lib, ...}: {
+  perSystem = {pkgs, ...}: let
     devUtils = [
       (pkgs.writeShellApplication {
         name = "util-sqlx-prepare";
@@ -21,11 +13,9 @@
       })
     ];
   in {
-    devShells.default = pkgs.mkShell {
-      inherit GITHUB_GRAPHQL_SCHEMA;
-      inputsFrom = lib.attrValues self'.packages;
-      packages = [pkgs.sqlx-cli] ++ devUtils;
-      SQLX_OFFLINE = "true";
+    devshells.default = {
+      env = lib.attrsToList {SQLX_OFFLINE = "true";};
+      devshell.packages = [pkgs.sqlx-cli pkgs.rust-analyzer] ++ devUtils;
     };
   };
 }

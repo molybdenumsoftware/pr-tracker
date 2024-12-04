@@ -2,16 +2,17 @@
   imports = [./nixos-module.nix];
 
   perSystem = {
-    self',
+    config,
     pkgs,
-    buildWorkspacePackage,
     ...
   }: {
-    packages.api = buildWorkspacePackage {
-      dir = "api";
-      nativeCheckInputs = [pkgs.postgresql];
+    nci.crates.pr-tracker-api = {
+      drvConfig = {
+        mkDerivation = {
+          nativeCheckInputs = [pkgs.postgresql];
+        };
+      };
     };
-
-    checks."packages/api" = self'.packages.api;
+    packages.api = config.nci.outputs.pr-tracker-api.packages.release;
   };
 }
