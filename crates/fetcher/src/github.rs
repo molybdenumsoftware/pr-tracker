@@ -131,6 +131,7 @@ impl GithubClient for GitHubGraphqlClient {
     }
 }
 
+#[cfg(feature = "impure_tests")]
 #[cfg(test)]
 mod test {
     use super::*;

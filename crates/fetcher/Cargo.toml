@@ -25,6 +25,9 @@ once_cell = "*"
 db-context.workspace = true
 tempfile.workspace = true
 
+[features]
+impure_tests = []
+
 [package]
 name = "pr-tracker-fetcher"
 publish = false

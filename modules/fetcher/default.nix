@@ -20,7 +20,6 @@
       dir = "fetcher";
       nativeCheckInputs = with pkgs; [git postgresql];
       nativeBuildInputs = with pkgs; [makeWrapper];
-      cargoTestExtraArgs = "-- --skip 'github::test::pagination' --skip 'github::test::finite_pagination'";
       postInstall = ''
         wrapProgram $out/bin/pr-tracker-fetcher --prefix PATH ":" ${lib.makeBinPath [pkgs.git]}
       '';
