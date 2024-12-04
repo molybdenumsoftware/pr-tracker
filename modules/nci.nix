@@ -16,6 +16,7 @@
       # cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
     };
     # TODO: Check names "packages/fetcher"
+    # TODO test `cargo test` in the devshell
     treefmt.programs.rustfmt = {
       enable = true;
       package = config.nci.toolchains.mkBuild pkgs;
