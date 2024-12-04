@@ -1,20 +1,20 @@
 [profile.release]
 debug = true
-strip = "none"
 split-debuginfo = "off"
+strip = "none"
 
 [workspace]
 members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-anyhow = {version = "*", features = ["backtrace"]}
-camino = {version = "*", features = ["serde1"]}
-confique = {version = "*", default-features = false}
-derive_more = {version = "1.0.0-beta.6", features = ["from", "deref"]}
+anyhow = {features = ["backtrace"], version = "*"}
+camino = {features = ["serde1"], version = "*"}
+confique = {default-features = false, version = "*"}
+derive_more = {features = ["deref", "from"], version = "1.0.0-beta.6"}
 futures = "*"
 getset = "*"
-gix = {version = "*", features = ["revision"]}
+gix = {features = ["revision"], version = "*"}
 serde = "*"
 tempfile = "*"
 thiserror = "*"
@@ -24,8 +24,8 @@ pr-tracker-store.path = "crates/store"
 util.path = "crates/util"
 
 [workspace.package]
-version = "4.1.1"
 authors = ["Molybdenum Software"]
 edition = "2021"
 license = "AGPL-3.0-only"
 repository = "https://github.com/molybdenumsoftware/pr-tracker"
+version = "4.1.1"

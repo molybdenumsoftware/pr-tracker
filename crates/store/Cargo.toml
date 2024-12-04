@@ -1,6 +1,6 @@
 [dependencies]
-derive_more = {workspace = true, features = ["display"]}
-sqlx = {version = "*", features = ["postgres", "runtime-tokio"]}
+derive_more = {features = ["display"], workspace = true}
+sqlx = {features = ["postgres", "runtime-tokio"], version = "*"}
 futures.workspace = true
 getset.workspace = true
 thiserror.workspace = true

@@ -1,8 +1,8 @@
 [dependencies]
-pr-tracker-api-config = {path = "../api-config"}
 camino = "*"
-poem = {version = "*", features = ["test"]}
-sqlx = {version = "*", default-features = false, features = ["macros", "migrate"]}
+poem = {features = ["test"], version = "*"}
+pr-tracker-api-config = {path = "../api-config"}
+sqlx = {default-features = false, features = ["macros", "migrate"], version = "*"}
 tokio = "*"
 anyhow.workspace = true
 confique.workspace = true

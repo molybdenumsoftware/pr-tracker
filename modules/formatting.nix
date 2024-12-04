@@ -7,7 +7,10 @@
     programs = {
       alejandra.enable = true;
       prettier.enable = true;
-      toml-sort.enable = true;
+      toml-sort = {
+        enable = true;
+        all = true;
+      };
     };
   };
 }

@@ -1,7 +1,7 @@
 [dependencies]
 futures = "*"
-sqlx = {version = "*", features = ["postgres", "runtime-tokio"]}
-tokio = {version = "*", features = ["process", "macros", "rt", "rt-multi-thread"]}
+sqlx = {features = ["postgres", "runtime-tokio"], version = "*"}
+tokio = {features = ["macros", "process", "rt", "rt-multi-thread"], version = "*"}
 db-context.workspace = true
 
 [package]

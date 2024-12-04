@@ -1,16 +1,16 @@
 [dependencies]
-chrono = {version = "*", features = ["serde"]}
-pr-tracker-fetcher-config = {path = "../fetcher-config"}
+chrono = {features = ["serde"], version = "*"}
+env_logger = "*"
 futures = "*"
-graphql_client = {version = "*", features = ["reqwest-rustls", "graphql_query_derive"], default-features = false}
+graphql_client = {default-features = false, features = ["graphql_query_derive", "reqwest-rustls"], version = "*"}
 itertools = "*"
 log = "*"
-env_logger = "*"
-reqwest = {version = "*", default-features = false, features = ["rustls"]}
-tokio = {version = "*", features = ["process", "macros", "rt", "rt-multi-thread"]}
-wildmatch = {version = "*", features = ["serde"]}
-sqlx-core = "*"
+pr-tracker-fetcher-config = {path = "../fetcher-config"}
+reqwest = {default-features = false, features = ["rustls"], version = "*"}
 serde_json = "*"
+sqlx-core = "*"
+tokio = {features = ["macros", "process", "rt", "rt-multi-thread"], version = "*"}
+wildmatch = {features = ["serde"], version = "*"}
 anyhow.workspace = true
 camino.workspace = true
 confique.workspace = true
