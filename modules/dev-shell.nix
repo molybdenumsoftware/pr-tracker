@@ -1,4 +1,12 @@
-{lib, ...}: {
+{
+  inputs,
+  lib,
+  ...
+}: {
+  imports = [
+    inputs.devshell.flakeModule
+  ];
+
   perSystem = {pkgs, ...}: let
     devUtils = [
       (pkgs.writeShellApplication {
