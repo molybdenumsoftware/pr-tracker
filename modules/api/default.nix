@@ -3,14 +3,14 @@
 
   perSystem = {
     self',
-    pkgs,
-    lib,
+    POSTGRESQL_INITDB_PATH,
+    POSTGRESQL_POSTGRES_PATH,
     buildWorkspacePackage,
     ...
   }: {
     packages.api = buildWorkspacePackage {
       dir = "api";
-      POSTGRESQL_BIN_PATH = lib.getBin pkgs.postgresql;
+      inherit POSTGRESQL_INITDB_PATH POSTGRESQL_POSTGRES_PATH;
     };
 
     checks."packages/api" = self'.packages.api;

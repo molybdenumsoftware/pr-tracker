@@ -11,12 +11,13 @@
     self',
     pkgs,
     lib,
+    POSTGRESQL_INITDB_PATH,
+    POSTGRESQL_POSTGRES_PATH,
     buildWorkspacePackage,
     ...
   }: {
     packages.fetcher = buildWorkspacePackage {
-      inherit GITHUB_GRAPHQL_SCHEMA;
-      POSTGRESQL_BIN_PATH = lib.getBin pkgs.postgresql;
+      inherit GITHUB_GRAPHQL_SCHEMA POSTGRESQL_INITDB_PATH POSTGRESQL_POSTGRES_PATH;
 
       dir = "fetcher";
       nativeCheckInputs = with pkgs; [git];

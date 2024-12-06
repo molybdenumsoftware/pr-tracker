@@ -6,6 +6,8 @@
   perSystem = {
     pkgs,
     self',
+    POSTGRESQL_INITDB_PATH,
+    POSTGRESQL_POSTGRES_PATH,
     ...
   }: let
     devUtils = [
@@ -22,7 +24,7 @@
     ];
   in {
     devShells.default = pkgs.mkShell {
-      inherit GITHUB_GRAPHQL_SCHEMA;
+      inherit GITHUB_GRAPHQL_SCHEMA POSTGRESQL_INITDB_PATH POSTGRESQL_POSTGRES_PATH;
       inputsFrom = lib.attrValues self'.packages;
       packages = [pkgs.sqlx-cli] ++ devUtils;
       SQLX_OFFLINE = "true";
