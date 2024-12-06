@@ -21,7 +21,6 @@
       GIT_PATH = lib.getExe pkgs.git;
 
       dir = "fetcher";
-      nativeBuildInputs = with pkgs; [makeWrapper];
     };
 
     checks."packages/fetcher" = self'.packages.fetcher;
