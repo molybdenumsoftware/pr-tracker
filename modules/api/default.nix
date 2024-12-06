@@ -2,6 +2,7 @@
   imports = [./nixos-module.nix];
 
   perSystem = {
+    self',
     config,
     pkgs,
     ...
@@ -13,6 +14,8 @@
         };
       };
     };
+
     packages.api = config.nci.outputs.pr-tracker-api.packages.release;
+    checks."packages/api" = self'.packages.api;
   };
 }

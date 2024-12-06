@@ -15,7 +15,6 @@
       # from crane usage that is being replaced
       # cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
     };
-    # TODO: Check names "packages/fetcher"
     # TODO test `cargo test` in the devshell
     treefmt.programs.rustfmt = {
       enable = true;

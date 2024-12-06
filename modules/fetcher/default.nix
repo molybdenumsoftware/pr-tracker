@@ -8,6 +8,7 @@
   _module.args.GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
 
   perSystem = {
+    self',
     config,
     pkgs,
     lib,
@@ -26,5 +27,6 @@
     };
 
     packages.fetcher = config.nci.outputs.pr-tracker-fetcher.packages.release;
+    checks."packages/fetcher" = self'.packages.fetcher;
   };
 }
