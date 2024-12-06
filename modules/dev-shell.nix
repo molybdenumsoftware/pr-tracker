@@ -6,6 +6,7 @@
   perSystem = {
     pkgs,
     self',
+    config,
     ...
   }: let
     devUtils = [
@@ -26,6 +27,7 @@
       inputsFrom = lib.attrValues self'.packages;
       packages = [pkgs.sqlx-cli] ++ devUtils;
       SQLX_OFFLINE = "true";
+      shellHook = config.pre-commit.installationScript;
     };
   };
 }
