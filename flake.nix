@@ -7,6 +7,9 @@
     fenix.url = "github:nix-community/fenix";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    git-hooks-nix.url = "github:cachix/git-hooks.nix";
+    git-hooks-nix.inputs.nixpkgs.follows = "nixpkgs";
+    git-hooks-nix.inputs.nixpkgs-stable.follows = "nixpkgs";
     github-graphql-schema.flake = false;
     github-graphql-schema.url = "github:octokit/graphql-schema";
     nmd.inputs.nixpkgs.follows = "nixpkgs";
@@ -35,6 +38,7 @@
         ./modules/release
         ./modules/store.nix
         ./modules/util.nix
+        ./modules/git-hooks.nix
       ];
     });
 

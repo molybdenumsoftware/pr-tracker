@@ -1,3 +1,4 @@
+/.pre-commit-config.yaml
 /crates/fetcher/src/graphql/schema.graphql
 /logs
 /result
