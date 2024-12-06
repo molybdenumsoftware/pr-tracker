@@ -4,12 +4,13 @@
   perSystem = {
     self',
     pkgs,
+    lib,
     buildWorkspacePackage,
     ...
   }: {
     packages.api = buildWorkspacePackage {
       dir = "api";
-      nativeCheckInputs = [pkgs.postgresql];
+      POSTGRESQL_BIN_PATH = lib.getBin pkgs.postgresql;
     };
 
     checks."packages/api" = self'.packages.api;
