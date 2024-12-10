@@ -1,9 +1,13 @@
-{GITHUB_GRAPHQL_SCHEMA, ...}: {
+{
+  GITHUB_GRAPHQL_SCHEMA,
+  lib,
+  ...
+}: {
   perSystem = {
+    pkgs,
     src,
     cargoArtifacts,
     crane,
-    GIT_PATH,
     POSTGRESQL_INITDB_PATH,
     POSTGRESQL_POSTGRES_PATH,
     ...
@@ -12,11 +16,11 @@
       inherit
         src
         GITHUB_GRAPHQL_SCHEMA
-        GIT_PATH
         POSTGRESQL_INITDB_PATH
         POSTGRESQL_POSTGRES_PATH
         cargoArtifacts
         ;
+      GIT_PATH = lib.getExe pkgs.git;
       cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
       pname = "pr-tracker";
       version = "unversioned";
