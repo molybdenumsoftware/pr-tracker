@@ -44,8 +44,8 @@ impl DatabaseContext {
         let data_dir = tmp_dir.path().join("data");
         std::fs::create_dir(&sockets_dir).unwrap();
 
-        let mut initdb = Command::new("initdb");
-        let mut postgres = Command::new("postgres");
+        let mut initdb = Command::new(env!("POSTGRESQL_INITDB_PATH"));
+        let mut postgres = Command::new(env!("POSTGRESQL_POSTGRES_PATH"));
 
         match log_destination {
             LogDestination::File => {

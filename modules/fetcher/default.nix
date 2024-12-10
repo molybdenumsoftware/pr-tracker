@@ -11,18 +11,16 @@
     self',
     pkgs,
     lib,
+    POSTGRESQL_INITDB_PATH,
+    POSTGRESQL_POSTGRES_PATH,
     buildWorkspacePackage,
     ...
   }: {
     packages.fetcher = buildWorkspacePackage {
-      inherit GITHUB_GRAPHQL_SCHEMA;
+      inherit GITHUB_GRAPHQL_SCHEMA POSTGRESQL_INITDB_PATH POSTGRESQL_POSTGRES_PATH;
+      GIT_PATH = lib.getExe pkgs.git;
 
       dir = "fetcher";
-      nativeCheckInputs = with pkgs; [git postgresql];
-      nativeBuildInputs = with pkgs; [makeWrapper];
-      postInstall = ''
-        wrapProgram $out/bin/pr-tracker-fetcher --prefix PATH ":" ${lib.makeBinPath [pkgs.git]}
-      '';
     };
 
     checks."packages/fetcher" = self'.packages.fetcher;
