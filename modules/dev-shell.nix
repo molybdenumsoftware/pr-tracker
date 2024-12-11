@@ -32,8 +32,7 @@
         GIT = lib.getExe pkgs.git;
       };
       devshell = {
-      interactive.pre-commit.text = lib.traceVal config.pre-commit.installationScript;
-      # perSystem.devshells.<name>.devshell.startup.<name>.text
+      startup.pre-commit.text = config.pre-commit.installationScript;
 
       packages = [pkgs.sqlx-cli pkgs.rust-analyzer] ++ devUtils;
 
