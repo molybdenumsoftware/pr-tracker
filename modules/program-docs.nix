@@ -7,7 +7,7 @@
   }: {
 
     #<<< TODO: extract >>>
-    nci.crates.db-context.drvConfig.mkDerivation.env = {
+    nci.crates.db-context.drvConfig.env = {
       POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
       POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
       GIT = lib.getExe pkgs.git;
