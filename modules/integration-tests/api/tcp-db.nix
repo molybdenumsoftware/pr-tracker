@@ -1,6 +1,5 @@
 {self, ...}: {
   perSystem = {
-    self',
     nodeToApiTest,
     pkgs,
     ...
@@ -40,7 +39,7 @@
       ];
 
       services.pr-tracker.api.enable = true;
-      services.pr-tracker.api.package = self'.packages.api.overrideAttrs {dontStrip = true;};
+      # <<< services.pr-tracker.api.package = self'.packages.api.overrideAttrs {dontStrip = true;};
       systemd.services.pr-tracker-api.environment.RUST_BACKTRACE = "1";
       services.pr-tracker.api.port = port;
       services.pr-tracker.api.user = user;

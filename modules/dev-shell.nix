@@ -1,6 +1,6 @@
 {
+  inputs,
   lib,
-  GITHUB_GRAPHQL_SCHEMA,
   ...
 }: {
   perSystem = {
@@ -22,17 +22,19 @@
       })
     ];
   in {
-    devShells.default = pkgs.mkShell {
-      inherit GITHUB_GRAPHQL_SCHEMA;
-      env = {
+    imports = [
+      inputs.devshell.flakeModule
+    ];
+    devshells.default = {
+      env = lib.attrsToList {
+        SQLX_OFFLINE = "true";
         POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
         POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
         GIT = lib.getExe pkgs.git;
       };
-      inputsFrom = lib.attrValues self'.packages;
-      packages = [pkgs.sqlx-cli] ++ devUtils;
-      SQLX_OFFLINE = "true";
-      shellHook = config.pre-commit.installationScript;
+      # <<< shellHook = config.pre-commit.installationScript;
+
+      devshell.packages = [pkgs.sqlx-cli pkgs.rust-analyzer] ++ devUtils;
     };
   };
 }
