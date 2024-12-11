@@ -3,12 +3,10 @@
   lib,
   ...
 }: {
-  perSystem = {
-    pkgs,
-    self',
-    config,
-    ...
-  }: let
+  imports = [
+    inputs.devshell.flakeModule
+  ];
+  perSystem = {pkgs, ...}: let
     devUtils = [
       (pkgs.writeShellApplication {
         name = "util-sqlx-prepare";
@@ -22,9 +20,6 @@
       })
     ];
   in {
-    imports = [
-      inputs.devshell.flakeModule
-    ];
     devshells.default = {
       env = lib.attrsToList {
         SQLX_OFFLINE = "true";
@@ -34,7 +29,7 @@
       };
       # <<< shellHook = config.pre-commit.installationScript;
       # perSystem.devshells.<name>.devshell.interactive.<name>.text
-        # perSystem.devshells.<name>.devshell.startup.<name>.text
+      # perSystem.devshells.<name>.devshell.startup.<name>.text
 
       devshell.packages = [pkgs.sqlx-cli pkgs.rust-analyzer] ++ devUtils;
     };
