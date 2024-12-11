@@ -32,11 +32,10 @@
         GIT = lib.getExe pkgs.git;
       };
       devshell = {
-      startup.pre-commit.text = config.pre-commit.installationScript;
+        startup.pre-commit.text = config.pre-commit.installationScript;
 
-      packages = [pkgs.sqlx-cli pkgs.rust-analyzer] ++ devUtils;
-
-        };
+        packages = [pkgs.sqlx-cli pkgs.rust-analyzer] ++ devUtils;
+      };
     };
   };
 }
