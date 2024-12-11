@@ -24,6 +24,11 @@
   in {
     devShells.default = pkgs.mkShell {
       inherit GITHUB_GRAPHQL_SCHEMA;
+      env = {
+        POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
+        POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
+        GIT = lib.getExe pkgs.git;
+      };
       inputsFrom = lib.attrValues self'.packages;
       packages = [pkgs.sqlx-cli] ++ devUtils;
       SQLX_OFFLINE = "true";

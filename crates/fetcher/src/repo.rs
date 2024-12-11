@@ -9,7 +9,7 @@ use camino::Utf8Path;
 pub async fn isolated_git(
     args: impl IntoIterator<Item = impl AsRef<OsStr>>,
 ) -> anyhow::Result<std::process::Output> {
-    let mut command = tokio::process::Command::new("git");
+    let mut command = tokio::process::Command::new(env!("GIT"));
 
     command
         .env("GIT_CONFIG_GLOBAL", "/dev/null")
