@@ -28,4 +28,4 @@ authors = ["Molybdenum Software"]
 edition = "2021"
 license = "AGPL-3.0-only"
 repository = "https://github.com/molybdenumsoftware/pr-tracker"
-version = "4.1.1"
+version = "5.0.0"

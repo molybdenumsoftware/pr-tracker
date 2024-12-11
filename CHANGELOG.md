@@ -1,3 +1,14 @@
+## [5.0.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v4.1.1...v5.0.0) (2024-12-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* runtime deps defined at build time
+
+### Features
+
+* runtime deps defined at build time ([08196d1](https://github.com/molybdenumsoftware/pr-tracker/commit/08196d1025c294dadca7632b93b526012d638061))
+
 ## [4.1.1](https://github.com/molybdenumsoftware/pr-tracker/compare/v4.1.0...v4.1.1) (2024-10-02)
 
 
