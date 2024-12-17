@@ -1,3 +1,10 @@
+## [5.1.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v5.0.0...v5.1.0) (2024-12-17)
+
+
+### Features
+
+* switch from AGPL to MIT. ([44a1019](https://github.com/molybdenumsoftware/pr-tracker/commit/44a10199964cd2d2975cf2b0b5b3f7e006730739))
+
 ## [5.0.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v4.1.1...v5.0.0) (2024-12-11)
 
 
