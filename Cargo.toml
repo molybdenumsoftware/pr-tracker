@@ -26,6 +26,6 @@ util.path = "crates/util"
 [workspace.package]
 authors = ["Molybdenum Software"]
 edition = "2021"
-license = "AGPL-3.0-only"
+license = "MIT"
 repository = "https://github.com/molybdenumsoftware/pr-tracker"
 version = "5.0.0"
