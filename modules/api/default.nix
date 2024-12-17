@@ -17,5 +17,13 @@
     };
 
     checks."packages/api" = self'.packages.api;
+
+    devshells.default.devshell.packages = [
+      (pkgs.writeShellApplication {
+        name = "util-run-api"; #<<< should this go in util instead? >>>
+        # <<< runtimeInputs = [pkgs.sqlx-cli];
+        text = "cargo run --package util --bin sqlx-prepare";
+      })
+    ];
   };
 }
