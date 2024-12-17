@@ -57,5 +57,7 @@
       enable = true;
       package = toolchain;
     };
+
+    devshells.default.devshell.packages = [pkgs.stdenv.cc];
   };
 }

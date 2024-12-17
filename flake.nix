@@ -3,6 +3,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     crane.url = "github:ipetkov/crane";
+    devshell.inputs.nixpkgs.follows = "nixpkgs";
+    devshell.url = "github:numtide/devshell";
     fenix.inputs.nixpkgs.follows = "nixpkgs";
     fenix.url = "github:nix-community/fenix";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -26,6 +28,7 @@
         ./modules/api
         ./modules/clippy.nix
         ./modules/crate-utils.nix
+        ./modules/db-context.nix
         ./modules/dev-shell.nix
         ./modules/fetcher
         ./modules/filter-options.nix

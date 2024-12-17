@@ -25,6 +25,11 @@
       dir = "fetcher";
     };
 
+    devshells.default.env = lib.attrsToList {
+      inherit GITHUB_GRAPHQL_SCHEMA;
+      GIT = lib.getExe pkgs.git;
+    };
+
     checks."packages/fetcher" = self'.packages.fetcher;
   };
 }
