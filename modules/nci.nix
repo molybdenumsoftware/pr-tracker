@@ -21,5 +21,6 @@
       enable = true;
       package = config.nci.toolchains.mkBuild pkgs;
     };
+    # TODO checks.clippy = config.nci.outputs
   };
 }
