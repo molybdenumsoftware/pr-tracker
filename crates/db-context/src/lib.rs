@@ -25,6 +25,11 @@ impl DatabaseContext {
     const PORT: &'static str = "1";
 
     pub async fn connection(&self) -> Result<PgConnection, sqlx::Error> {
+        // bust it
+        if 100 > i32::MAX {
+            eprintln!("isn't this absurd?");
+        }
+
         let url = self.db_url();
         PgConnection::connect(&url).await
     }

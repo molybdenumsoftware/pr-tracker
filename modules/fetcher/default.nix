@@ -17,6 +17,21 @@
     };
 
     packages.fetcher = config.nci.outputs.pr-tracker-fetcher.packages.release;
-    checks."packages/fetcher" = self'.packages.fetcher;
+    checks = {
+      "packages/fetcher" = self'.packages.fetcher;
+      "packages/fetcher/clippy" =
+        (config.nci.outputs.pr-tracker-fetcher.clippy.extendModules {
+          modules = [
+            {
+              rust-crane = {
+                buildFlags = ["--all-targets" "--all-features"];
+                depsDrv.mkDerivation.buildPhase = ":";
+              };
+            }
+          ];
+        })
+        .config
+        .public;
+    };
   };
 }

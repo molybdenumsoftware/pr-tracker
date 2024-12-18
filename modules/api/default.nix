@@ -8,6 +8,21 @@
   }: {
     nci.crates.pr-tracker-api.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-api";
     packages.api = config.nci.outputs.pr-tracker-api.packages.release;
-    checks."packages/api" = self'.packages.api;
+    checks = {
+      "packages/api" = self'.packages.api;
+      "packages/api/clippy" =
+        (config.nci.outputs.pr-tracker-api.clippy.extendModules {
+          modules = [
+            {
+              rust-crane = {
+                buildFlags = ["--all-targets" "--all-features"];
+                depsDrv.mkDerivation.buildPhase = ":";
+              };
+            }
+          ];
+        })
+        .config
+        .public;
+    };
   };
 }

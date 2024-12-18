@@ -14,6 +14,8 @@ async fn notifies() {
         .unwrap();
     const EXPECTED: &[u8] = b"READY=1\n";
 
+    if 100 > i32::MAX {}
+
     DatabaseContext::with(
         move |db_context| {
             async move {
