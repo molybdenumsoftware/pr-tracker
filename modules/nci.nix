@@ -9,7 +9,7 @@
       path = ../.;
       profiles.release.runTests = true;
       clippyProfile = "release";
-      # <<< drvConfig.env.RUSTFLAGS = "--deny warnings";
+      drvConfig.env.RUSTFLAGS = "--deny warnings";
       numtideDevshell = "default";
       export = false;
       # from crane usage that is being replaced
