@@ -24,16 +24,12 @@
     #   # };
     # };
 
-<<<<<<< Updated upstream
     devshells.default.env = lib.attrsToList {
       inherit GITHUB_GRAPHQL_SCHEMA;
       GIT = lib.getExe pkgs.git;
     };
 
-||||||| Stash base
-=======
     packages.fetcher = config.nci.outputs.pr-tracker-fetcher.packages.release;
->>>>>>> Stashed changes
     checks."packages/fetcher" = self'.packages.fetcher;
   };
 }
