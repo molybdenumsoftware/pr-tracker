@@ -8,7 +8,7 @@
     checks."packages/program-docs" = config.packages.program-docs;
 
     nci.crates =
-      lib.pipe (lib.trace config.nci.outputs.default config.nci.outputs) #<<< TODO: default is also in here? >>>
+      lib.pipe config.nci.outputs
       [
         lib.attrNames
         (map (crateName:
