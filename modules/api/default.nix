@@ -6,7 +6,10 @@
     config,
     ...
   }: {
-    nci.crates.pr-tracker-api.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-api";
+    nci.crates = {
+      pr-tracker-api.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-api";
+      pr-tracker-api-config.excludeFromProjectDocs = false;
+    };
     packages.api = config.nci.outputs.pr-tracker-api.packages.release;
     checks = {
       "packages/api" = self'.packages.api;

@@ -13,7 +13,10 @@
         GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
         GIT = lib.getExe pkgs.git;
       };
-      crates.pr-tracker-fetcher.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-fetcher";
+      crates = {
+        pr-tracker-fetcher.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-fetcher";
+        pr-tracker-fetcher-config.excludeFromProjectDocs = false;
+      };
     };
 
     packages.fetcher = config.nci.outputs.pr-tracker-fetcher.packages.release;
