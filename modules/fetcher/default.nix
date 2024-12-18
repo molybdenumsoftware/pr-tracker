@@ -9,27 +9,31 @@
 
   perSystem = {
     self',
+    config,
     pkgs,
     lib,
-    buildWorkspacePackage,
     ...
   }: {
-    packages.fetcher = buildWorkspacePackage {
-      inherit GITHUB_GRAPHQL_SCHEMA;
-      env = {
-        POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
-        POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
-        GIT = lib.getExe pkgs.git;
-      };
+    # nci.crates.pr-tracker-fetcher.drvConfig = {
+    #   mkDerivation.meta.mainProgram = "pr-tracker-fetcher";
+    #   # env = {
+    #   #     # inherit GITHUB_GRAPHQL_SCHEMA;
+    #   #     # GIT = lib.getExe pkgs.git;
+    #   #   # <<< POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
+    #   #   # <<< POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
+    #   # };
+    # };
 
-      dir = "fetcher";
-    };
-
+<<<<<<< Updated upstream
     devshells.default.env = lib.attrsToList {
       inherit GITHUB_GRAPHQL_SCHEMA;
       GIT = lib.getExe pkgs.git;
     };
 
+||||||| Stash base
+=======
+    packages.fetcher = config.nci.outputs.pr-tracker-fetcher.packages.release;
+>>>>>>> Stashed changes
     checks."packages/fetcher" = self'.packages.fetcher;
   };
 }
