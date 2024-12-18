@@ -14,15 +14,13 @@
     lib,
     ...
   }: {
-    # nci.crates.pr-tracker-fetcher.drvConfig = {
-    #   mkDerivation.meta.mainProgram = "pr-tracker-fetcher";
-    #   # env = {
-    #   #     # inherit GITHUB_GRAPHQL_SCHEMA;
-    #   #     # GIT = lib.getExe pkgs.git;
-    #   #   # <<< POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
-    #   #   # <<< POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
-    #   # };
-    # };
+    nci = {
+      projects.default.drvConfig.env = {
+        inherit GITHUB_GRAPHQL_SCHEMA;
+        GIT = lib.getExe pkgs.git;
+      };
+      crates.pr-tracker-fetcher.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-fetcher";
+    };
 
     # <<< devshells.default.env = lib.attrsToList {
     # <<<   inherit GITHUB_GRAPHQL_SCHEMA;
