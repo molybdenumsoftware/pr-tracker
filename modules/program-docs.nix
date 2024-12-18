@@ -5,7 +5,6 @@
     pkgs,
     ...
   }: {
-
     # <<< packages.program-docs = config.nci.outputs.default.docs.overrideAttrs {
     # <<<   env = {
     # <<<     POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
@@ -13,7 +12,7 @@
     # <<<     GIT = lib.getExe pkgs.git;
     # <<<   };
     # <<< };
-    packages.program-docs = config.nci.crates config.nci.outputs.default.docs;
+    packages.program-docs = config.nci.outputs.default.docs;
     checks.program-docs = config.packages.program-docs;
   };
 }
