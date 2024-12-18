@@ -15,6 +15,7 @@
       # from crane usage that is being replaced
       # cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
     };
+    devshells.default.devshell.packages = [pkgs.rust-analyzer];
     # TODO test `cargo test` in the devshell
     treefmt.programs.rustfmt = {
       enable = true;

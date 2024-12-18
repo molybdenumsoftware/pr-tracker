@@ -24,10 +24,10 @@
     #   # };
     # };
 
-    devshells.default.env = lib.attrsToList {
-      inherit GITHUB_GRAPHQL_SCHEMA;
-      GIT = lib.getExe pkgs.git;
-    };
+    # <<< devshells.default.env = lib.attrsToList {
+    # <<<   inherit GITHUB_GRAPHQL_SCHEMA;
+    # <<<   GIT = lib.getExe pkgs.git;
+    # <<< };
 
     packages.fetcher = config.nci.outputs.pr-tracker-fetcher.packages.release;
     checks."packages/fetcher" = self'.packages.fetcher;
