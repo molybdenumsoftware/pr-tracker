@@ -12,7 +12,7 @@
     #   POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
     #   GIT = lib.getExe pkgs.git;
     # };
-    nci.projects.default.drvConfig.env = assert lib.assertMsg false "inside program-docs.nix. we hit this assertion because we commented out the corresponding setting in modules/nci.nix"; {
+    nci.projects.default.drvConfig.env = {
     # <<< nci.crates.util.drvConfig.env = {
       POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
       POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";

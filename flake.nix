@@ -6,8 +6,8 @@
     nci.inputs.nixpkgs.follows = "nixpkgs";
     nci.inputs.parts.follows = "flake-parts";
     nci.inputs.treefmt.follows = "treefmt-nix";
-    devshell.url = "github:numtide/devshell";
     devshell.inputs.nixpkgs.follows = "nixpkgs";
+    devshell.url = "github:numtide/devshell";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     flake-parts.url = "github:hercules-ci/flake-parts";
     git-hooks-nix.url = "github:cachix/git-hooks.nix";
@@ -26,21 +26,6 @@
     inputs.flake-parts.lib.mkFlake {inherit inputs;} ({inputs, ...}: {
       systems = import inputs.systems;
       imports = [
-        ({config,lib,...}: {
-          flake.debug = lib.traceVal config.val;
-        })
-       ({lib,...}:{
-          options.val = lib.mkOption {
-            type = lib.types.attrs;
-            default = {};
-          };
-        }) 
-        {
-          val = {a=1;};
-        }
-        {
-          val = {b=1;};
-        }
         ./modules/api
         ./modules/db-context.nix
         ./modules/dev-shell.nix
