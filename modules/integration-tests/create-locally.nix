@@ -22,7 +22,9 @@ in {
         services.pr-tracker.db.createLocally = true;
 
         services.pr-tracker.api.enable = true;
-        # <<< services.pr-tracker.api.package = self.packages.${system}.api.overrideAttrs {dontStrip = true;};
+        services.pr-tracker.api.package = self.packages.${system}.api.extendModules {
+          modules = [{mkDerivation.dontStrip = true;}];
+        };
         systemd.services.pr-tracker-api.environment.RUST_BACKTRACE = "1";
         services.pr-tracker.api.port = apiPort;
 
