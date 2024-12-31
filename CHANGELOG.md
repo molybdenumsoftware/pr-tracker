@@ -1,3 +1,15 @@
+## [6.0.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v5.1.0...v6.0.0) (2024-12-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* override mechanism from nixpkgs replaced by
+that of dream2nix
+
+### Miscellaneous Chores
+
+* use nix-cargo-integration ([3c61682](https://github.com/molybdenumsoftware/pr-tracker/commit/3c616822196ad3da864a1c13d1a01a3d4f44cd53))
+
 ## [5.1.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v5.0.0...v5.1.0) (2024-12-17)
 
 
