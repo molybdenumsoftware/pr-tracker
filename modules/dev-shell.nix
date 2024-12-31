@@ -1,18 +1,9 @@
-{
-  lib,
-  inputs,
-  ...
-}: {
+{inputs, ...}: {
   imports = [
     inputs.devshell.flakeModule
   ];
-
-  perSystem = {
-    self',
-    config,
-    ...
-  }: {
-    devshells.default.devshell.packagesFrom = lib.attrValues self'.packages;
+  perSystem = {config, ...}: {
+    nci.projects.default.numtideDevshell = "default";
     checks.devshell = config.devShells.default;
   };
 }

@@ -22,12 +22,24 @@ in {
         services.pr-tracker.db.createLocally = true;
 
         services.pr-tracker.api.enable = true;
-        services.pr-tracker.api.package = self.packages.${system}.api.overrideAttrs {dontStrip = true;};
+        services.pr-tracker.api.package =
+          (self.packages.${system}.api.extendModules
+            {
+              modules = [{mkDerivation.dontStrip = true;}];
+            })
+          .config
+          .public;
         systemd.services.pr-tracker-api.environment.RUST_BACKTRACE = "1";
         services.pr-tracker.api.port = apiPort;
 
         services.pr-tracker.fetcher.enable = true;
-        services.pr-tracker.fetcher.package = self.packages.${system}.fetcher.overrideAttrs {dontStrip = true;};
+        services.pr-tracker.fetcher.package =
+          (self.packages.${system}.fetcher.extendModules
+            {
+              modules = [{mkDerivation.dontStrip = true;}];
+            })
+          .config
+          .public;
         systemd.services.pr-tracker-fetcher.environment.RUST_BACKTRACE = "1";
         services.pr-tracker.fetcher.onCalendar = "*:*:*"; # every single second
         services.pr-tracker.fetcher.githubApiTokenFile = writeText "gh-auth-token" "hunter2";

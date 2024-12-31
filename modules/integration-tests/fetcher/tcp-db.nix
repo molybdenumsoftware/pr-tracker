@@ -2,7 +2,6 @@
   perSystem = {
     nodeToFetcherTest,
     pkgs,
-    self',
     ...
   }: {
     checks."integration/fetcher/tcp-db" = nodeToFetcherTest "fetcher with tcp db" (let
@@ -40,7 +39,13 @@
       ];
 
       services.pr-tracker.fetcher.enable = true;
-      services.pr-tracker.fetcher.package = self'.packages.fetcher.overrideAttrs {dontStrip = true;};
+      services.pr-tracker.fetcher.package =
+        (self.packages.${system}.fetcher.extendModules
+          {
+            modules = [{mkDerivation.dontStrip = true;}];
+          })
+        .config
+        .public;
       systemd.services.pr-tracker-fetcher.environment.RUST_BACKTRACE = "1";
       services.pr-tracker.fetcher.user = user;
       services.pr-tracker.fetcher.db.urlParams.user = user;

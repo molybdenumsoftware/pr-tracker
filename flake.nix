@@ -2,11 +2,12 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-    crane.url = "github:ipetkov/crane";
+    nci.url = "github:yusdacra/nix-cargo-integration";
+    nci.inputs.nixpkgs.follows = "nixpkgs";
+    nci.inputs.parts.follows = "flake-parts";
+    nci.inputs.treefmt.follows = "treefmt-nix";
     devshell.inputs.nixpkgs.follows = "nixpkgs";
     devshell.url = "github:numtide/devshell";
-    fenix.inputs.nixpkgs.follows = "nixpkgs";
-    fenix.url = "github:nix-community/fenix";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     flake-parts.url = "github:hercules-ci/flake-parts";
     git-hooks-nix.url = "github:cachix/git-hooks.nix";
@@ -26,14 +27,13 @@
       systems = import inputs.systems;
       imports = [
         ./modules/api
-        ./modules/clippy.nix
-        ./modules/crate-utils.nix
         ./modules/db-context.nix
         ./modules/dev-shell.nix
         ./modules/fetcher
         ./modules/filter-options.nix
         ./modules/formatting.nix
         ./modules/integration-tests
+        ./modules/nci.nix
         ./modules/nixos-manual
         ./modules/nixos-modules-lib.nix
         ./modules/private-nixos-modules

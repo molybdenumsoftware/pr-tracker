@@ -1,35 +1,40 @@
-{
-  inputs,
-  GITHUB_GRAPHQL_SCHEMA,
-  ...
-}: {
+{inputs, ...}: {
   imports = [./nixos-module.nix];
-
-  _module.args.GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
 
   perSystem = {
     self',
+    config,
     pkgs,
     lib,
-    buildWorkspacePackage,
     ...
   }: {
-    packages.fetcher = buildWorkspacePackage {
-      inherit GITHUB_GRAPHQL_SCHEMA;
-      env = {
-        POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
-        POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
+    nci = {
+      projects.default.drvConfig.env = {
+        GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
         GIT = lib.getExe pkgs.git;
       };
-
-      dir = "fetcher";
+      crates = {
+        pr-tracker-fetcher.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-fetcher";
+        pr-tracker-fetcher-config.excludeFromProjectDocs = false;
+      };
     };
 
-    devshells.default.env = lib.attrsToList {
-      inherit GITHUB_GRAPHQL_SCHEMA;
-      GIT = lib.getExe pkgs.git;
+    packages.fetcher = config.nci.outputs.pr-tracker-fetcher.packages.release;
+    checks = {
+      "packages/fetcher" = self'.packages.fetcher;
+      "packages/fetcher/clippy" =
+        (config.nci.outputs.pr-tracker-fetcher.clippy.extendModules {
+          modules = [
+            {
+              rust-crane = {
+                buildFlags = ["--all-targets" "--all-features"];
+                depsDrv.mkDerivation.buildPhase = ":";
+              };
+            }
+          ];
+        })
+        .config
+        .public;
     };
-
-    checks."packages/fetcher" = self'.packages.fetcher;
   };
 }

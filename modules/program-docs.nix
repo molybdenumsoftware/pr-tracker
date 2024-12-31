@@ -1,20 +1,21 @@
-{GITHUB_GRAPHQL_SCHEMA, ...}: {
+{
   perSystem = {
-    crane,
-    src,
-    cargoArtifacts,
-    self',
+    config,
+    lib,
     ...
   }: {
-    packages.program-docs = crane.cargoDoc {
-      inherit src cargoArtifacts GITHUB_GRAPHQL_SCHEMA;
+    packages.program-docs = config.nci.outputs.default.docs;
+    checks."packages/program-docs" = config.packages.program-docs;
 
-      pname = "pr-tracker-program-docs";
-      version = "unversioned";
-
-      cargoDocExtraArgs = "--package pr-tracker-fetcher-config --package pr-tracker-api-config --no-deps";
-    };
-
-    checks."packages/program-docs" = self'.packages.program-docs;
+    nci.crates =
+      lib.pipe config.nci.outputs
+      [
+        lib.attrNames
+        (map (crateName:
+          lib.nameValuePair crateName {
+            excludeFromProjectDocs = lib.mkDefault true;
+          }))
+        lib.listToAttrs
+      ];
   };
 }

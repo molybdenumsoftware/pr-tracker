@@ -3,19 +3,29 @@
 
   perSystem = {
     self',
-    lib,
-    pkgs,
-    buildWorkspacePackage,
+    config,
     ...
   }: {
-    packages.api = buildWorkspacePackage {
-      dir = "api";
-      env = {
-        POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
-        POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
-      };
+    nci.crates = {
+      pr-tracker-api.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-api";
+      pr-tracker-api-config.excludeFromProjectDocs = false;
     };
-
-    checks."packages/api" = self'.packages.api;
+    packages.api = config.nci.outputs.pr-tracker-api.packages.release;
+    checks = {
+      "packages/api" = self'.packages.api;
+      "packages/api/clippy" =
+        (config.nci.outputs.pr-tracker-api.clippy.extendModules {
+          modules = [
+            {
+              rust-crane = {
+                buildFlags = ["--all-targets" "--all-features"];
+                depsDrv.mkDerivation.buildPhase = ":";
+              };
+            }
+          ];
+        })
+        .config
+        .public;
+    };
   };
 }
