@@ -1,12 +1,54 @@
-{inputs, ...}: {
+{
+  inputs,
+  lib,
+  flake-parts-lib,
+  ...
+}: {
   imports = [inputs.nci.flakeModule];
-  perSystem = {
+
+  options.perSystem = flake-parts-lib.mkPerSystemOption {
+    options.nci.projects = lib.mkOption {
+      type = lib.types.lazyAttrsOf (lib.types.submoduleWith {
+        modules = [
+          {
+            options.fileset = lib.mkOption {
+              type = lib.mkOptionType {
+                name = "fileset";
+                merge = _loc: defs: lib.fileset.unions (map (def: def.value) defs);
+              };
+            };
+          }
+        ];
+      });
+    };
+  };
+
+  config.perSystem = {
     pkgs,
     config,
     ...
   }: {
     nci.projects.default = {
-      path = ../.;
+      path = lib.fileset.toSource {
+        root = ../.;
+        fileset = config.nci.projects.default.fileset;
+      };
+
+      fileset = lib.fileset.unions ([
+          ../Cargo.toml
+          ../Cargo.lock
+        ]
+        ++ (lib.pipe ../crates [
+          builtins.readDir
+          (lib.filterAttrs (name: type: type == "directory"))
+          (lib.mapAttrsToList (name: type: [
+            (../crates + "/${name}/Cargo.toml")
+            (lib.fileset.maybeMissing (../crates + "/${name}/build.rs"))
+            (../crates + "/${name}/src")
+          ]))
+          lib.flatten
+        ]));
+
       profiles = {
         dev = {};
         release.runTests = true;

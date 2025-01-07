@@ -1,5 +1,6 @@
 {
   perSystem = {pkgs, ...}: {
+    nci.projects.default.fileset = ../crates/util/migrations;
     treefmt.settings.global.excludes = ["crates/util/migrations/*"];
     devshells.default.commands = [
       {
