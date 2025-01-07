@@ -2,7 +2,9 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-    nci.url = "github:yusdacra/nix-cargo-integration";
+    # TODO: unpin once upstream issue with clippy is resolved.
+    # nci.url = "github:yusdacra/nix-cargo-integration";
+    nci.url = "github:yusdacra/nix-cargo-integration/9f7e28da21e6e62006588c9486256e2064fdb8f5";
     nci.inputs.nixpkgs.follows = "nixpkgs";
     nci.inputs.parts.follows = "flake-parts";
     nci.inputs.treefmt.follows = "treefmt-nix";

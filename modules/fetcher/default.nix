@@ -23,7 +23,7 @@
       };
       crates = {
         pr-tracker-fetcher.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-fetcher";
-        pr-tracker-fetcher-config.excludeFromProjectDocs = false;
+        pr-tracker-fetcher-config.includeInProjectDocs = true;
       };
     };
 
