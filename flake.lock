@@ -207,17 +207,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1735824621,
-        "narHash": "sha256-j75ZftbrZTgbB0jz6pqqgTnKiUyPMLXwDaRjK38r7PA=",
+        "lastModified": 1736230587,
+        "narHash": "sha256-4CC8WYhJ9EqGNxypM+3YKoj0MvJ9+97Ij/UG+qx9MLE=",
         "owner": "yusdacra",
         "repo": "nix-cargo-integration",
-        "rev": "9f7e28da21e6e62006588c9486256e2064fdb8f5",
+        "rev": "28331caaa4129f3fe2739538574745fa558e73e2",
         "type": "github"
       },
       "original": {
         "owner": "yusdacra",
         "repo": "nix-cargo-integration",
-        "rev": "9f7e28da21e6e62006588c9486256e2064fdb8f5",
         "type": "github"
       }
     },
