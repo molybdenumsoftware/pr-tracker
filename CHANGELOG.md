@@ -1,3 +1,10 @@
+## [6.1.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v6.0.0...v6.1.0) (2025-01-08)
+
+
+### Features
+
+* **flake:** no experimental features ([e324e34](https://github.com/molybdenumsoftware/pr-tracker/commit/e324e3499bdb620af8b7228a2e85ba3fde69a24e))
+
 ## [6.0.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v5.1.0...v6.0.0) (2024-12-31)
 
 
