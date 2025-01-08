@@ -21,10 +21,10 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: |
-          nix --accept-flake-config build .#program-docs
+          nix build .#program-docs
           mkdir docs
           cp -r result docs/programs
-          nix --accept-flake-config build .#nixos-manual
+          nix build .#nixos-manual
           cp -r result docs/nixos-modules
       - uses: actions/upload-pages-artifact@v3
         with:
