@@ -2,7 +2,7 @@
 use std::time::Duration;
 
 use poem::{endpoint::BoxEndpoint, EndpointExt};
-use poem_openapi::{ApiResponse, OpenApi, OpenApiService};
+use poem_openapi::{payload::PlainText, ApiResponse, OpenApi, OpenApiService};
 use serde::{Deserialize, Serialize};
 use sqlx::{
     pool::{PoolConnection, PoolOptions},
@@ -80,8 +80,8 @@ impl Api {
 
     #[oai(path = "/healthcheck", method = "get")]
     #[allow(clippy::unused_async)]
-    async fn health_check(&self, DbConnection(mut conn): DbConnection) -> &'static str {
-        "Here is your 200, but in the body"
+    async fn health_check(&self, DbConnection(_conn): DbConnection) -> PlainText<&'static str> {
+        PlainText("Here is your 200, but in the body")
     }
 }
 
