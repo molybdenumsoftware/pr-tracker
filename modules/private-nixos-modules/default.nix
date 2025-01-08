@@ -1,3 +1,3 @@
 {
-  imports = [./db.nix];
+  imports = [ ./db.nix ];
 }

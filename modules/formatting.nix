@@ -1,4 +1,5 @@
-{inputs, ...}: {
+{ inputs, ... }:
+{
   imports = [
     inputs.treefmt-nix.flakeModule
   ];
@@ -11,7 +12,7 @@
     treefmt = {
       projectRootFile = "flake.nix";
       programs = {
-        alejandra.enable = true;
+        nixfmt.enable = true;
         prettier.enable = true;
         toml-sort = {
           enable = true;

@@ -24,28 +24,35 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
 
-  outputs = inputs:
-    inputs.flake-parts.lib.mkFlake {inherit inputs;} ({inputs, ...}: {
-      systems = import inputs.systems;
-      imports = [
-        ./modules/api
-        ./modules/db-context.nix
-        ./modules/dev-shell.nix
-        ./modules/fetcher
-        ./modules/filter-options.nix
-        ./modules/formatting.nix
-        ./modules/integration-tests
-        ./modules/nci.nix
-        ./modules/nixos-manual
-        ./modules/nixos-modules-lib.nix
-        ./modules/private-nixos-modules
-        ./modules/program-docs.nix
-        ./modules/release
-        ./modules/store.nix
-        ./modules/util.nix
-        ./modules/git-hooks.nix
-      ];
-    });
+  outputs =
+    inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } (
+      { inputs, ... }:
+      {
+        systems = import inputs.systems;
+        imports = [
+          ./modules/api
+          ./modules/db-context.nix
+          ./modules/dev-shell.nix
+          ./modules/fetcher
+          ./modules/filter-options.nix
+          ./modules/formatting.nix
+          ./modules/integration-tests
+          ./modules/nci.nix
+          ./modules/nixos-manual
+          ./modules/nixos-modules-lib.nix
+          ./modules/private-nixos-modules
+          ./modules/program-docs.nix
+          ./modules/release
+          ./modules/store.nix
+          ./modules/util.nix
+          ./modules/git-hooks.nix
+        ];
+      }
+    );
 
-  nixConfig.extra-experimental-features = ["pipe-operators" "no-url-literals"];
+  nixConfig.extra-experimental-features = [
+    "pipe-operators"
+    "no-url-literals"
+  ];
 }
