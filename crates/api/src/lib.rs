@@ -80,7 +80,7 @@ impl Api {
 
     #[oai(path = "/healthcheck", method = "get")]
     #[allow(clippy::unused_async)]
-    async fn health_check(_: DbConnection) -> &'static str {
+    async fn health_check(&self, DbConnection(mut conn): DbConnection) -> &'static str {
         "Here is your 200, but in the body"
     }
 }
