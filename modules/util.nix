@@ -20,6 +20,13 @@
           };
           help = "Start a psql repl connected to a database with migrations applied.";
         }
+        {
+          package = pkgs.writeShellApplication {
+            name = "util-run-api";
+            text = ''exec cargo run --package util --bin run-api -- "$@"'';
+          };
+          help = "Start an API server instance for development.";
+        }
       ];
     };
 }

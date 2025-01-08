@@ -10,6 +10,8 @@ use sqlx::{
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
+pub const HEALTHCHECK_PATH: &str = "/api/v1/healthcheck";
+
 /// # Panics
 /// See implementation.
 pub async fn endpoint(db_url: &str) -> BoxEndpoint<'static> {
@@ -22,7 +24,7 @@ pub async fn endpoint(db_url: &str) -> BoxEndpoint<'static> {
     util::migrate(&db_pool).await.unwrap();
 
     poem::Route::new()
-        .at("/api/v1/healthcheck", poem::get(health_check))
+        .at(HEALTHCHECK_PATH, poem::get(health_check))
         .at("/api/v1/:pr", poem::get(landed))
         .with(poem::middleware::AddData::new(db_pool))
         .boxed()
@@ -61,7 +63,9 @@ async fn landed(
 }
 
 #[poem::handler]
-fn health_check(_: DbConnection) {}
+fn health_check(_: DbConnection) -> &'static str {
+    "Here is your 200, but in the body"
+}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Branch(pub String);

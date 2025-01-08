@@ -6,7 +6,7 @@ use poem::{
     listener::{Listener, TcpListener},
     Server,
 };
-use pr_tracker_api::endpoint;
+use pr_tracker_api::{endpoint, HEALTHCHECK_PATH};
 use pr_tracker_api_config::Environment;
 
 #[tokio::main]
@@ -22,6 +22,7 @@ async fn main() {
     } = config;
 
     let addr = format!("0.0.0.0:{port}");
+
     let acceptor = TcpListener::bind(&addr)
         .into_acceptor()
         .await
@@ -33,6 +34,8 @@ async fn main() {
         .unwrap();
 
     let endpoint = endpoint(&db_url).await;
+
+    eprintln!("Server started on http://{addr}{HEALTHCHECK_PATH}");
 
     Server::new_with_acceptor(acceptor)
         .run(endpoint)
