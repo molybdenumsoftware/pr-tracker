@@ -66,9 +66,14 @@
         drvConfig.env.RUSTFLAGS = "--deny warnings";
         export = false;
       };
-      devshells.default.devshell.packages = [
-        pkgs.rust-analyzer-unwrapped # https://github.com/NixOS/nixpkgs/issues/212439
-      ];
+      devshells.default.devshell = {
+        startup.rust-allow-warnings.text = ''
+          export RUSTFLAGS="$RUSTFLAGS --allow warnings"
+        '';
+        packages = [
+          pkgs.rust-analyzer-unwrapped # https://github.com/NixOS/nixpkgs/issues/212439
+        ];
+      };
       treefmt.programs.rustfmt = {
         enable = true;
         package = config.nci.toolchains.mkBuild pkgs;
