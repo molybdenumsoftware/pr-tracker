@@ -1,6 +1,7 @@
 [dependencies]
 camino = "*"
 poem = {features = ["test"], version = "*"}
+poem-openapi = {features = ["swagger-ui"], version = "*"}
 pr-tracker-api-config = {path = "../api-config"}
 sqlx = {default-features = false, features = ["macros", "migrate"], version = "*"}
 tokio = "*"

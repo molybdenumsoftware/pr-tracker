@@ -35,6 +35,7 @@ async fn main() {
 
     let endpoint = endpoint(&db_url).await;
 
+    // TODO: add a homepage that links to the swagger docs, link to it here instead
     eprintln!("Server started on http://{addr}{HEALTHCHECK_PATH}");
 
     Server::new_with_acceptor(acceptor)
