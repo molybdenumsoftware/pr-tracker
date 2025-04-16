@@ -116,12 +116,20 @@ enum LandedError {
 
 impl From<PrNumberNonPositiveError> for LandedError {
     fn from(_: PrNumberNonPositiveError) -> Self {
+        println!(
+            "{}",
+            ::std::string::ToString::to_string(&LandedError::PrNotFound)
+        ); //<<<
         Self::PrNumberNonPositive
     }
 }
 
 impl From<ForPrError> for LandedError {
     fn from(value: ForPrError) -> Self {
+        println!(
+            "{}",
+            ::std::string::ToString::to_string(&LandedError::PrNotFound)
+        ); //<<<
         match value {
             ForPrError::Sqlx(_) => Self::Sqlx,
             ForPrError::PrNotFound => Self::PrNotFound,
