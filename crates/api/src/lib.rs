@@ -11,11 +11,11 @@ use sqlx::{
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
-const DOCS_PATH = "/api-docs";
+const DOCS_PATH: &str = "/api-docs";
 
 #[poem::handler]
 async fn index() -> poem::web::Redirect {
-    poem::web::Redirect::see_other(DOCS_PATH) // TODO: DRY with other place
+    poem::web::Redirect::see_other(DOCS_PATH)
 }
 
 /// # Panics
@@ -35,8 +35,8 @@ pub async fn endpoint(db_url: &str) -> BoxEndpoint<'static> {
 
     poem::Route::new()
         .at("/", poem::get(index))
-        .nest(DOCS_PATH, api_service.swagger_ui())
-        .nest("/openapi.json", api_service.spec_endpoint())
+        .at(DOCS_PATH, api_service.swagger_ui())
+        .at("/openapi.json", api_service.spec_endpoint())
         .nest(API_PREFIX, api_service)
         .with(poem::middleware::AddData::new(db_pool))
         .boxed()
