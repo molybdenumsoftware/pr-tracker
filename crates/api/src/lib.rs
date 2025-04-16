@@ -101,6 +101,7 @@ pub struct LandedIn {
 }
 
 #[derive(Debug, thiserror::Error, ApiResponse)]
+#[oai(display = true)]
 enum LandedError {
     #[error("Pull request number non-positive.")]
     #[oai(status = 400)]
@@ -128,27 +129,26 @@ impl From<ForPrError> for LandedError {
     }
 }
 
-impl poem::error::ResponseError for LandedError {
-    fn status(&self) -> poem::http::StatusCode {
-        match self {
-            LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => StatusCode::BAD_REQUEST,
-            LandedError::Sqlx(_sqlx_error) => StatusCode::INTERNAL_SERVER_ERROR,
-            LandedError::PrNotFound => StatusCode::NOT_FOUND,
-        }
-    }
+// impl poem::error::ResponseError for LandedError {
+//     fn status(&self) -> poem::http::StatusCode {
+//         match self {
+//             LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => StatusCode::BAD_REQUEST,
+//             LandedError::Sqlx(_sqlx_error) => StatusCode::INTERNAL_SERVER_ERROR,
+//             LandedError::PrNotFound => StatusCode::NOT_FOUND,
+//         }
+//     }
 
-    // <<< fn as_response(&self) -> Response
-    // <<< where
-    // <<<     Self: std::error::Error + Send + Sync + 'static,
-    // <<< {
-    // <<<     let body = match self {
-    // <<<         LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => {
-    // <<<             "Non positive pull request number.".to_owned()
-    // <<<         }
-    // <<<         LandedError::Sqlx(_sqlx_error) => "Error. Sorry.".to_owned(),
-    // <<<         LandedError::PrNotFound => self.to_string(),
-    // <<<     };
-    // <<<
-    // <<<     Response::builder().status(self.status()).body(body)
-    // <<< }
-}
+// <<< fn as_response(&self) -> Response
+// <<< where
+// <<<     Self: std::error::Error + Send + Sync + 'static,
+// <<< {
+// <<<     let body = match self {
+// <<<         LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => {
+// <<<             "Non positive pull request number.".to_owned()
+// <<<         }
+// <<<         LandedError::Sqlx(_sqlx_error) => "Error. Sorry.".to_owned(),
+// <<<         LandedError::PrNotFound => self.to_string(),
+// <<<     };
+// <<<
+// <<<     Response::builder().status(self.status()).body(body)
+// <<< }
