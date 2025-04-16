@@ -11,7 +11,12 @@ use sqlx::{
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
-pub const HEALTHCHECK_PATH: &str = "/api/v1/healthcheck";
+const DOCS_PATH = "/api-docs";
+
+#[poem::handler]
+async fn index() -> poem::web::Redirect {
+    poem::web::Redirect::see_other(DOCS_PATH) // TODO: DRY with other place
+}
 
 /// # Panics
 /// See implementation.
@@ -22,15 +27,17 @@ pub async fn endpoint(db_url: &str) -> BoxEndpoint<'static> {
         .await
         .unwrap();
 
-    let api_service = OpenApiService::new(Api, env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+    const API_PREFIX: &str = "/api";
+    let api_service = OpenApiService::new(Api, env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
+        .url_prefix(API_PREFIX);
 
     util::migrate(&db_pool).await.unwrap();
 
     poem::Route::new()
-        // TODO figure out best paths
-        .nest("/api-docs", api_service.swagger_ui())
+        .at("/", poem::get(index))
+        .nest(DOCS_PATH, api_service.swagger_ui())
         .nest("/openapi.json", api_service.spec_endpoint())
-        .nest("/", api_service)
+        .nest(API_PREFIX, api_service)
         .with(poem::middleware::AddData::new(db_pool))
         .boxed()
 }
@@ -54,7 +61,7 @@ impl<'a> poem::FromRequest<'a> for DbConnection {
 
 struct Api;
 
-#[OpenApi(prefix_path = "/api/v1")]
+#[OpenApi(prefix_path = "/v1")]
 impl Api {
     #[oai(path = "/:pr", method = "get")]
     async fn landed(

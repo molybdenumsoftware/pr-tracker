@@ -6,7 +6,7 @@ use poem::{
     listener::{Listener, TcpListener},
     Server,
 };
-use pr_tracker_api::{endpoint, HEALTHCHECK_PATH};
+use pr_tracker_api::endpoint;
 use pr_tracker_api_config::Environment;
 
 #[tokio::main]
@@ -35,8 +35,7 @@ async fn main() {
 
     let endpoint = endpoint(&db_url).await;
 
-    // TODO: add a homepage that links to the swagger docs, link to it here instead
-    eprintln!("Server started on http://{addr}{HEALTHCHECK_PATH}");
+    eprintln!("Server started on http://{addr}");
 
     Server::new_with_acceptor(acceptor)
         .run(endpoint)
