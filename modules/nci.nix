@@ -68,7 +68,7 @@
       };
       devshells.default.devshell = {
         startup.rust-allow-warnings.text = ''
-          export RUSTFLAGS="$RUSTFLAGS --allow warnings"
+          export RUSTFLAGS="$RUSTFLAGS --warn warnings"
         '';
         packages = [
           pkgs.rust-analyzer-unwrapped # https://github.com/NixOS/nixpkgs/issues/212439
