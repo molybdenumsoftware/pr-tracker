@@ -9,7 +9,7 @@ use wildmatch::WildMatch;
 use crate::{github::GithubClient, repo::isolated_git};
 use std::collections::BTreeSet;
 
-static LOGGER: once_cell::sync::Lazy<()> = once_cell::sync::Lazy::new(|| {
+static LOGGER: std::sync::LazyLock<()> = std::sync::LazyLock::new(|| {
     env_logger::init();
 });
 
@@ -117,7 +117,7 @@ struct TestContext {
 
 impl TestContext {
     async fn with(test: impl FnOnce(TestContext) -> LocalBoxFuture<'static, ()> + 'static) {
-        once_cell::sync::Lazy::get(&LOGGER);
+        std::sync::LazyLock::force(&LOGGER);
 
         DatabaseContext::with(
             |db_context| {
