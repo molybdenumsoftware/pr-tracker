@@ -37,6 +37,9 @@ Expects [configuration via environment](https://molybdenumsoftware.github.io/pr-
 Takes no arguments.
 Expects [configuration via environment](https://molybdenumsoftware.github.io/pr-tracker/programs/pr_tracker_api_config/struct.Environment.html).
 
+- `/openapi.json`
+- `/` redirects to API documentation
+
 ## NixOS modules
 
 [Manual](https://molybdenumsoftware.github.io/pr-tracker/nixos-modules)

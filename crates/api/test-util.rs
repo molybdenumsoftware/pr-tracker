@@ -4,6 +4,8 @@ use poem::endpoint::BoxEndpoint;
 
 #[derive(getset::Getters, getset::MutGetters)]
 pub struct TestContext {
+    // This value represents a running DB even if the field is not used.
+    #[allow(dead_code)]
     #[getset(get = "pub", get_mut = "pub")]
     db: db_context::DatabaseContext,
     #[getset(get = "pub")]
@@ -33,4 +35,13 @@ impl TestContext {
         )
         .await;
     }
+}
+
+macro_rules! test {
+    ($name:ident, $test:expr) => {
+        #[tokio::test]
+        async fn $name() {
+            TestContext::with(|ctx| async { $test(ctx).await }.boxed()).await;
+        }
+    };
 }

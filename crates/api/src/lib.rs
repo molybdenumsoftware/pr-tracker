@@ -1,7 +1,8 @@
 #![warn(clippy::pedantic)]
 use std::time::Duration;
 
-use poem::{endpoint::BoxEndpoint, http::StatusCode, web::Json, EndpointExt, Response};
+use poem::{endpoint::BoxEndpoint, EndpointExt};
+use poem_openapi::{payload::PlainText, ApiResponse, OpenApi, OpenApiService};
 use serde::{Deserialize, Serialize};
 use sqlx::{
     pool::{PoolConnection, PoolOptions},
@@ -10,22 +11,34 @@ use sqlx::{
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
-pub const HEALTHCHECK_PATH: &str = "/api/v1/healthcheck";
+const DOCS_PATH: &str = "/api-docs";
+
+#[poem::handler]
+fn index() -> poem::web::Redirect {
+    poem::web::Redirect::see_other(DOCS_PATH)
+}
 
 /// # Panics
 /// See implementation.
 pub async fn endpoint(db_url: &str) -> BoxEndpoint<'static> {
+    const API_PREFIX: &str = "/api";
+
     let db_pool = PoolOptions::<Postgres>::new()
         .acquire_timeout(Duration::from_secs(5))
         .connect(db_url)
         .await
         .unwrap();
 
+    let api_service = OpenApiService::new(Api, env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
+        .url_prefix(API_PREFIX);
+
     util::migrate(&db_pool).await.unwrap();
 
     poem::Route::new()
-        .at(HEALTHCHECK_PATH, poem::get(health_check))
-        .at("/api/v1/:pr", poem::get(landed))
+        .at("/", poem::get(index))
+        .nest(DOCS_PATH, api_service.swagger_ui())
+        .at("/openapi.json", api_service.spec_endpoint())
+        .nest(API_PREFIX, api_service)
         .with(poem::middleware::AddData::new(db_pool))
         .boxed()
 }
@@ -47,27 +60,34 @@ impl<'a> poem::FromRequest<'a> for DbConnection {
     }
 }
 
-#[poem::handler]
-async fn landed(
-    poem::web::Path(pr): poem::web::Path<i32>,
-    DbConnection(mut conn): DbConnection,
-) -> poem::Result<poem::web::Json<LandedIn>, LandedError> {
-    let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
+struct Api;
 
-    let branches = landings
-        .into_iter()
-        .map(|branch| Branch::new(branch.name()))
-        .collect();
+#[OpenApi(prefix_path = "/v1")]
+impl Api {
+    #[oai(path = "/:pr", method = "get")]
+    async fn landed(
+        &self,
+        poem_openapi::param::Path(pr): poem_openapi::param::Path<i32>,
+        DbConnection(mut conn): DbConnection,
+    ) -> poem::Result<poem_openapi::payload::Json<LandedIn>, LandedError> {
+        let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
 
-    Ok(Json(LandedIn { branches }))
+        let branches = landings
+            .into_iter()
+            .map(|branch| Branch::new(branch.name()))
+            .collect();
+
+        Ok(poem_openapi::payload::Json(LandedIn { branches }))
+    }
+
+    #[oai(path = "/healthcheck", method = "get")]
+    #[allow(clippy::unused_async)]
+    async fn health_check(&self, DbConnection(_conn): DbConnection) -> PlainText<&'static str> {
+        PlainText("Here is your 200, but in the body")
+    }
 }
 
-#[poem::handler]
-fn health_check(_: DbConnection) -> &'static str {
-    "Here is your 200, but in the body"
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, poem_openapi::NewType)]
 pub struct Branch(pub String);
 
 impl Branch {
@@ -76,51 +96,38 @@ impl Branch {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, poem_openapi::Object)]
 pub struct LandedIn {
     pub branches: Vec<Branch>,
 }
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, ApiResponse)]
 enum LandedError {
-    #[error(transparent)]
-    PrNumberNonPositive(#[from] PrNumberNonPositiveError),
-    #[error(transparent)]
-    Sqlx(sqlx::Error),
-    #[error("Pull request not found.")]
-    PrNotFound,
+    #[oai(status = 400)]
+    PrNumberNonPositive(PlainText<String>),
+
+    #[oai(status = 500)]
+    Sqlx(PlainText<String>),
+
+    #[oai(status = 404)]
+    PrNotFound(PlainText<String>),
+}
+
+impl From<PrNumberNonPositiveError> for LandedError {
+    fn from(_: PrNumberNonPositiveError) -> Self {
+        Self::PrNumberNonPositive(PlainText(String::from("Pull request number non-positive.")))
+    }
 }
 
 impl From<ForPrError> for LandedError {
     fn from(value: ForPrError) -> Self {
         match value {
-            ForPrError::Sqlx(e) => Self::Sqlx(e),
-            ForPrError::PrNotFound => Self::PrNotFound,
-        }
-    }
-}
-
-impl poem::error::ResponseError for LandedError {
-    fn status(&self) -> StatusCode {
-        match self {
-            LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => StatusCode::BAD_REQUEST,
-            LandedError::Sqlx(_sqlx_error) => StatusCode::INTERNAL_SERVER_ERROR,
-            LandedError::PrNotFound => StatusCode::NOT_FOUND,
-        }
-    }
-
-    fn as_response(&self) -> Response
-    where
-        Self: std::error::Error + Send + Sync + 'static,
-    {
-        let body = match self {
-            LandedError::PrNumberNonPositive(PrNumberNonPositiveError) => {
-                "Non positive pull request number.".to_owned()
+            ForPrError::Sqlx(_) => Self::Sqlx(poem_openapi::payload::PlainText(String::from(
+                "Error. Sorry.",
+            ))),
+            ForPrError::PrNotFound => {
+                Self::PrNotFound(PlainText(String::from("Pull request not found.")))
             }
-            LandedError::Sqlx(_sqlx_error) => "Error. Sorry.".to_owned(),
-            LandedError::PrNotFound => self.to_string(),
-        };
-
-        Response::builder().status(self.status()).body(body)
+        }
     }
 }

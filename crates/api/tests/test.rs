@@ -1,18 +1,10 @@
 #[path = "../test-util.rs"]
+#[macro_use]
 mod test_util;
 
 use futures::FutureExt;
 use poem::http::StatusCode;
 use test_util::TestContext;
-
-macro_rules! test {
-    ($name:ident, $test:expr) => {
-        #[tokio::test]
-        async fn $name() {
-            TestContext::with(|ctx| async { $test(ctx).await }.boxed()).await;
-        }
-    };
-}
 
 test![healthcheck_ok, |ctx: TestContext| async move {
     let response = ctx.client().get("/api/v1/healthcheck").send().await;
@@ -24,6 +16,33 @@ test![healthcheck_not_ok, |mut ctx: TestContext| async move {
     let response = ctx.client().get("/api/v1/healthcheck").send().await;
     response.assert_status(StatusCode::SERVICE_UNAVAILABLE);
 }];
+
+test![negative_pr_number, |ctx: TestContext| async move {
+    let response = ctx.client().get("/api/v1/-1").send().await;
+    response.assert_status(StatusCode::BAD_REQUEST);
+    response
+        .assert_text("Pull request number non-positive.")
+        .await;
+}];
+
+// https://github.com/molybdenumsoftware/pr-tracker/issues/241
+// async fn bork_db(ctx: &mut db_context::DatabaseContext) {
+//     let mut sure = ctx.connection().await.unwrap();
+//     sqlx::raw_sql(
+//         "
+//         ALTER TABLE github_prs DROP COLUMN commit
+//         ",
+//     )
+//     .execute(&mut sure)
+//     .await;
+// }
+//
+// test![internal_landed_error, |mut ctx: TestContext| async move {
+//     bork_db(ctx.db_mut()).await;
+//     let response = ctx.client().get("/api/v1/1").send().await;
+//     response.assert_status(StatusCode::SERVICE_UNAVAILABLE);
+//     response.assert_text("Error. Sorry.").await;
+// }];
 
 test![pr_not_found, |ctx: TestContext| async move {
     let response = ctx.client().get("/api/v1/2134").send().await;
