@@ -1,3 +1,10 @@
+## [6.2.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v6.1.0...v6.2.0) (2025-04-25)
+
+
+### Features
+
+* openapi with swagger ui ([1bf9d2c](https://github.com/molybdenumsoftware/pr-tracker/commit/1bf9d2cfba257365af89226d3c1cc53a9b8ba47c)), closes [#188](https://github.com/molybdenumsoftware/pr-tracker/issues/188)
+
 ## [6.1.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v6.0.0...v6.1.0) (2025-01-08)
 
 
