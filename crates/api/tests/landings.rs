@@ -7,7 +7,7 @@ use poem::http::StatusCode;
 use test_util::TestContext;
 
 test![negative_pr_number, |ctx: TestContext| async move {
-    let response = ctx.client().get("/api/v1/-1").send().await;
+    let response = ctx.client().get("/api/v2/landings/-1").send().await;
     response.assert_status(StatusCode::BAD_REQUEST);
     response
         .assert_text("Pull request number non-positive.")
@@ -28,13 +28,13 @@ test![negative_pr_number, |ctx: TestContext| async move {
 //
 // test![internal_landed_error, |mut ctx: TestContext| async move {
 //     bork_db(ctx.db_mut()).await;
-//     let response = ctx.client().get("/api/v1/1").send().await;
+//     let response = ctx.client().get("/api/v2/landings/1").send().await;
 //     response.assert_status(StatusCode::SERVICE_UNAVAILABLE);
 //     response.assert_text("Error. Sorry.").await;
 // }];
 
 test![pr_not_found, |ctx: TestContext| async move {
-    let response = ctx.client().get("/api/v1/2134").send().await;
+    let response = ctx.client().get("/api/v2/landings/2134").send().await;
     response.assert_status(StatusCode::NO_CONTENT);
     response.assert_text("Pull request not found.").await;
 }];
@@ -50,7 +50,7 @@ test![pr_not_landed, |ctx: TestContext| async move {
     .await
     .unwrap();
 
-    let response = ctx.client().get("/api/v1/123").send().await;
+    let response = ctx.client().get("/api/v2/landings/123").send().await;
     response.assert_status_is_ok();
     response
         .assert_json(pr_tracker_api::LandedIn { branches: vec![] })
@@ -77,7 +77,7 @@ test![pr_landed, |ctx: TestContext| async move {
 
     landing.upsert(connection).await.unwrap();
 
-    let response = ctx.client().get("/api/v1/2134").send().await;
+    let response = ctx.client().get("/api/v2/landings/2134").send().await;
     response.assert_status_is_ok();
 
     response

@@ -62,9 +62,15 @@ impl<'a> FromRequest<'a> for DbConnection {
 
 struct Api;
 
-#[OpenApi(prefix_path = "/v1")]
+#[OpenApi]
 impl Api {
-    #[oai(path = "/:pr", method = "get")]
+    #[allow(clippy::unused_async)]
+    #[oai(path = "/v1/:_", method = "get")]
+    async fn v1(&self) -> V1Response {
+        V1Response::NotSupported(payload::PlainText("API v1 not supported"))
+    }
+
+    #[oai(path = "/v2/landings/:pr", method = "get")]
     async fn landed(
         &self,
         param::Path(pr): param::Path<i32>,
@@ -80,7 +86,7 @@ impl Api {
         Ok(payload::Json(LandedIn { branches }))
     }
 
-    #[oai(path = "/healthcheck", method = "get")]
+    #[oai(path = "/v2/healthcheck", method = "get")]
     #[allow(clippy::unused_async)]
     async fn health_check(
         &self,
@@ -88,6 +94,12 @@ impl Api {
     ) -> payload::PlainText<&'static str> {
         payload::PlainText("Here is your 200, but in the body")
     }
+}
+
+#[derive(ApiResponse)]
+enum V1Response {
+    #[oai(status = 404)]
+    NotSupported(payload::PlainText<&'static str>),
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, poem_openapi::NewType)]
