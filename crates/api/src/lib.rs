@@ -1,8 +1,11 @@
 #![warn(clippy::pedantic)]
 use std::time::Duration;
 
-use poem::{endpoint::BoxEndpoint, EndpointExt};
-use poem_openapi::{payload::PlainText, ApiResponse, OpenApi, OpenApiService};
+use poem::{
+    endpoint::BoxEndpoint, middleware, web::Redirect, EndpointExt, FromRequest, Request,
+    RequestBody, Route,
+};
+use poem_openapi::{param, payload, ApiResponse, OpenApi, OpenApiService};
 use serde::{Deserialize, Serialize};
 use sqlx::{
     pool::{PoolConnection, PoolOptions},
@@ -14,8 +17,8 @@ use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 const DOCS_PATH: &str = "/api-docs";
 
 #[poem::handler]
-fn index() -> poem::web::Redirect {
-    poem::web::Redirect::see_other(DOCS_PATH)
+fn index() -> Redirect {
+    Redirect::see_other(DOCS_PATH)
 }
 
 /// # Panics
@@ -34,22 +37,19 @@ pub async fn endpoint(db_url: &str) -> BoxEndpoint<'static> {
 
     util::migrate(&db_pool).await.unwrap();
 
-    poem::Route::new()
+    Route::new()
         .at("/", poem::get(index))
         .nest(DOCS_PATH, api_service.swagger_ui())
         .at("/openapi.json", api_service.spec_endpoint())
         .nest(API_PREFIX, api_service)
-        .with(poem::middleware::AddData::new(db_pool))
+        .with(middleware::AddData::new(db_pool))
         .boxed()
 }
 
 pub struct DbConnection(PoolConnection<Postgres>);
 
-impl<'a> poem::FromRequest<'a> for DbConnection {
-    async fn from_request(
-        req: &'a poem::Request,
-        _body: &mut poem::RequestBody,
-    ) -> poem::Result<Self> {
+impl<'a> FromRequest<'a> for DbConnection {
+    async fn from_request(req: &'a Request, _body: &mut RequestBody) -> poem::Result<Self> {
         let pool = req.extensions()
             .get::<Pool<Postgres>>()
             .expect("Could not find a db pool on `req.extensions`. Perhaps you forgot to register an `AddData` middleware that adds it?");
@@ -67,9 +67,9 @@ impl Api {
     #[oai(path = "/:pr", method = "get")]
     async fn landed(
         &self,
-        poem_openapi::param::Path(pr): poem_openapi::param::Path<i32>,
+        param::Path(pr): param::Path<i32>,
         DbConnection(mut conn): DbConnection,
-    ) -> poem::Result<poem_openapi::payload::Json<LandedIn>, LandedError> {
+    ) -> poem::Result<payload::Json<LandedIn>, LandedError> {
         let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
 
         let branches = landings
@@ -77,13 +77,16 @@ impl Api {
             .map(|branch| Branch::new(branch.name()))
             .collect();
 
-        Ok(poem_openapi::payload::Json(LandedIn { branches }))
+        Ok(payload::Json(LandedIn { branches }))
     }
 
     #[oai(path = "/healthcheck", method = "get")]
     #[allow(clippy::unused_async)]
-    async fn health_check(&self, DbConnection(_conn): DbConnection) -> PlainText<&'static str> {
-        PlainText("Here is your 200, but in the body")
+    async fn health_check(
+        &self,
+        DbConnection(_conn): DbConnection,
+    ) -> payload::PlainText<&'static str> {
+        payload::PlainText("Here is your 200, but in the body")
     }
 }
 
@@ -104,29 +107,29 @@ pub struct LandedIn {
 #[derive(Debug, ApiResponse)]
 enum LandedError {
     #[oai(status = 400)]
-    PrNumberNonPositive(PlainText<String>),
+    PrNumberNonPositive(payload::PlainText<String>),
 
     #[oai(status = 500)]
-    Sqlx(PlainText<String>),
+    Sqlx(payload::PlainText<String>),
 
     #[oai(status = 404)]
-    PrNotFound(PlainText<String>),
+    PrNotFound(payload::PlainText<String>),
 }
 
 impl From<PrNumberNonPositiveError> for LandedError {
     fn from(_: PrNumberNonPositiveError) -> Self {
-        Self::PrNumberNonPositive(PlainText(String::from("Pull request number non-positive.")))
+        Self::PrNumberNonPositive(payload::PlainText(String::from(
+            "Pull request number non-positive.",
+        )))
     }
 }
 
 impl From<ForPrError> for LandedError {
     fn from(value: ForPrError) -> Self {
         match value {
-            ForPrError::Sqlx(_) => Self::Sqlx(poem_openapi::payload::PlainText(String::from(
-                "Error. Sorry.",
-            ))),
+            ForPrError::Sqlx(_) => Self::Sqlx(payload::PlainText(String::from("Error. Sorry."))),
             ForPrError::PrNotFound => {
-                Self::PrNotFound(PlainText(String::from("Pull request not found.")))
+                Self::PrNotFound(payload::PlainText(String::from("Pull request not found.")))
             }
         }
     }
