@@ -1,3 +1,16 @@
+## [7.0.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v6.2.0...v7.0.0) (2025-04-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* **api:** remove /api/v1 and add /api/v2
+* **api:** return 204 when no PR is found
+
+### Features
+
+* **api:** remove /api/v1 and add /api/v2 ([9216afc](https://github.com/molybdenumsoftware/pr-tracker/commit/9216afc13eb6e7e67fc6ec3665ba170bee79a7b1))
+* **api:** return 204 when no PR is found ([057cb0c](https://github.com/molybdenumsoftware/pr-tracker/commit/057cb0cf209121783727e0f2c965cdba8bc95738))
+
 ## [6.2.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v6.1.0...v6.2.0) (2025-04-25)
 
 
