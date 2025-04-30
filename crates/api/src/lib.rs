@@ -79,7 +79,12 @@ impl Api {
             }
         };
 
-        let landings = Landing::for_pr(&mut conn, try_into).await?;
+        let landings = match Landing::for_pr(&mut conn, pr).await {
+            Ok(landings) => landings,
+            Err(ForPrError::PrNotFound) => PrNumberNonPositiveError::PrNotFound(PlainText(
+                String::from("Pull request not found."),
+            )),
+        };
 
         let branches = landings
             .into_iter()
