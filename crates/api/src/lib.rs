@@ -9,7 +9,7 @@ use sqlx::{
     Pool, Postgres,
 };
 
-use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
+use pr_tracker_store::{ForPrError, Landing, PrNumber, PrNumberNonPositiveError};
 
 const DOCS_PATH: &str = "/api-docs";
 
@@ -69,15 +69,18 @@ impl Api {
         &self,
         poem_openapi::param::Path(pr): poem_openapi::param::Path<i32>,
         DbConnection(mut conn): DbConnection,
-    ) -> poem::Result<poem_openapi::payload::Json<LandedIn>, LandedError> {
-        let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
+    ) -> LandedResponse {
+        let Ok(PrNumber(_)) = pr.try_into() else {
+            return LandedResponse::PrNumberNonPositive(PlainText(">>> TODO <<<".to_string()));
+        };
+        let landings = Landing::for_pr(&mut conn, try_into).await?;
 
         let branches = landings
             .into_iter()
             .map(|branch| Branch::new(branch.name()))
             .collect();
 
-        Ok(poem_openapi::payload::Json(LandedIn { branches }))
+        LandedResponse::Landings(poem_openapi::payload::Json(branches))
     }
 
     #[oai(path = "/healthcheck", method = "get")]
@@ -102,7 +105,10 @@ pub struct LandedIn {
 }
 
 #[derive(Debug, ApiResponse)]
-enum LandedError {
+enum LandedResponse {
+    #[oai(status = 200)]
+    Landings(poem_openapi::payload::Json<Vec<Branch>>),
+
     #[oai(status = 400)]
     PrNumberNonPositive(PlainText<String>),
 
@@ -113,13 +119,13 @@ enum LandedError {
     PrNotFound(PlainText<String>),
 }
 
-impl From<PrNumberNonPositiveError> for LandedError {
+impl From<PrNumberNonPositiveError> for LandedResponse {
     fn from(_: PrNumberNonPositiveError) -> Self {
         Self::PrNumberNonPositive(PlainText(String::from("Pull request number non-positive.")))
     }
 }
 
-impl From<ForPrError> for LandedError {
+impl From<ForPrError> for LandedResponse {
     fn from(value: ForPrError) -> Self {
         match value {
             ForPrError::Sqlx(_) => Self::Sqlx(poem_openapi::payload::PlainText(String::from(
