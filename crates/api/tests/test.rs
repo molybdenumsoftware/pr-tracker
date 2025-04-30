@@ -46,7 +46,7 @@ test![negative_pr_number, |ctx: TestContext| async move {
 
 test![pr_not_found, |ctx: TestContext| async move {
     let response = ctx.client().get("/api/v1/2134").send().await;
-    response.assert_status(StatusCode::NOT_FOUND);
+    response.assert_status(StatusCode::NO_CONTENT);
     response.assert_text("Pull request not found.").await;
 }];
 

@@ -69,7 +69,7 @@ impl Api {
         &self,
         param::Path(pr): param::Path<i32>,
         DbConnection(mut conn): DbConnection,
-    ) -> poem::Result<payload::Json<LandedIn>, LandedError> {
+    ) -> poem::Result<payload::Json<LandedIn>, NoLandingsResponse> {
         let landings = Landing::for_pr(&mut conn, pr.try_into()?).await?;
 
         let branches = landings
@@ -105,18 +105,18 @@ pub struct LandedIn {
 }
 
 #[derive(Debug, ApiResponse)]
-enum LandedError {
+enum NoLandingsResponse {
     #[oai(status = 400)]
     PrNumberNonPositive(payload::PlainText<String>),
 
     #[oai(status = 500)]
     Sqlx(payload::PlainText<String>),
 
-    #[oai(status = 404)]
+    #[oai(status = 204)]
     PrNotFound(payload::PlainText<String>),
 }
 
-impl From<PrNumberNonPositiveError> for LandedError {
+impl From<PrNumberNonPositiveError> for NoLandingsResponse {
     fn from(_: PrNumberNonPositiveError) -> Self {
         Self::PrNumberNonPositive(payload::PlainText(String::from(
             "Pull request number non-positive.",
@@ -124,7 +124,7 @@ impl From<PrNumberNonPositiveError> for LandedError {
     }
 }
 
-impl From<ForPrError> for LandedError {
+impl From<ForPrError> for NoLandingsResponse {
     fn from(value: ForPrError) -> Self {
         match value {
             ForPrError::Sqlx(_) => Self::Sqlx(payload::PlainText(String::from("Error. Sorry."))),
