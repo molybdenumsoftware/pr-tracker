@@ -70,9 +70,15 @@ impl Api {
         poem_openapi::param::Path(pr): poem_openapi::param::Path<i32>,
         DbConnection(mut conn): DbConnection,
     ) -> LandedResponse {
-        let Ok(PrNumber(_)) = pr.try_into() else {
-            return LandedResponse::PrNumberNonPositive(PlainText(">>> TODO <<<".to_string()));
+        let pr = match pr.try_into() {
+            Ok(pr) => pr,
+            Err(PrNumberNonPositiveError) => {
+                return LandedResponse::PrNumberNonPositive(PlainText(String::from(
+                    "Pull request number non-positive.",
+                )))
+            }
         };
+
         let landings = Landing::for_pr(&mut conn, try_into).await?;
 
         let branches = landings
@@ -117,12 +123,6 @@ enum LandedResponse {
 
     #[oai(status = 404)]
     PrNotFound(PlainText<String>),
-}
-
-impl From<PrNumberNonPositiveError> for LandedResponse {
-    fn from(_: PrNumberNonPositiveError) -> Self {
-        Self::PrNumberNonPositive(PlainText(String::from("Pull request number non-positive.")))
-    }
 }
 
 impl From<ForPrError> for LandedResponse {
