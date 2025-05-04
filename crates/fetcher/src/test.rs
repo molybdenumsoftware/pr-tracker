@@ -1,6 +1,6 @@
 use camino::Utf8PathBuf;
 use db_context::{DatabaseContext, LogDestination};
-use futures::{future::LocalBoxFuture, FutureExt};
+use futures::{FutureExt, future::LocalBoxFuture};
 use itertools::Itertools;
 use pr_tracker_store::{Branch, GitCommit, GithubPrQueryCursor, Landing, Pr, PrNumber};
 use tempfile::TempDir;

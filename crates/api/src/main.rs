@@ -3,8 +3,8 @@
 use anyhow::Context;
 use confique::Config;
 use poem::{
-    listener::{Listener, TcpListener},
     Server,
+    listener::{Listener, TcpListener},
 };
 use pr_tracker_api::endpoint;
 use pr_tracker_api_config::Environment;
