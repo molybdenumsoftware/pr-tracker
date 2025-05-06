@@ -1,6 +1,5 @@
 [dependencies]
 camino = "*"
-futures = "*"
 sqlx = {features = ["postgres", "runtime-tokio"], version = "*"}
 tempfile = "*"
 fragile-child.workspace = true

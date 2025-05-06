@@ -2,17 +2,24 @@
 #[macro_use]
 mod test_util;
 
-use futures::FutureExt;
 use poem::http::StatusCode;
 use test_util::TestContext;
 
-test![healthcheck_ok, |ctx: TestContext| async move {
-    let response = ctx.client().get("/api/v2/healthcheck").send().await;
-    response.assert_status_is_ok();
-}];
+#[tokio::test]
+async fn healthcheck_ok() {
+    TestContext::with(async |ctx| {
+        let response = ctx.client().get("/api/v2/healthcheck").send().await;
+        response.assert_status_is_ok();
+    })
+    .await;
+}
 
-test![healthcheck_not_ok, |mut ctx: TestContext| async move {
-    ctx.db_mut().kill_db().unwrap();
-    let response = ctx.client().get("/api/v2/healthcheck").send().await;
-    response.assert_status(StatusCode::SERVICE_UNAVAILABLE);
-}];
+#[tokio::test]
+async fn healthcheck_not_ok() {
+    TestContext::with(async |mut ctx| {
+        ctx.db_mut().kill_db().unwrap();
+        let response = ctx.client().get("/api/v2/healthcheck").send().await;
+        response.assert_status(StatusCode::SERVICE_UNAVAILABLE);
+    })
+    .await;
+}

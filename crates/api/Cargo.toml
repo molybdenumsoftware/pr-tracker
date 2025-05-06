@@ -7,7 +7,6 @@ sqlx = {default-features = false, features = ["macros", "migrate"], version = "*
 tokio = "*"
 anyhow.workspace = true
 confique.workspace = true
-futures.workspace = true
 pr-tracker-store.workspace = true
 serde.workspace = true
 thiserror.workspace = true

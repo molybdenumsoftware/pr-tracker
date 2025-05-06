@@ -531,7 +531,6 @@ version = "7.0.0"
 dependencies = [
  "camino",
  "fragile-child",
- "futures",
  "gix",
  "sqlx",
  "tempfile",
@@ -2854,7 +2853,6 @@ dependencies = [
  "confique",
  "db-context",
  "fragile-child",
- "futures",
  "getset",
  "poem",
  "poem-openapi",
@@ -2889,7 +2887,6 @@ dependencies = [
  "db-context",
  "derive_more",
  "env_logger",
- "futures",
  "gix",
  "graphql_client",
  "itertools",
@@ -2921,7 +2918,6 @@ name = "pr-tracker-store"
 version = "7.0.0"
 dependencies = [
  "derive_more",
- "futures",
  "getset",
  "sqlx",
  "thiserror 1.0.69",
@@ -4027,7 +4023,6 @@ version = "7.0.0"
 dependencies = [
  "clap",
  "db-context",
- "futures",
  "sqlx",
  "tokio",
 ]

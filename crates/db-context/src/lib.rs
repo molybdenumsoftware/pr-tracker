@@ -1,5 +1,4 @@
 use fragile_child::{FragileChild, SpawnFragileChild};
-use futures::future::LocalBoxFuture;
 use sqlx::{Connection, PgConnection, PgPool};
 use std::fs::{create_dir_all, OpenOptions};
 use std::os::unix::net::UnixDatagram;
@@ -122,10 +121,7 @@ impl DatabaseContext {
         Ok(())
     }
 
-    pub async fn with<T>(
-        f: impl FnOnce(Self) -> LocalBoxFuture<'static, T>,
-        log_destination: LogDestination,
-    ) -> T {
+    pub async fn with<T>(f: impl AsyncFnOnce(Self) -> T, log_destination: LogDestination) -> T {
         let ctx = Self::init(log_destination).await;
         f(ctx).await
     }

@@ -1,6 +1,5 @@
 use camino::Utf8PathBuf;
 use db_context::{DatabaseContext, LogDestination};
-use futures::{future::LocalBoxFuture, FutureExt};
 use itertools::Itertools;
 use pr_tracker_store::{Branch, GitCommit, GithubPrQueryCursor, Landing, Pr, PrNumber};
 use tempfile::TempDir;
@@ -116,38 +115,35 @@ struct TestContext {
 }
 
 impl TestContext {
-    async fn with(test: impl FnOnce(TestContext) -> LocalBoxFuture<'static, ()> + 'static) {
+    async fn with(test: impl AsyncFnOnce(TestContext)) {
         std::sync::LazyLock::force(&LOGGER);
 
         DatabaseContext::with(
-            |db_context| {
-                async move {
-                    let tempdir = tempfile::tempdir().unwrap();
+            async |db_context| {
+                let tempdir = tempfile::tempdir().unwrap();
 
-                    let remote_repo_path =
-                        Utf8PathBuf::try_from(tempdir.path().join("remote-repo")).unwrap();
+                let remote_repo_path =
+                    Utf8PathBuf::try_from(tempdir.path().join("remote-repo")).unwrap();
 
-                    isolated_git(["init", remote_repo_path.as_str(), "--initial-branch=main"])
-                        .await
-                        .unwrap();
+                isolated_git(["init", remote_repo_path.as_str(), "--initial-branch=main"])
+                    .await
+                    .unwrap();
 
-                    let test_context = TestContext {
-                        db_context,
-                        tempdir,
-                        pull_requests: BTreeSet::new(),
-                        pull_request_mtime_counter: 0,
-                        remote_repo_path,
-                        page_size: usize::MAX,
-                        queried_cursors: Vec::new(),
-                    };
+                let test_context = TestContext {
+                    db_context,
+                    tempdir,
+                    pull_requests: BTreeSet::new(),
+                    pull_request_mtime_counter: 0,
+                    remote_repo_path,
+                    page_size: usize::MAX,
+                    queried_cursors: Vec::new(),
+                };
 
-                    test_context
-                        .isolated_git(["commit", "--allow-empty", "-m", "init"])
-                        .await;
+                test_context
+                    .isolated_git(["commit", "--allow-empty", "-m", "init"])
+                    .await;
 
-                    test(test_context).await;
-                }
-                .boxed_local()
+                test(test_context).await;
             },
             LogDestination::Inherit,
         )
@@ -290,170 +286,161 @@ impl GithubClient for &mut TestContext {
 
 #[tokio::test]
 async fn story() {
-    TestContext::with(|mut context| {
-        async move {
-            let branch_patterns = &[WildMatch::new("*")];
+    TestContext::with(async |mut context| {
+        let branch_patterns = &[WildMatch::new("*")];
 
-            context.run(branch_patterns).await;
-            assert_prs!(context, &[]);
-            assert_landings!(context, []);
+        context.run(branch_patterns).await;
+        assert_prs!(context, &[]);
+        assert_landings!(context, []);
 
-            let pr_1 = &context.pr_against("main");
-            context.run(branch_patterns).await;
-            assert_prs!(context, [pr_1]);
-            assert_landings!(context, []);
+        let pr_1 = &context.pr_against("main");
+        context.run(branch_patterns).await;
+        assert_prs!(context, [pr_1]);
+        assert_landings!(context, []);
 
-            context.merge_pr(pr_1).await;
-            context.run(branch_patterns).await;
-            assert_prs!(context, [pr_1]);
-            assert_landings!(context, [(pr_1, "main")]);
+        context.merge_pr(pr_1).await;
+        context.run(branch_patterns).await;
+        assert_prs!(context, [pr_1]);
+        assert_landings!(context, [(pr_1, "main")]);
 
-            // idempotency
-            context.run(branch_patterns).await;
-            assert_prs!(context, [pr_1]);
-            assert_landings!(context, [(pr_1, "main")]);
+        // idempotency
+        context.run(branch_patterns).await;
+        assert_prs!(context, [pr_1]);
+        assert_landings!(context, [(pr_1, "main")]);
 
-            let pr_2 = &context.pr_against("main");
-            context.run(branch_patterns).await;
-            assert_prs!(context, [pr_1, pr_2]);
-            assert_landings!(context, [(pr_1, "main")]);
+        let pr_2 = &context.pr_against("main");
+        context.run(branch_patterns).await;
+        assert_prs!(context, [pr_1, pr_2]);
+        assert_landings!(context, [(pr_1, "main")]);
 
-            context.create_branch("staging", "main").await;
-            let pr_3 = &context.pr_against("staging");
-            context.run(branch_patterns).await;
-            assert_prs!(context, [pr_1, pr_2, pr_3]);
-            assert_landings!(context, [(pr_1, "main"), (pr_1, "staging")]);
+        context.create_branch("staging", "main").await;
+        let pr_3 = &context.pr_against("staging");
+        context.run(branch_patterns).await;
+        assert_prs!(context, [pr_1, pr_2, pr_3]);
+        assert_landings!(context, [(pr_1, "main"), (pr_1, "staging")]);
 
-            context.merge_pr(pr_3).await;
-            context.run(branch_patterns).await;
-            assert_prs!(context, [pr_1, pr_2, pr_3]);
-            assert_landings!(
-                context,
-                [(pr_1, "main"), (pr_1, "staging"), (pr_3, "staging")]
-            );
+        context.merge_pr(pr_3).await;
+        context.run(branch_patterns).await;
+        assert_prs!(context, [pr_1, pr_2, pr_3]);
+        assert_landings!(
+            context,
+            [(pr_1, "main"), (pr_1, "staging"), (pr_3, "staging")]
+        );
 
-            context.merge_branch_into_branch("staging", "main").await;
-            context.run(branch_patterns).await;
-            assert_prs!(context, [pr_1, pr_2, pr_3]);
-            assert_landings!(
-                context,
-                [
-                    (pr_1, "main"),
-                    (pr_1, "staging"),
-                    (pr_3, "main"),
-                    (pr_3, "staging")
-                ]
-            );
+        context.merge_branch_into_branch("staging", "main").await;
+        context.run(branch_patterns).await;
+        assert_prs!(context, [pr_1, pr_2, pr_3]);
+        assert_landings!(
+            context,
+            [
+                (pr_1, "main"),
+                (pr_1, "staging"),
+                (pr_3, "main"),
+                (pr_3, "staging")
+            ]
+        );
 
-            let pr_4 = &context.pr_against("main");
-            context.merge_pr(pr_4).await;
-            let pr_5 = &context.pr_against("main");
-            context.merge_pr(pr_5).await;
-            let pr_6 = &context.pr_against("staging");
-            context.merge_pr(pr_6).await;
-            context.run(branch_patterns).await;
-            assert_prs!(context, [pr_1, pr_2, pr_3, pr_4, pr_5, pr_6]);
-            assert_landings!(
-                context,
-                [
-                    (pr_1, "main"),
-                    (pr_1, "staging"),
-                    (pr_3, "main"),
-                    (pr_3, "staging"),
-                    (pr_4, "main"),
-                    (pr_5, "main"),
-                    (pr_6, "staging"),
-                ]
-            );
+        let pr_4 = &context.pr_against("main");
+        context.merge_pr(pr_4).await;
+        let pr_5 = &context.pr_against("main");
+        context.merge_pr(pr_5).await;
+        let pr_6 = &context.pr_against("staging");
+        context.merge_pr(pr_6).await;
+        context.run(branch_patterns).await;
+        assert_prs!(context, [pr_1, pr_2, pr_3, pr_4, pr_5, pr_6]);
+        assert_landings!(
+            context,
+            [
+                (pr_1, "main"),
+                (pr_1, "staging"),
+                (pr_3, "main"),
+                (pr_3, "staging"),
+                (pr_4, "main"),
+                (pr_5, "main"),
+                (pr_6, "staging"),
+            ]
+        );
 
-            context.rebase_branch_on_branch("staging", "main").await;
-            context.run(branch_patterns).await;
-            assert_landings!(
-                context,
-                [
-                    (pr_1, "main"),
-                    (pr_1, "staging"),
-                    (pr_3, "main"),
-                    (pr_3, "staging"),
-                    (pr_4, "main"),
-                    (pr_4, "staging"),
-                    (pr_5, "main"),
-                    (pr_5, "staging"),
-                    (pr_6, "staging"),
-                ]
-            );
-        }
-        .boxed_local()
+        context.rebase_branch_on_branch("staging", "main").await;
+        context.run(branch_patterns).await;
+        assert_landings!(
+            context,
+            [
+                (pr_1, "main"),
+                (pr_1, "staging"),
+                (pr_3, "main"),
+                (pr_3, "staging"),
+                (pr_4, "main"),
+                (pr_4, "staging"),
+                (pr_5, "main"),
+                (pr_5, "staging"),
+                (pr_6, "staging"),
+            ]
+        );
     })
     .await;
 }
 
 #[tokio::test]
 async fn branch_patterns() {
-    TestContext::with(|mut context| {
-        async move {
-            context.create_branch("release-1", "main").await;
-            context.create_branch("release-10", "main").await; // for the asterisk
-            let pr_1 = &context.pr_against("main");
-            context.merge_pr(pr_1).await;
-            let pr_2 = &context.pr_against("release-1");
-            context.merge_pr(pr_2).await;
-            let pr_3 = &context.pr_against("release-10");
-            context.merge_pr(pr_3).await;
-            context.run(&[WildMatch::new("main")]).await;
-            assert_prs!(context, [pr_1, pr_2, pr_3]);
-            assert_landings!(context, [(pr_1, "main")]);
+    TestContext::with(async |mut context| {
+        context.create_branch("release-1", "main").await;
+        context.create_branch("release-10", "main").await; // for the asterisk
+        let pr_1 = &context.pr_against("main");
+        context.merge_pr(pr_1).await;
+        let pr_2 = &context.pr_against("release-1");
+        context.merge_pr(pr_2).await;
+        let pr_3 = &context.pr_against("release-10");
+        context.merge_pr(pr_3).await;
+        context.run(&[WildMatch::new("main")]).await;
+        assert_prs!(context, [pr_1, pr_2, pr_3]);
+        assert_landings!(context, [(pr_1, "main")]);
 
-            context
-                .run(&[WildMatch::new("main"), WildMatch::new("release-*")])
-                .await;
+        context
+            .run(&[WildMatch::new("main"), WildMatch::new("release-*")])
+            .await;
 
-            assert_landings!(
-                context,
-                [(pr_1, "main"), (pr_2, "release-1"), (pr_3, "release-10")]
-            );
-        }
-        .boxed_local()
+        assert_landings!(
+            context,
+            [(pr_1, "main"), (pr_2, "release-1"), (pr_3, "release-10")]
+        );
     })
     .await;
 }
 
 #[tokio::test]
 async fn github_client_pagination() {
-    TestContext::with(|mut context| {
-        async move {
-            let branch_patterns = [WildMatch::new("main")];
-            let pr_1 = &context.pr_against("main");
-            let pr_2 = &context.pr_against("main");
-            let pr_3 = &context.pr_against("main");
-            let pr_4 = &context.pr_against("main");
-            let pr_5 = &context.pr_against("main");
-            context.set_github_client_page_size(2);
-            context.run(&branch_patterns).await;
-            assert_prs!(context, [pr_1, pr_2, pr_3, pr_4, pr_5]);
-            assert_queried_cursors!(
-                context,
-                [
-                    None,       // returns pr_1, pr_2 and cursor to pr_3
-                    Some(pr_3), // returns pr_3, pr_4 and cursor to pr_5
-                    Some(pr_5), // returns pr_5 and no cursor
-                ]
-            );
+    TestContext::with(async |mut context| {
+        let branch_patterns = [WildMatch::new("main")];
+        let pr_1 = &context.pr_against("main");
+        let pr_2 = &context.pr_against("main");
+        let pr_3 = &context.pr_against("main");
+        let pr_4 = &context.pr_against("main");
+        let pr_5 = &context.pr_against("main");
+        context.set_github_client_page_size(2);
+        context.run(&branch_patterns).await;
+        assert_prs!(context, [pr_1, pr_2, pr_3, pr_4, pr_5]);
+        assert_queried_cursors!(
+            context,
+            [
+                None,       // returns pr_1, pr_2 and cursor to pr_3
+                Some(pr_3), // returns pr_3, pr_4 and cursor to pr_5
+                Some(pr_5), // returns pr_5 and no cursor
+            ]
+        );
 
-            let pr_6 = &context.pr_against("main");
-            context.run(&branch_patterns).await;
-            assert_prs!(context, [pr_1, pr_2, pr_3, pr_4, pr_5, pr_6]);
-            assert_queried_cursors!(
-                context,
-                [
-                    None,       // as documented above
-                    Some(pr_3), // as documented above
-                    Some(pr_5), // as documented above
-                    Some(pr_5), // returns pr_5, pr_6 and no cursor
-                ]
-            );
-        }
-        .boxed_local()
+        let pr_6 = &context.pr_against("main");
+        context.run(&branch_patterns).await;
+        assert_prs!(context, [pr_1, pr_2, pr_3, pr_4, pr_5, pr_6]);
+        assert_queried_cursors!(
+            context,
+            [
+                None,       // as documented above
+                Some(pr_3), // as documented above
+                Some(pr_5), // as documented above
+                Some(pr_5), // returns pr_5, pr_6 and no cursor
+            ]
+        );
     })
     .await;
 }

@@ -3,8 +3,7 @@
 use std::fmt::Write;
 use std::{collections::BTreeMap, num::NonZeroU32};
 
-use futures::FutureExt;
-use sqlx::{Connection, Postgres, Transaction};
+use sqlx::Connection;
 
 pub use sqlx::PgConnection;
 
@@ -141,37 +140,36 @@ impl GithubPrQueryCursor {
     ///
     /// See error type for details.
     pub async fn upsert(new_cursor: &Self, connection: &mut PgConnection) -> sqlx::Result<()> {
-        async fn transaction(
-            new_cursor: GithubPrQueryCursor,
-            txn: &mut Transaction<'_, Postgres>,
-        ) -> sqlx::Result<()> {
-            let old_cursor = GithubPrQueryCursor::get(txn).await?;
-
-            match old_cursor {
-                Some(_) => {
-                    // There is only 1 row in this table, an unfiltered UPDATE will update it.
-                    sqlx::query!(
-                        "UPDATE github_pr_query_cursor SET cursor = $1",
-                        new_cursor.0,
-                    )
-                    .execute(&mut **txn)
-                    .await?;
-                }
-                None => {
-                    sqlx::query!(
-                        "INSERT INTO github_pr_query_cursor (cursor) VALUES ($1)",
-                        new_cursor.0,
-                    )
-                    .execute(&mut **txn)
-                    .await?;
-                }
-            }
-
-            Ok(())
-        }
+        let new_cursor = new_cursor.clone();
 
         connection
-            .transaction(move |txn| transaction(new_cursor.clone(), txn).boxed())
+            .transaction(|txn| {
+                Box::pin(async move {
+                    let old_cursor = GithubPrQueryCursor::get(txn).await?;
+
+                    match old_cursor {
+                        Some(_) => {
+                            // There is only 1 row in this table, an unfiltered UPDATE will update it.
+                            sqlx::query!(
+                                "UPDATE github_pr_query_cursor SET cursor = $1",
+                                new_cursor.0,
+                            )
+                            .execute(&mut **txn)
+                            .await?;
+                        }
+                        None => {
+                            sqlx::query!(
+                                "INSERT INTO github_pr_query_cursor (cursor) VALUES ($1)",
+                                new_cursor.0,
+                            )
+                            .execute(&mut **txn)
+                            .await?;
+                        }
+                    }
+
+                    Ok(())
+                })
+            })
             .await
     }
 
@@ -283,29 +281,27 @@ impl Branch {
         connection: &mut PgConnection,
         name: impl AsRef<str>,
     ) -> sqlx::Result<Self> {
-        async fn transaction(
-            name: String,
-            txn: &mut Transaction<'_, Postgres>,
-        ) -> sqlx::Result<Branch> {
-            let branch = sqlx::query_as!(Branch, "SELECT * from branches WHERE name = $1", name)
-                .fetch_optional(&mut **txn)
-                .await?;
-            if let Some(branch) = branch {
-                Ok(branch)
-            } else {
-                sqlx::query_as!(
-                    Branch,
-                    "INSERT INTO branches (name) VALUES ($1) RETURNING *",
-                    name
-                )
-                .fetch_one(&mut **txn)
-                .await
-            }
-        }
-
-        let s = name.as_ref().to_owned();
+        let name = name.as_ref().to_owned();
         connection
-            .transaction(move |txn| transaction(s, txn).boxed())
+            .transaction(|txn| {
+                Box::pin(async move {
+                    let branch =
+                        sqlx::query_as!(Branch, "SELECT * from branches WHERE name = $1", name)
+                            .fetch_optional(&mut **txn)
+                            .await?;
+                    if let Some(branch) = branch {
+                        Ok(branch)
+                    } else {
+                        sqlx::query_as!(
+                            Branch,
+                            "INSERT INTO branches (name) VALUES ($1) RETURNING *",
+                            name
+                        )
+                        .fetch_one(&mut **txn)
+                        .await
+                    }
+                })
+            })
             .await
     }
 
@@ -357,10 +353,8 @@ impl Landing {
         connection: &mut PgConnection,
         pr_num: PrNumber,
     ) -> Result<Vec<Branch>, ForPrError> {
-        async fn transaction(
-            txn: &mut Transaction<'_, Postgres>,
-            pr_num: PrNumber,
-        ) -> Result<Vec<Branch>, ForPrError> {
+        let branches = connection
+            .transaction(|txn| Box::pin(async move {
             let pr_num: i32 = pr_num.into();
 
             let exists = sqlx::query!("SELECT 1 as pr from github_prs where number = $1", pr_num)
@@ -382,10 +376,7 @@ impl Landing {
             let branches = records;
 
             Ok(branches)
-        }
-
-        let branches = connection
-            .transaction(|txn| transaction(txn, pr_num).boxed())
+        }))
             .await?;
 
         Ok(branches)
@@ -416,24 +407,20 @@ impl Landing {
     ///
     /// See error type for details.
     pub async fn upsert(self, connection: &mut PgConnection) -> sqlx::Result<()> {
-        async fn transaction(
-            txn: &mut Transaction<'_, Postgres>,
-            landing: Landing,
-        ) -> sqlx::Result<()> {
-            let pr_number: i32 = landing.github_pr.into();
-            sqlx::query!(
-                "INSERT INTO landings(github_pr, branch_id) VALUES ($1, $2) ON CONFLICT (github_pr, branch_id) DO NOTHING",
-                pr_number,
-                landing.branch_id.0,
-            )
-            .execute(&mut **txn)
-            .await?;
-
-            Ok(())
-        }
-
         connection
-            .transaction(|txn| transaction(txn, self).boxed())
+            .transaction(|txn| Box::pin(async move {
+                    let pr_number: i32 = self.github_pr.into();
+                    sqlx::query!(
+                        "INSERT INTO landings(github_pr, branch_id) VALUES ($1, $2) ON CONFLICT (github_pr, branch_id) DO NOTHING",
+                        pr_number,
+                        self.branch_id.0,
+                    )
+                    .execute(&mut **txn)
+                    .await?;
+
+                    Ok::<(), sqlx::Error>(())
+                })
+            )
             .await?;
         Ok(())
     }

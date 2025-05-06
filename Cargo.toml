@@ -12,7 +12,6 @@ anyhow = {features = ["backtrace"], version = "*"}
 camino = {features = ["serde1"], version = "*"}
 confique = {default-features = false, version = "*"}
 derive_more = {features = ["deref", "from"], version = "*"}
-futures = "*"
 getset = "*"
 gix = {features = ["revision"], version = "*"}
 serde = "*"
