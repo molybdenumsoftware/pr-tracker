@@ -1,6 +1,6 @@
 #![warn(clippy::pedantic)]
 
-use anyhow::{ensure, Context};
+use anyhow::{Context, ensure};
 use confique::Config;
 use pr_tracker_fetcher::{github::GitHubGraphqlClient, run};
 use pr_tracker_fetcher_config::Environment;

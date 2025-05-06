@@ -1,5 +1,5 @@
 use db_context::LogDestination;
-use futures::{future::LocalBoxFuture, FutureExt};
+use futures::{FutureExt, future::LocalBoxFuture};
 use poem::endpoint::BoxEndpoint;
 
 #[derive(getset::Getters, getset::MutGetters)]
