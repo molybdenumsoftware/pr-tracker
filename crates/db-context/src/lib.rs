@@ -1,9 +1,9 @@
 use fragile_child::{FragileChild, SpawnFragileChild};
 use sqlx::{Connection, PgConnection, PgPool};
-use std::fs::{create_dir_all, OpenOptions};
+use std::fs::{OpenOptions, create_dir_all};
 use std::os::unix::net::UnixDatagram;
 use std::{process::Command, time::Duration};
-use tempfile::{tempdir, TempDir};
+use tempfile::{TempDir, tempdir};
 
 use camino::{Utf8Path, Utf8PathBuf};
 
