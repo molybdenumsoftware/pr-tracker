@@ -2,14 +2,14 @@
 use std::time::Duration;
 
 use poem::{
-    endpoint::BoxEndpoint, middleware, web::Redirect, EndpointExt, FromRequest, Request,
-    RequestBody, Route,
+    EndpointExt, FromRequest, Request, RequestBody, Route, endpoint::BoxEndpoint, middleware,
+    web::Redirect,
 };
-use poem_openapi::{param, payload, ApiResponse, OpenApi, OpenApiService};
+use poem_openapi::{ApiResponse, OpenApi, OpenApiService, param, payload};
 use serde::{Deserialize, Serialize};
 use sqlx::{
-    pool::{PoolConnection, PoolOptions},
     Pool, Postgres,
+    pool::{PoolConnection, PoolOptions},
 };
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};

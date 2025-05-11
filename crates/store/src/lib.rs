@@ -450,7 +450,9 @@ impl Landing {
 
         let values = values.strip_suffix(',').expect("because non-empty");
 
-        let batch = format!("INSERT INTO landings(github_pr, branch_id) VALUES {values} ON CONFLICT (github_pr, branch_id) DO NOTHING");
+        let batch = format!(
+            "INSERT INTO landings(github_pr, branch_id) VALUES {values} ON CONFLICT (github_pr, branch_id) DO NOTHING"
+        );
 
         sqlx::query(&batch).execute(connection).await?;
 
