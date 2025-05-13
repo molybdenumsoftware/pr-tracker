@@ -67,7 +67,7 @@
         export = false;
       };
       devshells.default.devshell = {
-        startup.rust-allow-warnings.text = ''
+        startup.rust-warn-warnings.text = ''
           export RUSTFLAGS="$RUSTFLAGS --warn warnings"
         '';
         packages = [
