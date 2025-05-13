@@ -2900,6 +2900,7 @@ dependencies = [
  "camino",
  "confique",
  "serde",
+ "tracing-subscriber",
 ]
 
 [[package]]

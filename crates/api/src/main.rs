@@ -37,8 +37,6 @@ async fn main() {
 
     let endpoint = endpoint(&db_url).await;
 
-    eprintln!("Server started on http://{addr}");
-
     Server::new_with_acceptor(acceptor)
         .run(endpoint)
         .await
