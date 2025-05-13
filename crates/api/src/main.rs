@@ -7,7 +7,7 @@ use poem::{
     listener::{Listener, TcpListener},
 };
 use pr_tracker_api::endpoint;
-use pr_tracker_api_config::Environment;
+use pr_tracker_api_config::{EnvFilter, Environment};
 
 #[tokio::main]
 async fn main() {
@@ -23,7 +23,13 @@ async fn main() {
     } = config;
 
     tracing_subscriber::fmt()
-        .with_env_filter(env_filter.0)
+        .with_env_filter(
+            env_filter
+                .unwrap_or(EnvFilter(
+                    tracing_subscriber::EnvFilter::try_new("info").unwrap(),
+                ))
+                .0,
+        )
         .init();
 
     let addr = format!("0.0.0.0:{port}");
