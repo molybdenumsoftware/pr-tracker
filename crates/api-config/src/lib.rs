@@ -1,11 +1,12 @@
 #![allow(non_snake_case, clippy::struct_field_names)]
 
 pub use environment::Environment;
-use serde::Deserialize;
-use serde_with::serde_as;
 
 mod environment {
     use confique::Config;
+    use serde::Deserialize;
+    use serde_with::DisplayFromStr;
+    use serde_with::serde_as;
 
     /// See documentation for each field.
     #[derive(Debug, Config)]
@@ -16,12 +17,12 @@ mod environment {
         #[config(env = "PR_TRACKER_API_PORT")]
         #[doc = include_str!("../PORT.md")]
         pub PR_TRACKER_API_PORT: u16,
-        #[config(env = "PR_TRACKER_SOMETHING")]
-        #[doc = include_str!("../SOMETHING.md")] //<<<
-        pub PR_TRACKER_SOMETHING: EnvFilter,
+        #[config(env = "PR_TRACKER_TRACING_FILTER")]
+        #[doc = include_str!("../PORT.md")] //<<<
+        pub PR_TRACKER_TRACING_FILTER: EnvFilter,
     }
-}
 
-#[serde_as]
-#[derive(Deserialize, Debug)]
-struct EnvFilter(#[serde_as(as = "DisplayFromStr")] tracing_subscriber::EnvFilter);
+    #[serde_as]
+    #[derive(Deserialize, Debug)]
+    pub struct EnvFilter(#[serde_as(as = "DisplayFromStr")] pub tracing_subscriber::EnvFilter);
+}

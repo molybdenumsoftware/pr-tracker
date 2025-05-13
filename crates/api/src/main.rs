@@ -11,8 +11,6 @@ use pr_tracker_api_config::Environment;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt().init();
-
     let config = Environment::builder()
         .env()
         .load()
@@ -21,7 +19,12 @@ async fn main() {
     let Environment {
         PR_TRACKER_API_DATABASE_URL: db_url,
         PR_TRACKER_API_PORT: port,
+        PR_TRACKER_TRACING_FILTER: env_filter,
     } = config;
+
+    tracing_subscriber::fmt()
+        .with_env_filter(env_filter.0)
+        .init();
 
     let addr = format!("0.0.0.0:{port}");
 
