@@ -15,6 +15,7 @@ derive_more = {features = ["deref", "from"], version = "*"}
 getset = "*"
 gix = {features = ["revision"], version = "*"}
 serde = "*"
+serde_with = "*"
 tempfile = "*"
 thiserror = "*"
 tracing-subscriber = {features = ["env-filter"], version = "*"}
