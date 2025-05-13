@@ -17,12 +17,12 @@ mod environment {
         #[config(env = "PR_TRACKER_API_PORT")]
         #[doc = include_str!("../PORT.md")]
         pub PR_TRACKER_API_PORT: u16,
-        #[config(env = "PR_TRACKER_TRACING_FILTER")]
+        #[config(env = "PR_TRACKER_TRACING_FILTER", default = "trace")]
         #[doc = include_str!("../PORT.md")] //<<<
         pub PR_TRACKER_TRACING_FILTER: EnvFilter,
     }
 
     #[serde_as]
-    #[derive(Deserialize, Debug)]
+    #[derive(Deserialize, Debug, Default)]
     pub struct EnvFilter(#[serde_as(as = "DisplayFromStr")] pub tracing_subscriber::EnvFilter);
 }
