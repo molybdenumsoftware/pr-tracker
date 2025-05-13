@@ -11,9 +11,7 @@ use pr_tracker_api_config::Environment;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt()
-        // <<< .with_env_filter("poem=trace")
-        .init();
+    tracing_subscriber::fmt().init();
 
     let config = Environment::builder()
         .env()
