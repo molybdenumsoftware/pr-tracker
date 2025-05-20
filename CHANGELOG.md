@@ -1,3 +1,10 @@
+## [7.1.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.0.0...v7.1.0) (2025-05-20)
+
+
+### Features
+
+* **api:** tracing ([e40efb9](https://github.com/molybdenumsoftware/pr-tracker/commit/e40efb940011ed39cfda440bebab75272bc64be6))
+
 ## [7.0.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v6.2.0...v7.0.0) (2025-04-30)
 
 
