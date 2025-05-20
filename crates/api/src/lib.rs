@@ -1,6 +1,7 @@
 #![warn(clippy::pedantic)]
 use std::time::Duration;
 
+use poem::middleware::RequestId;
 use poem::{
     EndpointExt, FromRequest, Request, RequestBody, Route, endpoint::BoxEndpoint, middleware,
     web::Redirect,
@@ -43,6 +44,8 @@ pub async fn endpoint(db_url: &str) -> BoxEndpoint<'static> {
         .at("/openapi.json", api_service.spec_endpoint())
         .nest(API_PREFIX, api_service)
         .with(middleware::AddData::new(db_pool))
+        .with(middleware::Tracing)
+        .with(RequestId::default())
         .boxed()
 }
 

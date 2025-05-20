@@ -14,6 +14,7 @@
             pr_tracker_api.wait_for_unit("pr-tracker-api.service")
             pr_tracker_api.succeed("journalctl -u pr-tracker-api.service | grep 'listening addr=socket://0.0.0.0:7000'")
             pr_tracker_api.succeed("curl --fail http://localhost:7000/api/v2/healthcheck")
+            pr_tracker_api.succeed("journalctl -u pr-tracker-api.service | grep 'uri=/api/v2/healthcheck'")
           '';
         };
     };
