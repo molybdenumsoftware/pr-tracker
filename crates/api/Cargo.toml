@@ -10,6 +10,7 @@ confique.workspace = true
 pr-tracker-store.workspace = true
 serde.workspace = true
 thiserror.workspace = true
+tracing-subscriber.workspace = true
 util.workspace = true
 
 [dev-dependencies]

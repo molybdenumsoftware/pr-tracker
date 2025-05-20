@@ -48,6 +48,12 @@
         description = builtins.readFile ../../crates/api-config/PORT.md;
       };
 
+      options.services.pr-tracker.api.tracingFilter = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        description = builtins.readFile ../../crates/api-config/TRACING_FILTER.md;
+        default = null;
+      };
+
       options.services.pr-tracker.api.db = nixosModuleLib.db;
 
       config = lib.mkIf cfg.enable {
@@ -79,6 +85,9 @@
               "export PR_TRACKER_API_DATABASE_URL=${lib.escapeShellArg databaseUrl}"
               "export PR_TRACKER_API_PORT=${lib.escapeShellArg (toString cfg.port)}"
             ]
+            ++ (lib.optional (
+              cfg.tracingFilter != null
+            ) "export PR_TRACKER_TRACING_FILTER=${lib.escapeShellArg cfg.tracingFilter}")
             ++ passwordFile
             ++ [ "exec ${lib.getExe cfg.package}" ]
           );

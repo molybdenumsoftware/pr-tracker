@@ -1,3 +1,4 @@
+{ lib, ... }:
 {
   imports = [ ./nixos-module.nix ];
 
@@ -13,7 +14,10 @@
           pr-tracker-api.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-api";
           pr-tracker-api-config.includeInProjectDocs = true;
         };
-        projects.default.fileset = ../../crates/api-config/PORT.md;
+        projects.default.fileset = lib.fileset.unions [
+          ../../crates/api-config/PORT.md
+          ../../crates/api-config/TRACING_FILTER.md
+        ];
       };
       packages.api = config.nci.outputs.pr-tracker-api.packages.release;
       checks = {
