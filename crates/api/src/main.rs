@@ -19,7 +19,12 @@ async fn main() {
     let Environment {
         PR_TRACKER_API_DATABASE_URL: db_url,
         PR_TRACKER_API_PORT: port,
+        PR_TRACKER_TRACING_FILTER: tracing_filter,
     } = config;
+
+    tracing_subscriber::fmt()
+        .with_env_filter(tracing_filter.unwrap_or_default().env_filter)
+        .init();
 
     let addr = format!("0.0.0.0:{port}");
 
@@ -34,8 +39,6 @@ async fn main() {
         .unwrap();
 
     let endpoint = endpoint(&db_url).await;
-
-    eprintln!("Server started on http://{addr}");
 
     Server::new_with_acceptor(acceptor)
         .run(endpoint)

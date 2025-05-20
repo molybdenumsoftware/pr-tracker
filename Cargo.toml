@@ -15,8 +15,10 @@ derive_more = {features = ["deref", "from"], version = "*"}
 getset = "*"
 gix = {features = ["revision"], version = "*"}
 serde = "*"
+serde_with = "*"
 tempfile = "*"
 thiserror = "*"
+tracing-subscriber = {features = ["env-filter"], version = "*"}
 db-context.path = "crates/db-context"
 fragile-child.path = "crates/fragile-child"
 pr-tracker-store.path = "crates/store"
