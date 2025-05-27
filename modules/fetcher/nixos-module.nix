@@ -2,6 +2,7 @@
   mkNixosModuleLib,
   moduleLocation,
   privateNixosModules,
+  fetcher,
   ...
 }:
 {
@@ -45,7 +46,7 @@
 
       options.services.pr-tracker.fetcher.branchPatterns = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        description = builtins.readFile ../../crates/fetcher-config/BRANCH_PATTERNS.md;
+        inherit (fetcher.environmentVariables.PR_TRACKER_FETCHER_BRANCH_PATTERNS) description;
         example = [ "release-*" ];
       };
 
@@ -53,20 +54,19 @@
 
       options.services.pr-tracker.fetcher.githubApiTokenFile = lib.mkOption {
         type = lib.types.path;
-        description =
-          "Path to a file containing a " + builtins.readFile ../../crates/fetcher-config/GITHUB_TOKEN.md;
+        description = "Path to a file containing a ${fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_TOKEN.description}";
         example = "/run/secrets/github-api.token";
       };
 
       options.services.pr-tracker.fetcher.repo.owner = lib.mkOption {
         type = lib.types.str;
-        description = builtins.readFile ../../crates/fetcher-config/GITHUB_REPO_OWNER.md;
+        inherit (fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_REPO_OWNER) description;
         example = "NixOS";
       };
 
       options.services.pr-tracker.fetcher.repo.name = lib.mkOption {
         type = lib.types.str;
-        description = builtins.readFile ../../crates/fetcher-config/GITHUB_REPO_NAME.md;
+        inherit (fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_REPO_NAME) description;
         example = "nixpkgs";
       };
 
@@ -96,18 +96,18 @@
         systemd.services.pr-tracker-fetcher.requires = lib.optional cfg.db.isLocal "postgresql.service";
         systemd.services.pr-tracker-fetcher.script = lib.concatLines (
           [
-            "export PR_TRACKER_FETCHER_DATABASE_URL=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
-            "export PR_TRACKER_FETCHER_GITHUB_REPO_OWNER=${lib.escapeShellArg cfg.repo.owner}"
-            "export PR_TRACKER_FETCHER_GITHUB_REPO_NAME=${lib.escapeShellArg cfg.repo.name}"
-            "export PR_TRACKER_FETCHER_BRANCH_PATTERNS=${lib.escapeShellArg (builtins.toJSON cfg.branchPatterns)}"
-            "export PR_TRACKER_FETCHER_GITHUB_TOKEN=$(< ${cfg.githubApiTokenFile})"
+            "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_DATABASE_URL.name}=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
+            "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_REPO_OWNER.name}=${lib.escapeShellArg cfg.repo.owner}"
+            "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_REPO_NAME.name}=${lib.escapeShellArg cfg.repo.name}"
+            "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_BRANCH_PATTERNS.name}=${lib.escapeShellArg (builtins.toJSON cfg.branchPatterns)}"
+            "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_TOKEN.name}=$(< ${cfg.githubApiTokenFile})"
             # CACHE_DIRECTORY is set by systemd based on the CacheDirectory setting.
             # See https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
-            "export PR_TRACKER_FETCHER_CACHE_DIR=$CACHE_DIRECTORY"
+            "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_CACHE_DIR.name}=$CACHE_DIRECTORY"
           ]
           ++ lib.optional (cfg.db.passwordFile != null) ''
             PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < ${cfg.db.passwordFile})
-            PR_TRACKER_FETCHER_DATABASE_URL="$PR_TRACKER_FETCHER_DATABASE_URL&password=$PASSWORD"
+            ${fetcher.environmentVariables.PR_TRACKER_FETCHER_DATABASE_URL.name}+="&password=$PASSWORD"
           ''
           ++ [ "exec ${lib.getExe cfg.package}" ]
         );

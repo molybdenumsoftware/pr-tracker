@@ -1,23 +1,55 @@
-{ lib, ... }:
+{
+  lib,
+  api,
+  psqlConnectionUriMdLink,
+  ...
+}:
 {
   imports = [ ./nixos-module.nix ];
+
+  _module.args.api.environmentVariables = lib.mapAttrs (name: v: v // { inherit name; }) {
+    PR_TRACKER_API_DATABASE_URL = {
+      description = # markdown
+        "${psqlConnectionUriMdLink}.";
+      rustType = "::std::string::String";
+    };
+    PR_TRACKER_API_PORT = {
+      description =
+        # markdown
+        "Port to listen on.";
+      rustType = "::core::primitive::u16";
+    };
+    PR_TRACKER_TRACING_FILTER = {
+      description =
+        # markdown
+        "Expected to deserialize into an [`EnvFilter`](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html).";
+      # Note: ideally we'd use `::core::option::Option`, but cannot because
+      # confique's derive macro seems not to support it.
+      rustType = "Option<crate::TracingFilter>";
+    };
+  };
 
   perSystem =
     {
       self',
       config,
+      writeEnvironmentStructFile,
       ...
     }:
     {
       nci = {
         crates = {
-          pr-tracker-api.drvConfig.mkDerivation.meta.mainProgram = "pr-tracker-api";
-          pr-tracker-api-config.includeInProjectDocs = true;
+          pr-tracker-api.drvConfig = {
+            mkDerivation.meta.mainProgram = "pr-tracker-api";
+            env = {
+              inherit (config.nci.crates.pr-tracker-api-config.drvConfig.env) api_config_snippet;
+            };
+          };
+          pr-tracker-api-config = {
+            drvConfig.env.api_config_snippet = writeEnvironmentStructFile "api" api.environmentVariables;
+            includeInProjectDocs = true;
+          };
         };
-        projects.default.fileset = lib.fileset.unions [
-          ../../crates/api-config/PORT.md
-          ../../crates/api-config/TRACING_FILTER.md
-        ];
       };
       packages.api = config.nci.outputs.pr-tracker-api.packages.release;
       checks = {
