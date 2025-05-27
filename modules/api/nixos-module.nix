@@ -71,7 +71,7 @@
         ] ++ lib.optional cfg.db.isLocal "postgresql.service";
         systemd.services.pr-tracker-api.bindsTo = lib.optional cfg.db.isLocal "postgresql.service";
 
-        systemd.services.pr-tracker-api.script = lib.concatStringsSep "\n" (
+        systemd.services.pr-tracker-api.script = lib.concatLines (
           [
             "export PR_TRACKER_API_DATABASE_URL=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
             "export PR_TRACKER_API_PORT=${lib.escapeShellArg (toString cfg.port)}"

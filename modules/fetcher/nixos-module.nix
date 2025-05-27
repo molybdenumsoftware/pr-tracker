@@ -94,7 +94,7 @@
           "network.target"
         ] ++ lib.optional cfg.db.isLocal "postgresql.service";
         systemd.services.pr-tracker-fetcher.requires = lib.optional cfg.db.isLocal "postgresql.service";
-        systemd.services.pr-tracker-fetcher.script = builtins.concatStringsSep "\n" (
+        systemd.services.pr-tracker-fetcher.script = lib.concatLines (
           [
             "export PR_TRACKER_FETCHER_DATABASE_URL=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
             "export PR_TRACKER_FETCHER_GITHUB_REPO_OWNER=${lib.escapeShellArg cfg.repo.owner}"
