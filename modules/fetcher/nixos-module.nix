@@ -94,29 +94,23 @@
           "network.target"
         ] ++ lib.optional cfg.db.isLocal "postgresql.service";
         systemd.services.pr-tracker-fetcher.requires = lib.optional cfg.db.isLocal "postgresql.service";
-        systemd.services.pr-tracker-fetcher.script =
-          let
-            databaseUrl = "postgresql://?${attrsToURLParams cfg.db.urlParams}";
-
-            passwordFile = lib.optional (cfg.db.passwordFile != null) ''
-              PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < ${cfg.db.passwordFile})
-              PR_TRACKER_FETCHER_DATABASE_URL="$PR_TRACKER_FETCHER_DATABASE_URL&password=$PASSWORD"
-            '';
-          in
-          builtins.concatStringsSep "\n" (
-            [
-              "export PR_TRACKER_FETCHER_DATABASE_URL=${lib.escapeShellArg databaseUrl}"
-              "export PR_TRACKER_FETCHER_GITHUB_REPO_OWNER=${lib.escapeShellArg cfg.repo.owner}"
-              "export PR_TRACKER_FETCHER_GITHUB_REPO_NAME=${lib.escapeShellArg cfg.repo.name}"
-              "export PR_TRACKER_FETCHER_BRANCH_PATTERNS=${lib.escapeShellArg (builtins.toJSON cfg.branchPatterns)}"
-              "export PR_TRACKER_FETCHER_GITHUB_TOKEN=$(< ${cfg.githubApiTokenFile})"
-              # CACHE_DIRECTORY is set by systemd based on the CacheDirectory setting.
-              # See https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
-              "export PR_TRACKER_FETCHER_CACHE_DIR=$CACHE_DIRECTORY"
-            ]
-            ++ passwordFile
-            ++ [ "exec ${lib.getExe cfg.package}" ]
-          );
+        systemd.services.pr-tracker-fetcher.script = builtins.concatStringsSep "\n" (
+          [
+            "export PR_TRACKER_FETCHER_DATABASE_URL=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
+            "export PR_TRACKER_FETCHER_GITHUB_REPO_OWNER=${lib.escapeShellArg cfg.repo.owner}"
+            "export PR_TRACKER_FETCHER_GITHUB_REPO_NAME=${lib.escapeShellArg cfg.repo.name}"
+            "export PR_TRACKER_FETCHER_BRANCH_PATTERNS=${lib.escapeShellArg (builtins.toJSON cfg.branchPatterns)}"
+            "export PR_TRACKER_FETCHER_GITHUB_TOKEN=$(< ${cfg.githubApiTokenFile})"
+            # CACHE_DIRECTORY is set by systemd based on the CacheDirectory setting.
+            # See https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
+            "export PR_TRACKER_FETCHER_CACHE_DIR=$CACHE_DIRECTORY"
+          ]
+          ++ lib.optional (cfg.db.passwordFile != null) ''
+            PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < ${cfg.db.passwordFile})
+            PR_TRACKER_FETCHER_DATABASE_URL="$PR_TRACKER_FETCHER_DATABASE_URL&password=$PASSWORD"
+          ''
+          ++ [ "exec ${lib.getExe cfg.package}" ]
+        );
 
         systemd.services.pr-tracker-fetcher.serviceConfig.User = cfg.user;
         systemd.services.pr-tracker-fetcher.serviceConfig.Group = cfg.group;

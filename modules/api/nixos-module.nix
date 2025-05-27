@@ -71,26 +71,20 @@
         ] ++ lib.optional cfg.db.isLocal "postgresql.service";
         systemd.services.pr-tracker-api.bindsTo = lib.optional cfg.db.isLocal "postgresql.service";
 
-        systemd.services.pr-tracker-api.script =
-          let
-            databaseUrl = "postgresql://?${attrsToURLParams cfg.db.urlParams}";
-
-            passwordFile = lib.optional (cfg.db.passwordFile != null) ''
-              PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < ${cfg.db.passwordFile})
-              PR_TRACKER_API_DATABASE_URL="$PR_TRACKER_API_DATABASE_URL&password=$PASSWORD"
-            '';
-          in
-          lib.concatStringsSep "\n" (
-            [
-              "export PR_TRACKER_API_DATABASE_URL=${lib.escapeShellArg databaseUrl}"
-              "export PR_TRACKER_API_PORT=${lib.escapeShellArg (toString cfg.port)}"
-            ]
-            ++ (lib.optional (
-              cfg.tracingFilter != null
-            ) "export PR_TRACKER_TRACING_FILTER=${lib.escapeShellArg cfg.tracingFilter}")
-            ++ passwordFile
-            ++ [ "exec ${lib.getExe cfg.package}" ]
-          );
+        systemd.services.pr-tracker-api.script = lib.concatStringsSep "\n" (
+          [
+            "export PR_TRACKER_API_DATABASE_URL=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
+            "export PR_TRACKER_API_PORT=${lib.escapeShellArg (toString cfg.port)}"
+          ]
+          ++ (lib.optional (
+            cfg.tracingFilter != null
+          ) "export PR_TRACKER_TRACING_FILTER=${lib.escapeShellArg cfg.tracingFilter}")
+          ++ lib.optional (cfg.db.passwordFile != null) ''
+            PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < ${cfg.db.passwordFile})
+            PR_TRACKER_API_DATABASE_URL="$PR_TRACKER_API_DATABASE_URL&password=$PASSWORD"
+          ''
+          ++ [ "exec ${lib.getExe cfg.package}" ]
+        );
         systemd.services.pr-tracker-api.serviceConfig.User = cfg.user;
         systemd.services.pr-tracker-api.serviceConfig.Group = cfg.group;
         systemd.services.pr-tracker-api.serviceConfig.Type = "notify";
