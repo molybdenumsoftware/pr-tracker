@@ -55,11 +55,18 @@
             data = [
               {
                 title = "NixOS";
-                slug = "nixos";
               }
               {
                 title = "Programs";
                 children = [
+                  {
+                    title = "API";
+                    basename = "api";
+                  }
+                  {
+                    title = "Fetcher";
+                    basename = "fetcher";
+                  }
                 ];
               }
             ];
