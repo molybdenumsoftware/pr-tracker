@@ -86,14 +86,26 @@
                 indent ? "",
               }:
               lib.concatLines (
-                map (
-                  {
-                    title,
-                    basename ? null,
-                    children ? null,
-                  }:
-                  if (children == null) then "${indent}- [${page.title}](${page.title}.md)" else 
-                ) pageTree
+                lib.flatten (
+                  map (
+                    {
+                      title,
+                      basename ? null,
+                      children ? null,
+                      ... # <<< yuck?
+                    }:
+                    if (children == null) then
+                      "${indent}- [${title}](${basename}.md)" # <<< TODO: need path as well as basename
+                    else
+                      [
+                        "${indent}- [${title}](${title}.md)" # <<< wrong
+                        (renderMdList {
+                          pageTree = children;
+                          indent = "  " + indent;
+                        })
+                      ]
+                  ) pageTree
+                )
               );
           in
           renderMdList { pageTree = data; }
