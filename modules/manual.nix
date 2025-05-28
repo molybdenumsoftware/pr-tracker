@@ -1,8 +1,6 @@
 {
   lib,
   self,
-  api,
-  fetcher,
   ...
 }:
 {
@@ -50,62 +48,66 @@
         text =
           # markdown
           ''
-            - ${mkChapterLink chapters.nixos}
+            - ${mkChapterLink config.chapters.nixos}
 
             # Programs
 
-            - ${mkChapterLink chapters.api}
-            - ${mkChapterLink chapters.fetcher}
+            - ${mkChapterLink config.chapters.api}
+            - ${mkChapterLink config.chapters.fetcher}
           '';
       };
 
-      chapters = {
-        nixos = {
-          title = "NixOS";
-          basename = "nixos";
-          drv = optionsMd;
-        };
-        api = {
-          title = "API";
-          basename = "api";
-          drv = pkgs.writeTextFile {
-            name = "api.md";
-            text = "fake api";
-          };
-        };
-        fetcher = {
-          title = "Fetcher";
-          basename = "fetcher";
-          drv = pkgs.writeTextFile {
-            name = "fetcher.md";
-            text = "fake fetcher";
-          };
-        };
-      };
       mkChapterLink = { title, basename, ... }: "[${title}](${basename}.md)";
     in
     {
-      packages.manual =
-        pkgs.runCommand "pr-tracker-nixos-manual"
-          {
-            nativeBuildInputs = [
-              pkgs.mdbook
-              pkgs.coreutils
-            ];
-          }
-          ''
-            mkdir src
+      options = {
+        chapters = lib.mkOption {
+          type = lib.types.attrsOf (
+            lib.types.submodule {
+              options = {
+                title = lib.mkOption {
+                  type = lib.types.string;
+                };
 
-            ln -s ${summaryMd} src/SUMMARY.md
+                basename = lib.mkOption {
+                };
+              };
+            }
+          );
+        };
+      };
+      config = {
+        # <<< TODO: debate where to put this. should it really be one chapter or two? >>>
+        chapters = {
+          nixos = {
+            title = "NixOS";
+            basename = "nixos";
+            drv = optionsMd;
+          };
+        };
 
-            ${lib.pipe chapters [
-              (lib.mapAttrsToList (name: chapter: "ln -s ${chapter.drv} src/${chapter.basename}.md"))
-              lib.concatLines
-            ]}
+        packages.manual =
+          pkgs.runCommand "pr-tracker-nixos-manual"
+            {
+              nativeBuildInputs = [
+                pkgs.mdbook
+                pkgs.coreutils
+              ];
+            }
+            ''
+              mkdir src
 
-            mdbook build --dest-dir $out
-          '';
+              ln -s ${summaryMd} src/SUMMARY.md
 
-      checks."packages/manual" = self'.packages.nixos-manual;
+              ${lib.pipe chapters [
+                (lib.mapAttrsToList (name: chapter: "ln -s ${chapter.drv} src/${chapter.basename}.md"))
+                lib.concatLines
+              ]}
+
+              mdbook build --dest-dir $out
+            '';
+
+        checks."packages/manual" = self'.packages.nixos-manual;
+      };
     };
 }
