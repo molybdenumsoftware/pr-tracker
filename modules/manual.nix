@@ -80,16 +80,23 @@
                 ];
               }
             ];
+            renderMdList =
+              {
+                pageTree,
+                indent ? "",
+              }:
+              lib.concatLines (map (page: "${indent}- [${page.title}](${page.title}.md)") pageTree);
           in
-          # markdown
-          # ''
-          #   - [NixOS](nixos.md)
-          #   - Programs
-          #     - [API](api.md)
-          #     - [Fetcher](fetcher.md)
-          # '';
+          renderMdList { pageTree = data; }
+        # markdown
+        # ''
+        #   - [NixOS](nixos.md)
+        #   - Programs
+        #     - [API](api.md)
+        #     - [Fetcher](fetcher.md)
+        # '';
 
-          ;
+        ;
       };
     in
     {
@@ -101,9 +108,6 @@
           ''
             mkdir src
             ln -s ${summaryMd} src/SUMMARY.md
-            ln -s ${optionsMd} src/nixos.md
-            ln -s ${apiMd} src/api.md
-            ln -s ${fetcherMd} src/fetcher.md
             mdbook build --dest-dir $out
           '';
 
