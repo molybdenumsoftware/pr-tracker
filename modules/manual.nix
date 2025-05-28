@@ -85,7 +85,16 @@
                 pageTree,
                 indent ? "",
               }:
-              lib.concatLines (map (page: "${indent}- [${page.title}](${page.title}.md)") pageTree);
+              lib.concatLines (
+                map (
+                  {
+                    title,
+                    basename ? null,
+                    children ? null,
+                  }:
+                  if (children == null) then "${indent}- [${page.title}](${page.title}.md)" else 
+                ) pageTree
+              );
           in
           renderMdList { pageTree = data; }
         # markdown
