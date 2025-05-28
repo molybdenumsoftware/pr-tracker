@@ -65,6 +65,7 @@
         title = "Fetcher";
         drv = pkgs.writeTextFile {
           name = "fetcher.md";
+          # TODO this is fake
           text = "fake fetcher";
         };
       };

@@ -24,6 +24,7 @@
         ];
       };
 
+      # TODO consider extracting this
       options = filterOptions (
         path: option: lib.any (lib.hasPrefix "${self}/") option.declarations
       ) configuration.options;
