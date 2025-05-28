@@ -1,6 +1,8 @@
 {
   lib,
   self,
+  api,
+  fetcher,
   ...
 }:
 {
@@ -43,17 +45,36 @@
               ${optionsDocs.optionsJSON}/share/doc/nixos/options.json $out
           '';
 
+      apiMd = abort "TODO-api";
+      fetcherMd = abort "TODO-fetcher";
+
       summaryMd = pkgs.writeTextFile {
         name = "SUMMARY.md";
         text =
+          let
+            data = [
+              {
+                title = "NixOS";
+                slug = "nixos";
+              }
+              {
+                title = "Programs";
+                children = [
+                ];
+              }
+            ];
+          in
           # markdown
           ''
-            [Options](options.md)
+            - [NixOS](nixos.md)
+            - Programs
+              - [API](api.md)
+              - [Fetcher](fetcher.md)
           '';
       };
     in
     {
-      packages.nixos-manual =
+      packages.manual =
         pkgs.runCommand "pr-tracker-nixos-manual"
           {
             nativeBuildInputs = [ pkgs.mdbook ];
@@ -61,10 +82,12 @@
           ''
             mkdir src
             ln -s ${summaryMd} src/SUMMARY.md
-            ln -s ${optionsMd} src/options.md
+            ln -s ${optionsMd} src/nixos.md
+            ln -s ${apiMd} src/api.md
+            ln -s ${fetcherMd} src/fetcher.md
             mdbook build --dest-dir $out
           '';
 
-      checks."packages/nixos-modules-manual" = self'.packages.nixos-manual;
+      checks."packages/manual" = self'.packages.nixos-manual;
     };
 }
