@@ -52,12 +52,21 @@
         name = "SUMMARY.md";
         text =
           let
+<<<<<<< Updated upstream
             data = [
               {
                 type = "chapter";
+||||||| Stash base
+            data = [
+              {
+=======
+            chapters = {
+              nixos = {
+>>>>>>> Stashed changes
                 title = "NixOS";
                 basename = "nixos";
                 drv = optionsMd;
+<<<<<<< Updated upstream
               }
               {
                 type = "part";
@@ -111,17 +120,88 @@
                   ) pageTree
                 )
               );
+||||||| Stash base
+              }
+              {
+                title = "Programs";
+                children = [
+                  {
+                    title = "API";
+                    basename = "api";
+                    drv = pkgs.writeTextFile {
+                      name = "api.md";
+                      text = "fake api";
+                    };
+                  }
+                  {
+                    title = "Fetcher";
+                    basename = "fetcher";
+                    drv = pkgs.writeTextFile {
+                      name = "fetcher.md";
+                      text = "fake fetcher";
+                    };
+                  }
+                ];
+              }
+            ];
+            renderMdList =
+              {
+                pageTree,
+                indent ? "",
+              }:
+              lib.concatLines (
+                lib.flatten (
+                  map (
+                    {
+                      title,
+                      basename ? null,
+                      children ? null,
+                      ... # <<< yuck?
+                    }:
+                    if (children == null) then
+                      "${indent}- [${title}](${basename}.md)" # <<< TODO: need path as well as basename
+                    else
+                      [
+                        "${indent}- [${title}](${title}.md)" # <<< wrong
+                        (renderMdList {
+                          pageTree = children;
+                          indent = "  " + indent;
+                        })
+                      ]
+                  ) pageTree
+                )
+              );
+=======
+              };
+              api = {
+                title = "API";
+                basename = "api";
+                drv = pkgs.writeTextFile {
+                  name = "api.md";
+                  text = "fake api";
+                };
+              };
+              fetcher = {
+                title = "Fetcher";
+                basename = "fetcher";
+                drv = pkgs.writeTextFile {
+                  name = "fetcher.md";
+                  text = "fake fetcher";
+                };
+              };
+            };
+            mkChapterLink = { title, basename, ... }: "[${title}](${basename}.md)";
+>>>>>>> Stashed changes
           in
-          renderMdList { pageTree = data; }
-        # markdown
-        # ''
-        #   - [NixOS](nixos.md)
-        #   - Programs
-        #     - [API](api.md)
-        #     - [Fetcher](fetcher.md)
-        # '';
+          # markdown
+          ''
+            - ${mkChapterLink chapters.nixos}
 
-        ;
+            # Programs
+
+            - ${mkChapterLink chapters.api}
+            - ${mkChapterLink chapters.fetcher}
+          '';
       };
     in
     {
