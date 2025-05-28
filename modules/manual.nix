@@ -54,14 +54,17 @@
           let
             data = [
               {
+                type = "chapter";
                 title = "NixOS";
                 basename = "nixos";
                 drv = optionsMd;
               }
               {
+                type = "part";
                 title = "Programs";
-                children = [
+                chapters = [
                   {
+                    type = "chapter";
                     title = "API";
                     basename = "api";
                     drv = pkgs.writeTextFile {
@@ -70,6 +73,7 @@
                     };
                   }
                   {
+                    type = "chapter";
                     title = "Fetcher";
                     basename = "fetcher";
                     drv = pkgs.writeTextFile {
