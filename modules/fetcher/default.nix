@@ -63,7 +63,6 @@
     {
       chapters.fetcher = {
         title = "Fetcher";
-        basename = "fetcher"; # <<< TODO: remove >>>
         drv = pkgs.writeTextFile {
           name = "fetcher.md";
           text = "fake fetcher";

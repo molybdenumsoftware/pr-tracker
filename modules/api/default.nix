@@ -40,7 +40,6 @@
     {
       chapters.api = {
         title = "API";
-        basename = "api"; # <<< TODO: remove >>>
         drv = pkgs.writeTextFile {
           name = "api.md";
           text = "fake api";

@@ -5,7 +5,7 @@
 }:
 {
   perSystem =
-    {
+    psArgs@{
       self',
       system,
       pkgs,
@@ -48,12 +48,12 @@
         text =
           # markdown
           ''
-            - ${mkChapterLink config.chapters.nixos}
+            - ${mkChapterLink psArgs.config.chapters.nixos}
 
             # Programs
 
-            - ${mkChapterLink config.chapters.api}
-            - ${mkChapterLink config.chapters.fetcher}
+            - ${mkChapterLink psArgs.config.chapters.api}
+            - ${mkChapterLink psArgs.config.chapters.fetcher}
           '';
       };
 
@@ -62,17 +62,26 @@
     {
       options = {
         chapters = lib.mkOption {
-          type = lib.types.attrsOf (
-            lib.types.submodule {
-              options = {
-                title = lib.mkOption {
-                  type = lib.types.string;
-                };
+          type = lib.types.lazyAttrsOf (
+            lib.types.submodule (
+              { name, ... }:
+              {
+                options = {
+                  title = lib.mkOption {
+                    type = lib.types.str;
+                  };
 
-                basename = lib.mkOption {
+                  basename = lib.mkOption {
+                    type = lib.types.str;
+                    default = name;
+                  };
+
+                  drv = lib.mkOption {
+                    type = lib.types.package;
+                  };
                 };
-              };
-            }
+              }
+            )
           );
         };
       };
@@ -81,7 +90,6 @@
         chapters = {
           nixos = {
             title = "NixOS";
-            basename = "nixos";
             drv = optionsMd;
           };
         };
@@ -99,7 +107,7 @@
 
               ln -s ${summaryMd} src/SUMMARY.md
 
-              ${lib.pipe chapters [
+              ${lib.pipe psArgs.config.chapters [
                 (lib.mapAttrsToList (name: chapter: "ln -s ${chapter.drv} src/${chapter.basename}.md"))
                 lib.concatLines
               ]}
