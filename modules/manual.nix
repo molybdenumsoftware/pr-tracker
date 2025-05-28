@@ -55,6 +55,8 @@
             data = [
               {
                 title = "NixOS";
+                basename = "nixos";
+                drv = optionsMd;
               }
               {
                 title = "Programs";
@@ -62,22 +64,32 @@
                   {
                     title = "API";
                     basename = "api";
+                    drv = pkgs.writeTextFile {
+                      name = "api.md";
+                      text = "fake api";
+                    };
                   }
                   {
                     title = "Fetcher";
                     basename = "fetcher";
+                    drv = pkgs.writeTextFile {
+                      name = "fetcher.md";
+                      text = "fake fetcher";
+                    };
                   }
                 ];
               }
             ];
           in
           # markdown
-          ''
-            - [NixOS](nixos.md)
-            - Programs
-              - [API](api.md)
-              - [Fetcher](fetcher.md)
-          '';
+          # ''
+          #   - [NixOS](nixos.md)
+          #   - Programs
+          #     - [API](api.md)
+          #     - [Fetcher](fetcher.md)
+          # '';
+
+          ;
       };
     in
     {
