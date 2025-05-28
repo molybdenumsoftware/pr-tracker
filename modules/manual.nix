@@ -45,154 +45,9 @@
               ${optionsDocs.optionsJSON}/share/doc/nixos/options.json $out
           '';
 
-      apiMd = abort "TODO-api";
-      fetcherMd = abort "TODO-fetcher";
-
       summaryMd = pkgs.writeTextFile {
         name = "SUMMARY.md";
         text =
-          let
-<<<<<<< Updated upstream
-            data = [
-              {
-                type = "chapter";
-||||||| Stash base
-            data = [
-              {
-=======
-            chapters = {
-              nixos = {
->>>>>>> Stashed changes
-                title = "NixOS";
-                basename = "nixos";
-                drv = optionsMd;
-<<<<<<< Updated upstream
-              }
-              {
-                type = "part";
-                title = "Programs";
-                chapters = [
-                  {
-                    type = "chapter";
-                    title = "API";
-                    basename = "api";
-                    drv = pkgs.writeTextFile {
-                      name = "api.md";
-                      text = "fake api";
-                    };
-                  }
-                  {
-                    type = "chapter";
-                    title = "Fetcher";
-                    basename = "fetcher";
-                    drv = pkgs.writeTextFile {
-                      name = "fetcher.md";
-                      text = "fake fetcher";
-                    };
-                  }
-                ];
-              }
-            ];
-            renderMdList =
-              {
-                pageTree,
-                indent ? "",
-              }:
-              lib.concatLines (
-                lib.flatten (
-                  map (
-                    {
-                      title,
-                      basename ? null,
-                      children ? null,
-                      ... # <<< yuck?
-                    }:
-                    if (children == null) then
-                      "${indent}- [${title}](${basename}.md)" # <<< TODO: need path as well as basename
-                    else
-                      [
-                        "${indent}- [${title}](${title}.md)" # <<< wrong
-                        (renderMdList {
-                          pageTree = children;
-                          indent = "  " + indent;
-                        })
-                      ]
-                  ) pageTree
-                )
-              );
-||||||| Stash base
-              }
-              {
-                title = "Programs";
-                children = [
-                  {
-                    title = "API";
-                    basename = "api";
-                    drv = pkgs.writeTextFile {
-                      name = "api.md";
-                      text = "fake api";
-                    };
-                  }
-                  {
-                    title = "Fetcher";
-                    basename = "fetcher";
-                    drv = pkgs.writeTextFile {
-                      name = "fetcher.md";
-                      text = "fake fetcher";
-                    };
-                  }
-                ];
-              }
-            ];
-            renderMdList =
-              {
-                pageTree,
-                indent ? "",
-              }:
-              lib.concatLines (
-                lib.flatten (
-                  map (
-                    {
-                      title,
-                      basename ? null,
-                      children ? null,
-                      ... # <<< yuck?
-                    }:
-                    if (children == null) then
-                      "${indent}- [${title}](${basename}.md)" # <<< TODO: need path as well as basename
-                    else
-                      [
-                        "${indent}- [${title}](${title}.md)" # <<< wrong
-                        (renderMdList {
-                          pageTree = children;
-                          indent = "  " + indent;
-                        })
-                      ]
-                  ) pageTree
-                )
-              );
-=======
-              };
-              api = {
-                title = "API";
-                basename = "api";
-                drv = pkgs.writeTextFile {
-                  name = "api.md";
-                  text = "fake api";
-                };
-              };
-              fetcher = {
-                title = "Fetcher";
-                basename = "fetcher";
-                drv = pkgs.writeTextFile {
-                  name = "fetcher.md";
-                  text = "fake fetcher";
-                };
-              };
-            };
-            mkChapterLink = { title, basename, ... }: "[${title}](${basename}.md)";
->>>>>>> Stashed changes
-          in
           # markdown
           ''
             - ${mkChapterLink chapters.nixos}
@@ -203,16 +58,51 @@
             - ${mkChapterLink chapters.fetcher}
           '';
       };
+
+      chapters = {
+        nixos = {
+          title = "NixOS";
+          basename = "nixos";
+          drv = optionsMd;
+        };
+        api = {
+          title = "API";
+          basename = "api";
+          drv = pkgs.writeTextFile {
+            name = "api.md";
+            text = "fake api";
+          };
+        };
+        fetcher = {
+          title = "Fetcher";
+          basename = "fetcher";
+          drv = pkgs.writeTextFile {
+            name = "fetcher.md";
+            text = "fake fetcher";
+          };
+        };
+      };
+      mkChapterLink = { title, basename, ... }: "[${title}](${basename}.md)";
     in
     {
       packages.manual =
         pkgs.runCommand "pr-tracker-nixos-manual"
           {
-            nativeBuildInputs = [ pkgs.mdbook ];
+            nativeBuildInputs = [
+              pkgs.mdbook
+              pkgs.coreutils
+            ];
           }
           ''
             mkdir src
+
             ln -s ${summaryMd} src/SUMMARY.md
+
+            ${lib.pipe chapters [
+              (lib.mapAttrsToList (name: chapter: "ln -s ${chapter.drv} src/${chapter.basename}.md"))
+              lib.concatLines
+            ]}
+
             mdbook build --dest-dir $out
           '';
 
