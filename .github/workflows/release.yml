@@ -17,7 +17,6 @@ jobs:
         with:
           extra-conf: |
             experimental-features = no-url-literals pipe-operators
-      - uses: DeterminateSystems/magic-nix-cache-action@main
       - uses: navikt/github-app-token-generator@v1
         id: get-token
         with:
