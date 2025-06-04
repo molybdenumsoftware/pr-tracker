@@ -1,14 +1,11 @@
 #![allow(non_snake_case, clippy::struct_field_names)]
 
-pub use environment::Environment;
 use serde::Deserialize;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
 use tracing_subscriber::EnvFilter;
 
-mod environment {
-    include!(env!("api_config_snippet"));
-}
+include!(env!("api_config_snippet"));
 
 #[serde_as]
 #[derive(Deserialize, Debug)]

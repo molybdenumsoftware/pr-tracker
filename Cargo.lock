@@ -2934,27 +2934,16 @@ dependencies = [
  "getset",
  "poem",
  "poem-openapi",
- "pr-tracker-api-config",
  "pr-tracker-store",
  "sd-notify",
  "serde",
+ "serde_with",
  "sqlx",
  "tempfile",
  "thiserror 1.0.69",
  "tokio",
  "tracing-subscriber",
  "util",
-]
-
-[[package]]
-name = "pr-tracker-api-config"
-version = "7.2.0"
-dependencies = [
- "camino",
- "confique",
- "serde",
- "serde_with",
- "tracing-subscriber",
 ]
 
 [[package]]
@@ -2973,7 +2962,6 @@ dependencies = [
  "itertools",
  "log",
  "once_cell",
- "pr-tracker-fetcher-config",
  "pr-tracker-store",
  "reqwest",
  "serde",
@@ -2983,15 +2971,6 @@ dependencies = [
  "tokio",
  "util",
  "wildmatch",
-]
-
-[[package]]
-name = "pr-tracker-fetcher-config"
-version = "7.2.0"
-dependencies = [
- "camino",
- "confique",
- "serde",
 ]
 
 [[package]]

@@ -2,13 +2,13 @@
 camino = "*"
 poem = {features = ["requestid", "test"], version = "*"}
 poem-openapi = {features = ["swagger-ui"], version = "*"}
-pr-tracker-api-config = {path = "../api-config"}
 sqlx = {default-features = false, features = ["macros", "migrate"], version = "*"}
 tokio = "*"
 anyhow.workspace = true
 confique.workspace = true
 pr-tracker-store.workspace = true
 serde.workspace = true
+serde_with.workspace = true
 thiserror.workspace = true
 tracing-subscriber.workspace = true
 util.workspace = true

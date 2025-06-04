@@ -29,7 +29,7 @@
         '';
       # Note: ideally we'd use `::core::option::Option`, but cannot because
       # confique's derive macro seems not to support it.
-      rustType = "Option<crate::TracingFilter>";
+      rustType = "Option<TracingFilter>";
     };
   };
 
@@ -58,11 +58,8 @@
         crates = {
           pr-tracker-api.drvConfig = {
             mkDerivation.meta.mainProgram = "pr-tracker-api";
-            env = {
-              inherit (config.nci.crates.pr-tracker-api-config.drvConfig.env) api_config_snippet;
-            };
+            env.api_config_snippet = writeEnvironmentStructFile "api" api.environmentVariables;
           };
-          pr-tracker-api-config.drvConfig.env.api_config_snippet = writeEnvironmentStructFile "api" api.environmentVariables;
         };
       };
       packages.api = config.nci.outputs.pr-tracker-api.packages.release;

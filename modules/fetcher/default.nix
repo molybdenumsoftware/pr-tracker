@@ -84,11 +84,8 @@
         crates = {
           pr-tracker-fetcher.drvConfig = {
             mkDerivation.meta.mainProgram = "pr-tracker-fetcher";
-            env = {
-              inherit (config.nci.crates.pr-tracker-fetcher-config.drvConfig.env) fetcher_config_snippet;
-            };
+            env.fetcher_config_snippet = writeEnvironmentStructFile "fetcher" fetcher.environmentVariables;
           };
-          pr-tracker-fetcher-config.drvConfig.env.fetcher_config_snippet = writeEnvironmentStructFile "fetcher" fetcher.environmentVariables;
         };
       };
 

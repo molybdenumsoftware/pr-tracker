@@ -1,13 +1,15 @@
 #![warn(clippy::pedantic)]
 
+mod config;
+
 use anyhow::Context;
+use config::Environment;
 use confique::Config;
 use poem::{
     Server,
     listener::{Listener, TcpListener},
 };
 use pr_tracker_api::endpoint;
-use pr_tracker_api_config::Environment;
 
 #[tokio::main]
 async fn main() {

@@ -1,9 +1,11 @@
 #![warn(clippy::pedantic)]
 
+mod config;
+
 use anyhow::{Context, ensure};
+use config::Environment;
 use confique::Config;
 use pr_tracker_fetcher::{github::GitHubGraphqlClient, run};
-use pr_tracker_fetcher_config::Environment;
 use pr_tracker_store::PgConnection;
 use sqlx_core::connection::Connection;
 use wildmatch::WildMatch;

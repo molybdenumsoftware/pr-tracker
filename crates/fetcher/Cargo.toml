@@ -4,7 +4,6 @@ env_logger = "*"
 graphql_client = {default-features = false, features = ["graphql_query_derive", "reqwest-rustls"], version = "*"}
 itertools = "*"
 log = "*"
-pr-tracker-fetcher-config = {path = "../fetcher-config"}
 # Pinned for compatibility with graphql-client.
 # We can unpin once this is released: <https://github.com/graphql-rust/graphql-client/commit/683951f335b22317ab18dd170809ad57838ffe9d>
 reqwest = {default-features = false, features = ["rustls-tls"], version = "^0.11"}
