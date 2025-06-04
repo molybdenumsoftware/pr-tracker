@@ -3,6 +3,7 @@
   inputs,
   fetcher,
   psqlConnectionUriMdLink,
+  environmentVariablesToMarkdown,
   ...
 }:
 {
@@ -61,6 +62,18 @@
       ...
     }:
     {
+      chapters.fetcher = {
+        title = "Fetcher";
+        drv = pkgs.writeTextFile {
+          name = "fetcher.md";
+          text = ''
+            ## Environment Variables
+
+            ${environmentVariablesToMarkdown fetcher.environmentVariables}
+          '';
+        };
+      };
+
       nci = {
         projects.default = {
           drvConfig.env = {
@@ -75,10 +88,7 @@
               inherit (config.nci.crates.pr-tracker-fetcher-config.drvConfig.env) fetcher_config_snippet;
             };
           };
-          pr-tracker-fetcher-config = {
-            drvConfig.env.fetcher_config_snippet = writeEnvironmentStructFile "fetcher" fetcher.environmentVariables;
-            includeInProjectDocs = true;
-          };
+          pr-tracker-fetcher-config.drvConfig.env.fetcher_config_snippet = writeEnvironmentStructFile "fetcher" fetcher.environmentVariables;
         };
       };
 

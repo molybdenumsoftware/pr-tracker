@@ -34,11 +34,10 @@
           ./modules/filter-options.nix
           ./modules/formatting.nix
           ./modules/integration-tests
+          ./modules/manual.nix
           ./modules/nci.nix
-          ./modules/nixos-manual.nix
           ./modules/nixos-modules-lib.nix
           ./modules/private-nixos-modules
-          ./modules/program-docs.nix
           ./modules/release
           ./modules/store.nix
           ./modules/util.nix

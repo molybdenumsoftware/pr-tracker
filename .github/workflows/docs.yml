@@ -19,14 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
-      - run: |
-          nix build .#program-docs
-          mkdir docs
-          cp -r result docs/programs
-          nix build .#nixos-manual
-          cp -r result docs/nixos-modules
+      - run: nix build .#manual
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: result
       - if: github.ref == 'refs/heads/main'
         uses: actions/deploy-pages@v4

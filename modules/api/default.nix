@@ -2,6 +2,7 @@
   lib,
   api,
   psqlConnectionUriMdLink,
+  environmentVariablesToMarkdown,
   ...
 }:
 {
@@ -22,7 +23,10 @@
     PR_TRACKER_TRACING_FILTER = {
       description =
         # markdown
-        "Expected to deserialize into an [`EnvFilter`](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html).";
+        ''
+          Optional.
+          Expected to deserialize into an [`EnvFilter`](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html).
+        '';
       # Note: ideally we'd use `::core::option::Option`, but cannot because
       # confique's derive macro seems not to support it.
       rustType = "Option<crate::TracingFilter>";
@@ -31,12 +35,25 @@
 
   perSystem =
     {
+      pkgs,
       self',
       config,
       writeEnvironmentStructFile,
       ...
     }:
     {
+      chapters.api = {
+        title = "API";
+        drv = pkgs.writeTextFile {
+          name = "api.md";
+          text = ''
+            ## Environment Variables
+
+            ${environmentVariablesToMarkdown api.environmentVariables}
+          '';
+        };
+      };
+
       nci = {
         crates = {
           pr-tracker-api.drvConfig = {
@@ -45,10 +62,7 @@
               inherit (config.nci.crates.pr-tracker-api-config.drvConfig.env) api_config_snippet;
             };
           };
-          pr-tracker-api-config = {
-            drvConfig.env.api_config_snippet = writeEnvironmentStructFile "api" api.environmentVariables;
-            includeInProjectDocs = true;
-          };
+          pr-tracker-api-config.drvConfig.env.api_config_snippet = writeEnvironmentStructFile "api" api.environmentVariables;
         };
       };
       packages.api = config.nci.outputs.pr-tracker-api.packages.release;

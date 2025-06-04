@@ -12,6 +12,17 @@
         (map (line: prefix + line))
         (lib.concatStringsSep "\n")
       ];
+
+    environmentVariablesToMarkdown = variables: ''
+      | Name | Description |
+      |------|-------------|
+      ${lib.pipe variables [
+        (lib.mapAttrsToList (
+          name: envVar: "| `${name}` | ${lib.strings.replaceStrings [ "\n" ] [ "<br>" ] envVar.description} |"
+        ))
+        lib.concatLines
+      ]}
+    '';
   };
 
   perSystem =
