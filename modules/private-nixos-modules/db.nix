@@ -95,9 +95,9 @@
         {
           config = mkIf (cfg.db.createLocally && hasAttr program cfg && programCfg.enable) {
             services.postgresql.ensureUsers = [ { name = programCfg.user; } ];
-            systemd.services.postgresql.postStart = lib.mkAfter ''
-              $PSQL '${cfg.db.name}' -c 'GRANT "${cfg.db.name}" TO "${programCfg.user}"'
-              $PSQL '${cfg.db.name}' -c 'ALTER DEFAULT PRIVILEGES FOR ROLE "${programCfg.user}" IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO "${cfg.db.name}"'
+            systemd.services.postgresql-setup.postStart = ''
+              psql '${cfg.db.name}' -c 'GRANT "${cfg.db.name}" TO "${programCfg.user}"'
+              psql '${cfg.db.name}' -c 'ALTER DEFAULT PRIVILEGES FOR ROLE "${programCfg.user}" IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO "${cfg.db.name}"'
             '';
           };
         }
