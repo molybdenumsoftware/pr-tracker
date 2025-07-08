@@ -92,8 +92,8 @@
         systemd.services.pr-tracker-fetcher.description = "pr-tracker-fetcher";
         systemd.services.pr-tracker-fetcher.after = [
           "network.target"
-        ] ++ lib.optional cfg.db.isLocal "postgresql.service";
-        systemd.services.pr-tracker-fetcher.requires = lib.optional cfg.db.isLocal "postgresql.service";
+        ] ++ lib.optional cfg.db.isLocal "postgresql.target";
+        systemd.services.pr-tracker-fetcher.requires = lib.optional cfg.db.isLocal "postgresql.target";
         systemd.services.pr-tracker-fetcher.script = lib.concatLines (
           [
             "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_DATABASE_URL.name}=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
