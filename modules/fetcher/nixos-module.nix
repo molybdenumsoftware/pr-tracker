@@ -92,7 +92,8 @@
         systemd.services.pr-tracker-fetcher.description = "pr-tracker-fetcher";
         systemd.services.pr-tracker-fetcher.after = [
           "network.target"
-        ] ++ lib.optional cfg.db.isLocal "postgresql.target";
+        ]
+        ++ lib.optional cfg.db.isLocal "postgresql.target";
         systemd.services.pr-tracker-fetcher.requires = lib.optional cfg.db.isLocal "postgresql.target";
         systemd.services.pr-tracker-fetcher.script = lib.concatLines (
           [
