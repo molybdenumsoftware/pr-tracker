@@ -69,7 +69,8 @@
         systemd.services.pr-tracker-api.wantedBy = [ "multi-user.target" ];
         systemd.services.pr-tracker-api.after = [
           "network.target"
-        ] ++ lib.optional cfg.db.isLocal "postgresql.target";
+        ]
+        ++ lib.optional cfg.db.isLocal "postgresql.target";
         systemd.services.pr-tracker-api.bindsTo = lib.optional cfg.db.isLocal "postgresql.target";
 
         systemd.services.pr-tracker-api.script = lib.concatLines (
