@@ -35,6 +35,9 @@
           ./modules/formatting.nix
           ./modules/integration-tests
           ./modules/manual.nix
+          ./modules/prior-art.nix
+          ./modules/introduction.nix
+          ./modules/vision.nix
           ./modules/nci.nix
           ./modules/nixos-modules-lib.nix
           ./modules/private-nixos-modules

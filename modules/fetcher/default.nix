@@ -66,11 +66,18 @@
         title = "Fetcher";
         drv = pkgs.writeTextFile {
           name = "fetcher.md";
-          text = ''
-            ## Environment Variables
+          text =
+            # markdown
+            ''
+              Intended to be periodically executed.
+              Takes no arguments.
 
-            ${environmentVariablesToMarkdown fetcher.environmentVariables}
-          '';
+              ## Environment Variables
+
+              Reads the following environment variables.
+
+              ${environmentVariablesToMarkdown fetcher.environmentVariables}
+            '';
         };
       };
 

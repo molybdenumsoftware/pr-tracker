@@ -46,11 +46,20 @@
         title = "API";
         drv = pkgs.writeTextFile {
           name = "api.md";
-          text = ''
-            ## Environment Variables
+          text =
+            # markdown
+            ''
+              Takes no arguments.
 
-            ${environmentVariablesToMarkdown api.environmentVariables}
-          '';
+              - `/openapi.json`
+              - `/` redirects to API documentation
+
+              ## Environment Variables
+
+              Reads the following environment variables.
+
+              ${environmentVariablesToMarkdown api.environmentVariables}
+            '';
         };
       };
 

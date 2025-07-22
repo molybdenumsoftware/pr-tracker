@@ -33,6 +33,21 @@
       };
     in
     {
+      chapters.versioning = {
+        title = "Versioning";
+        drv = pkgs.writeTextFile {
+          name = "versioning.md";
+          text =
+            # markdown
+            ''
+              - This project uses [Conventional Commits v1](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning v2](https://semver.org/spec/v2.0.0.html).
+              - With regard to versioning, the documented executables and NixOS modules are public.
+                The libraries are private.
+              - This project, with all its components, is versioned as one.
+            '';
+        };
+      };
+
       apps.bump-version = {
         type = "app";
         program = lib.getExe bump-version;

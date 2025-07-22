@@ -48,12 +48,16 @@
         text =
           # markdown
           ''
-            - ${mkChapterLink psArgs.config.chapters.nixos}
+            ${mkChapterLink psArgs.config.chapters.introduction}
 
-            # Programs
+            ${mkChapterLink psArgs.config.chapters.fetcher}
+            ${mkChapterLink psArgs.config.chapters.api}
 
-            - ${mkChapterLink psArgs.config.chapters.api}
-            - ${mkChapterLink psArgs.config.chapters.fetcher}
+            ${mkChapterLink psArgs.config.chapters.nixos}
+
+            ${mkChapterLink psArgs.config.chapters.versioning}
+            ${mkChapterLink psArgs.config.chapters.prior-art}
+            ${mkChapterLink psArgs.config.chapters.vision}
           '';
       };
 
@@ -88,7 +92,7 @@
       config = {
         chapters = {
           nixos = {
-            title = "NixOS";
+            title = "NixOS Module";
             drv = optionsMd;
           };
         };
@@ -107,7 +111,15 @@
               ln -s ${summaryMd} src/SUMMARY.md
 
               ${lib.pipe psArgs.config.chapters [
-                (lib.mapAttrsToList (name: chapter: "ln -s ${chapter.drv} src/${chapter.basename}.md"))
+                (lib.mapAttrsToList (
+                  name: chapter: ''
+                    (
+                      echo ${lib.escapeShellArg ("# " + chapter.title)}
+                      echo ""
+                      cat ${chapter.drv}
+                    )> src/${chapter.basename}.md
+                  ''
+                ))
                 lib.concatLines
               ]}
 
