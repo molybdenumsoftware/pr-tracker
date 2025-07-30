@@ -94,7 +94,7 @@ impl GithubClient for GitHubGraphqlClient {
 
         let repository = data
             .repository
-            .with_context(|| format!("data with no repo\n{}", reposito))?;
+            .with_context(|| format!("data with no repo\n{:#?}", data))?;
         let response_prs = repository.pull_requests;
         let nodes = response_prs.nodes.unwrap_or_default();
 
