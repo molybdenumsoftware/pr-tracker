@@ -92,20 +92,24 @@ impl GithubClient for GitHubGraphqlClient {
 
         log::info!("rate limits: {:?}", data.rate_limit);
 
-        let data_dbg = format!("{data:#?}");
-
         let repository = data
             .repository
-            .with_context(|| format!("data with no repo\n{:#?}", data_dbg))?;
-        let response_prs = repository.pull_requests;
-        let nodes = response_prs.nodes.unwrap_or_default();
+            .as_ref()
+            .context(format!("data with no repo\n{:#?}", &data))?;
+        let response_prs = &repository.pull_requests;
+        let items = response_prs.nodes.as_ref();
+        let empty_vec = Vec::new(); // <<< TODO: static or const or something? >>>
+        let nodes = items.unwrap_or_else(|| &empty_vec);
 
         let prs = nodes
-            .into_iter()
+            .iter()
             .map(|node| -> anyhow::Result<_> {
-                let node = node.context("null PR node")?;
+                let node = node.as_ref().context("null PR node")?;
 
-                let commit = node.merge_commit.map(|commit| GitCommit(commit.oid));
+                let commit = node
+                    .merge_commit
+                    .as_ref()
+                    .map(|commit| GitCommit(commit.oid.clone()));
 
                 let number: PrNumber = node
                     .number
@@ -119,6 +123,7 @@ impl GithubClient for GitHubGraphqlClient {
         let new_cursor = response_prs
             .page_info
             .end_cursor
+            .clone()
             .map(GithubPrQueryCursor::new);
 
         Ok((prs, new_cursor))
