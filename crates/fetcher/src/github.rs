@@ -99,7 +99,7 @@ impl GithubClient for GitHubGraphqlClient {
         let response_prs = &repository.pull_requests;
         let items = response_prs.nodes.as_ref();
         let empty_vec = Vec::new(); // <<< TODO: static or const or something? >>>
-        let nodes = items.unwrap_or_else(&empty_vec);
+        let nodes = items.unwrap_or(&empty_vec);
 
         let prs = nodes
             .iter()
