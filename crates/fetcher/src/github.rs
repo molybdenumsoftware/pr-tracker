@@ -92,9 +92,11 @@ impl GithubClient for GitHubGraphqlClient {
 
         log::info!("rate limits: {:?}", data.rate_limit);
 
+        let data_dbg = format!("{data:#?}");
+
         let repository = data
             .repository
-            .with_context(|| format!("data with no repo\n{:#?}", data))?;
+            .with_context(|| format!("data with no repo\n{:#?}", data_dbg))?;
         let response_prs = repository.pull_requests;
         let nodes = response_prs.nodes.unwrap_or_default();
 
