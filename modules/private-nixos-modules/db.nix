@@ -98,6 +98,7 @@
             systemd.services.postgresql-setup.postStart = ''
               psql '${cfg.db.name}' -c 'GRANT "${cfg.db.name}" TO "${programCfg.user}"'
               psql '${cfg.db.name}' -c 'ALTER DEFAULT PRIVILEGES FOR ROLE "${programCfg.user}" IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO "${cfg.db.name}"'
+              psql '${cfg.db.name}' -c 'ALTER DEFAULT PRIVILEGES FOR ROLE "${programCfg.user}" IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO "${cfg.db.name}"'
             '';
           };
         }
