@@ -1,6 +1,7 @@
 use anyhow::Context;
 use graphql_client::GraphQLQuery;
 use pr_tracker_store::{GitCommit, GithubPrQueryCursor, Pr, PrNumber};
+use reqwest::header::HeaderValue;
 
 // https://docs.github.com/en/graphql/overview/rate-limits-and-node-limits-for-the-graphql-api#node-limit
 const PAGE_SIZE: i64 = 100;
@@ -51,10 +52,9 @@ impl GitHubGraphqlClient {
         page_size_override_for_testing: Option<i64>,
     ) -> anyhow::Result<Self> {
         let mut headers = reqwest::header::HeaderMap::new();
-        headers.insert(
-            reqwest::header::AUTHORIZATION,
-            format!("Bearer {api_token}").parse()?,
-        );
+        let mut authorization = HeaderValue::from_str(&format!("Bearer {api_token}"))?;
+        authorization.set_sensitive(true);
+        headers.insert(reqwest::header::AUTHORIZATION, authorization);
 
         let client = reqwest::Client::builder()
             .user_agent(USER_AGENT)
@@ -81,27 +81,41 @@ impl GithubClient for GitHubGraphqlClient {
             cursor: cursor.map(|cursor| cursor.as_str().to_string()),
             page_size: self.page_size,
         };
-        let resp =
-            graphql_client::reqwest::post_graphql::<PullsQuery, _>(self, API_URL, query_vars)
-                .await?;
+
+        let body = PullsQuery::build_query(query_vars);
+        let request = self.post(API_URL).json(&body);
+        log::info!("request: {request:#?}");
+        log::info!("request body: {body:#?}");
+        let resp: graphql_client::Response<pulls_query::ResponseData> =
+            request.send().await?.json().await?;
 
         // https://github.com/graphql-rust/graphql-client/issues/467
         let data = resp
             .data
+            .as_ref()
             .context("response with no data, this might be due to an expired token")?;
 
         log::info!("rate limits: {:?}", data.rate_limit);
 
-        let repository = data.repository.context("data with no repo")?;
-        let response_prs = repository.pull_requests;
-        let nodes = response_prs.nodes.unwrap_or_default();
+        let repository = data
+            .repository
+            .as_ref()
+            .context(format!("data with no repo\n{:#?}", &resp))?;
+        let nodes = repository
+            .pull_requests
+            .nodes
+            .as_deref()
+            .unwrap_or_default();
 
         let prs = nodes
-            .into_iter()
+            .iter()
             .map(|node| -> anyhow::Result<_> {
-                let node = node.context("null PR node")?;
+                let node = node.as_ref().context("null PR node")?;
 
-                let commit = node.merge_commit.map(|commit| GitCommit(commit.oid));
+                let commit = node
+                    .merge_commit
+                    .as_ref()
+                    .map(|commit| GitCommit(commit.oid.clone()));
 
                 let number: PrNumber = node
                     .number
@@ -112,9 +126,11 @@ impl GithubClient for GitHubGraphqlClient {
             })
             .collect::<anyhow::Result<Vec<_>>>()?;
 
-        let new_cursor = response_prs
+        let new_cursor = repository
+            .pull_requests
             .page_info
             .end_cursor
+            .clone()
             .map(GithubPrQueryCursor::new);
 
         Ok((prs, new_cursor))
