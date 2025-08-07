@@ -1,3 +1,15 @@
+## [7.3.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.2.0...v7.3.0) (2025-08-07)
+
+
+### Features
+
+* **fetcher:** some more req/res logging ([680373f](https://github.com/molybdenumsoftware/pr-tracker/commit/680373fb1d7aa05e2a54ad209960c81524915772))
+
+
+### Bug Fixes
+
+* address race condition with migrations ([2160ff9](https://github.com/molybdenumsoftware/pr-tracker/commit/2160ff90ced18decf7b00f2f8d3c94c28a3e666c))
+
 ## [7.2.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.1.0...v7.2.0) (2025-05-20)
 
 
