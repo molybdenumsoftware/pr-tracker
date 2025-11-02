@@ -100,23 +100,19 @@ async fn update_landings(
 
     let commits = repo.rev_walk([head]).all()?;
 
-    let mut landings = Vec::new();
-
     for commit in commits {
         let commit = commit?;
 
         let git_commit: GitCommit = commit.id.to_string().into();
-        if let Some(pr_number) = prs.get(&git_commit) {
-            let landing = Landing {
-                github_pr: *pr_number,
-                branch_id: branch.id(),
-            };
-
-            landings.push(landing);
-        }
+        let Some(pr_number) = prs.get(&git_commit) else {
+            continue;
+        };
+        let landing = Landing {
+            github_pr: *pr_number,
+            branch_id: branch.id(),
+        };
+        landing.upsert(db_connection).await?;
     }
-
-    Landing::upsert_batch(db_connection, &landings).await?;
 
     Ok(())
 }
