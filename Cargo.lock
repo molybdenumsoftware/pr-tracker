@@ -527,7 +527,7 @@ dependencies = [
 
 [[package]]
 name = "db-context"
-version = "7.3.1"
+version = "7.4.0"
 dependencies = [
  "camino",
  "fragile-child",
@@ -763,7 +763,7 @@ dependencies = [
 
 [[package]]
 name = "fragile-child"
-version = "7.3.1"
+version = "7.4.0"
 
 [[package]]
 name = "futures"
@@ -2924,7 +2924,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-api"
-version = "7.3.1"
+version = "7.4.0"
 dependencies = [
  "anyhow",
  "camino",
@@ -2948,7 +2948,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-fetcher"
-version = "7.3.1"
+version = "7.4.0"
 dependencies = [
  "anyhow",
  "camino",
@@ -2975,7 +2975,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-store"
-version = "7.3.1"
+version = "7.4.0"
 dependencies = [
  "derive_more",
  "getset",
@@ -4210,7 +4210,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 
 [[package]]
 name = "util"
-version = "7.3.1"
+version = "7.4.0"
 dependencies = [
  "clap",
  "db-context",

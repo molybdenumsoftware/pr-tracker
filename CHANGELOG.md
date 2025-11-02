@@ -1,3 +1,10 @@
+## [7.4.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.3.1...v7.4.0) (2025-11-02)
+
+
+### Features
+
+* **fetcher:** log landing upsertion ([3e87023](https://github.com/molybdenumsoftware/pr-tracker/commit/3e870232685c932d9d418b76362ed96d74e72a3f))
+
 ## [7.3.1](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.3.0...v7.3.1) (2025-11-02)
 
 
