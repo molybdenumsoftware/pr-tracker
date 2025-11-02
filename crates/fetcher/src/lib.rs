@@ -112,6 +112,7 @@ async fn update_landings(
             branch_id: branch.id(),
         };
         landing.upsert(db_connection).await?;
+        info!("Upserted {landing:?}");
     }
 
     Ok(())

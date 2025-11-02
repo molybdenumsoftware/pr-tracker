@@ -258,7 +258,7 @@ impl From<PrNumber> for NonZeroU32 {
     }
 }
 
-#[derive(sqlx::FromRow, PartialEq, Eq, Debug)]
+#[derive(sqlx::FromRow, PartialEq, Eq, Debug, Clone, Copy)]
 pub struct Landing {
     pub github_pr: PrNumber,
     pub branch_id: BranchId,
