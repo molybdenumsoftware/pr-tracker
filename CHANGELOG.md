@@ -1,3 +1,10 @@
+## [7.3.1](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.3.0...v7.3.1) (2025-11-02)
+
+
+### Performance Improvements
+
+* **fetcher:** no batch landing upsertion ([2142497](https://github.com/molybdenumsoftware/pr-tracker/commit/2142497ab9d9bc2570d42bf01f34e71611522fee))
+
 ## [7.3.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.2.0...v7.3.0) (2025-08-07)
 
 
