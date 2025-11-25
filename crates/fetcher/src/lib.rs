@@ -58,19 +58,26 @@ async fn update_prs(
     github_client: &mut impl GithubClient,
     db_connection: &mut PgConnection,
 ) -> anyhow::Result<()> {
+    info!("Fetching PRs from GitHub");
+    let mut count: usize = 0;
     loop {
         let cursor = GithubPrQueryCursor::get(db_connection).await?;
         let (pulls, next_page_cursor) = github_client.query_pull_requests(cursor).await?;
+        let pulls_len = pulls.len();
+        info!("Fetched {pulls_len}");
 
         for pull_request in pulls {
             Pr::upsert(pull_request, db_connection).await?;
         }
+        count += pulls_len;
+        info!("Upserted {pulls_len}");
 
         let Some(next_page_cursor) = next_page_cursor else {
-            // We reached the end!
+            info!("No next query cursor; reached the end; upserted total {count}");
             break;
         };
         GithubPrQueryCursor::upsert(&next_page_cursor, db_connection).await?;
+        info!("Upserted cursor {next_page_cursor:?}");
     }
 
     Ok(())
