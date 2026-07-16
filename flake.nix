@@ -22,8 +22,8 @@
       flake = false;
     };
     github-graphql-schema = {
-      flake = false;
       url = "github:octokit/graphql-schema";
+      flake = false;
     };
     nmd = {
       inputs.nixpkgs.follows = "nixpkgs";
