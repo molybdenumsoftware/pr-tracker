@@ -186,27 +186,6 @@
         "type": "github"
       }
     },
-    "nmd": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "scss-reset": "scss-reset"
-      },
-      "locked": {
-        "lastModified": 1757277932,
-        "narHash": "sha256-eW2AzE4HeJXHKxSGDcp35/VQyxeESBt4p9i8QIFrSE8=",
-        "ref": "refs/heads/master",
-        "rev": "055e814ac35379dece164a8413d336b57c5d2e0c",
-        "revCount": 67,
-        "type": "git",
-        "url": "https://git.sr.ht/~rycee/nmd"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://git.sr.ht/~rycee/nmd"
-      }
-    },
     "purescript-overlay": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -261,7 +240,6 @@
         "github-graphql-schema": "github-graphql-schema",
         "nci": "nci",
         "nixpkgs": "nixpkgs",
-        "nmd": "nmd",
         "systems": "systems",
         "treefmt-nix": "treefmt-nix"
       }
@@ -284,22 +262,6 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "scss-reset": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1631450058,
-        "narHash": "sha256-muDlZJPtXDIGevSEWkicPP0HQ6VtucbkMNygpGlBEUM=",
-        "owner": "andreymatin",
-        "repo": "scss-reset",
-        "rev": "0cf50e27a4e95e9bb5b1715eedf9c54dee1a5a91",
-        "type": "github"
-      },
-      "original": {
-        "owner": "andreymatin",
-        "repo": "scss-reset",
         "type": "github"
       }
     },

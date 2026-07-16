@@ -25,10 +25,6 @@
       url = "github:octokit/graphql-schema";
       flake = false;
     };
-    nmd = {
-      inputs.nixpkgs.follows = "nixpkgs";
-      url = "git+https://git.sr.ht/~rycee/nmd";
-    };
     systems.url = "github:nix-systems/default";
     treefmt-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
