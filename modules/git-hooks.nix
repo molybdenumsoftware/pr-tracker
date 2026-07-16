@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  imports = [ inputs.git-hooks-nix.flakeModule ];
+  imports = [ "${inputs.git-hooks-nix}/flake-module.nix" ];
   perSystem =
     { config, ... }:
     {

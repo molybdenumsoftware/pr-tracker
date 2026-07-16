@@ -19,7 +19,7 @@
     };
     git-hooks-nix = {
       url = "github:cachix/git-hooks.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      flake = false;
     };
     github-graphql-schema = {
       flake = false;
