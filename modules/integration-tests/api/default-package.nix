@@ -2,23 +2,20 @@
 {
   perSystem =
     {
-      pkgs,
+      system,
       nodeToApiTest,
       ...
     }:
     {
       checks."integration/api/default-package" = nodeToApiTest "api with default pacakge" (
         let
-          inherit (pkgs)
-            system
-            ;
           port = 7000;
           pgPort = 5432;
         in
         {
           imports = [ self.nixosModules.api ];
 
-          nixpkgs.hostPlatform = system;
+          nixpkgs.hostPlatform = { inherit system; };
 
           services.pr-tracker.api.enable = true;
           systemd.services.pr-tracker-api.environment.RUST_BACKTRACE = "1";

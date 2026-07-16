@@ -2,6 +2,7 @@
 {
   perSystem =
     {
+      system,
       nodeToApiTest,
       pkgs,
       ...
@@ -10,7 +11,6 @@
       checks."integration/api/tcp-db" = nodeToApiTest "api with tcp db" (
         let
           inherit (pkgs)
-            system
             writeText
             ;
           dbPass = "api-db-secret";

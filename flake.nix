@@ -1,4 +1,8 @@
 {
+  nixConfig = {
+    abort-on-warn = true;
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nci = {

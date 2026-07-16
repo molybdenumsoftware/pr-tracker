@@ -4,7 +4,7 @@ let
 in
 {
   perSystem =
-    { pkgs, ... }:
+    { system, pkgs, ... }:
     {
       checks."integration/create-locally" = pkgs.testers.nixosTest {
         name = "db.createLocally";
@@ -13,7 +13,6 @@ in
           { pkgs, ... }:
           let
             inherit (pkgs)
-              system
               writeText
               ;
           in

@@ -3,6 +3,7 @@
   perSystem =
     {
       nodeToFetcherTest,
+      system,
       pkgs,
       ...
     }:
@@ -10,7 +11,6 @@
       checks."integration/fetcher/default-package" = nodeToFetcherTest "fetcher with default package" (
         let
           inherit (pkgs)
-            system
             writeText
             ;
           pgPort = 5432;

@@ -3,6 +3,7 @@
   perSystem =
     {
       nodeToFetcherTest,
+      system,
       pkgs,
       ...
     }:
@@ -10,7 +11,6 @@
       checks."integration/fetcher/tcp-db" = nodeToFetcherTest "fetcher with tcp db" (
         let
           inherit (pkgs)
-            system
             writeText
             ;
 
