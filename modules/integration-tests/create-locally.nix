@@ -6,7 +6,7 @@ in
   perSystem =
     { pkgs, ... }:
     {
-      checks."integration/create-locally" = pkgs.nixosTest {
+      checks."integration/create-locally" = pkgs.testers.nixosTest {
         name = "db.createLocally";
 
         nodes.pr_tracker =

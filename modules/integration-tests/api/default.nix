@@ -4,7 +4,7 @@
     {
       _module.args.nodeToApiTest =
         name: node:
-        pkgs.nixosTest {
+        pkgs.testers.nixosTest {
           inherit name;
 
           nodes.pr_tracker_api = node;

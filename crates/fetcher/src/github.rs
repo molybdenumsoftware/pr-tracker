@@ -100,7 +100,7 @@ impl GithubClient for GitHubGraphqlClient {
         let repository = data
             .repository
             .as_ref()
-            .context(format!("data with no repo\n{:#?}", &resp))?;
+            .context(format!("data with no repo\n{resp:#?}"))?;
         let nodes = repository
             .pull_requests
             .nodes

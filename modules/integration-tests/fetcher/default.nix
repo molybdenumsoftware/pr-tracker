@@ -5,7 +5,7 @@
     {
       _module.args.nodeToFetcherTest =
         name: node:
-        pkgs.nixosTest {
+        pkgs.testers.nixosTest {
           inherit name;
 
           nodes.pr_tracker_fetcher = node;
