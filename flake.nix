@@ -5,8 +5,10 @@
     nci.inputs.nixpkgs.follows = "nixpkgs";
     nci.inputs.parts.follows = "flake-parts";
     nci.inputs.treefmt.follows = "treefmt-nix";
-    devshell.inputs.nixpkgs.follows = "nixpkgs";
-    devshell.url = "github:numtide/devshell";
+    devshell = {
+      url = "github:numtide/devshell";
+      flake = false;
+    };
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     flake-parts.url = "github:hercules-ci/flake-parts";
     git-hooks-nix.url = "github:cachix/git-hooks.nix";
