@@ -1,4 +1,5 @@
 {
+  inputs,
   lib,
   self,
   ...
@@ -14,14 +15,14 @@
     let
       filterOptions = import ../filterOptions.nix lib;
 
-      configuration = lib.nixosSystem {
-        modules = [
-          self.nixosModules.api
-          self.nixosModules.fetcher
-          {
-            nixpkgs.hostPlatform = system;
-          }
-        ];
+      configuration = import "${inputs.nixpkgs}/nixos" {
+        inherit system;
+        configuration = {
+          imports = [
+            self.nixosModules.api
+            self.nixosModules.fetcher
+          ];
+        };
       };
 
       options = filterOptions (
