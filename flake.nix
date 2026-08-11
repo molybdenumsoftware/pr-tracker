@@ -1,4 +1,6 @@
 {
+  outputs = inputs: import ./outputs.nix inputs;
+
   nixConfig = {
     abort-on-warn = true;
   };
@@ -36,6 +38,4 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-
-  outputs = inputs: import ./outputs.nix inputs;
 }
