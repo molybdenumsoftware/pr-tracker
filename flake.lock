@@ -124,6 +124,21 @@
         "type": "github"
       }
     },
+    "import-tree": {
+      "locked": {
+        "lastModified": 1784254960,
+        "narHash": "sha256-iI88R3wHz8wTKQb5orvpc51L/Xr64AJyxid/0MKa/b8=",
+        "owner": "denful",
+        "repo": "import-tree",
+        "rev": "4ebb10ae17d5f1ad366e7aef5b92cb8eecf24f69",
+        "type": "github"
+      },
+      "original": {
+        "owner": "denful",
+        "repo": "import-tree",
+        "type": "github"
+      }
+    },
     "mk-naked-shell": {
       "flake": false,
       "locked": {
@@ -238,6 +253,7 @@
         "flake-parts": "flake-parts",
         "git-hooks-nix": "git-hooks-nix",
         "github-graphql-schema": "github-graphql-schema",
+        "import-tree": "import-tree",
         "nci": "nci",
         "nixpkgs": "nixpkgs",
         "systems": "systems",

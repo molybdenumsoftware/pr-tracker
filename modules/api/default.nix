@@ -6,7 +6,6 @@
   ...
 }:
 {
-  imports = [ ./nixos-module.nix ];
 
   _module.args.api.environmentVariables = lib.mapAttrs (name: v: v // { inherit name; }) {
     PR_TRACKER_API_DATABASE_URL = {

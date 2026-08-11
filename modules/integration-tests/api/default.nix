@@ -18,8 +18,4 @@
           '';
         };
     };
-  imports = [
-    ./default-package.nix
-    ./tcp-db.nix
-  ];
 }
