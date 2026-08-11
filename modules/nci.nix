@@ -37,16 +37,15 @@
     };
 
     perSystem =
-      {
+      psArgs@{
         pkgs,
-        config,
         ...
       }:
       {
         nci.projects.default = {
           path = lib.fileset.toSource {
             root = ../.;
-            fileset = config.nci.projects.default.fileset;
+            fileset = psArgs.config.nci.projects.default.fileset;
           };
 
           fileset = lib.fileset.unions (
@@ -86,7 +85,7 @@
         };
         treefmt.programs.rustfmt = {
           enable = true;
-          package = config.nci.toolchains.mkBuild pkgs;
+          package = psArgs.config.nci.toolchains.mkBuild pkgs;
         };
       };
   };

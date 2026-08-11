@@ -58,9 +58,8 @@
   };
 
   perSystem =
-    {
+    psArgs@{
       self',
-      config,
       pkgs,
       writeEnvironmentStructFile,
       ...
@@ -100,10 +99,10 @@
         };
       };
 
-      packages.fetcher = config.nci.outputs.pr-tracker-fetcher.packages.release;
+      packages.fetcher = psArgs.config.nci.outputs.pr-tracker-fetcher.packages.release;
       checks = {
         "packages/fetcher" = self'.packages.fetcher;
-        "packages/fetcher/clippy" = config.nci.outputs.pr-tracker-fetcher.clippy;
+        "packages/fetcher/clippy" = psArgs.config.nci.outputs.pr-tracker-fetcher.clippy;
       };
     };
 }
