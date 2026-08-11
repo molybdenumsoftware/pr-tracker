@@ -1,5 +1,9 @@
 { inputs, ... }:
 {
+  flake-file.inputs.devshell = {
+    url = "github:numtide/devshell";
+    flake = false;
+  };
   imports = [
     "${inputs.devshell}/flake-module.nix"
   ];

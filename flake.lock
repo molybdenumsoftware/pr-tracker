@@ -72,6 +72,21 @@
         "type": "github"
       }
     },
+    "flake-file": {
+      "locked": {
+        "lastModified": 1785282747,
+        "narHash": "sha256-ZwdMXUu0Udb4yzI65+psyJeUF+wexByNEvTUSx1xjVs=",
+        "owner": "denful",
+        "repo": "flake-file",
+        "rev": "56c46842d70754345c4a4581b8cbebe87b8fc067",
+        "type": "github"
+      },
+      "original": {
+        "owner": "denful",
+        "repo": "flake-file",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -250,6 +265,7 @@
     "root": {
       "inputs": {
         "devshell": "devshell",
+        "flake-file": "flake-file",
         "flake-parts": "flake-parts",
         "git-hooks-nix": "git-hooks-nix",
         "github-graphql-schema": "github-graphql-schema",

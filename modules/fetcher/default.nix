@@ -8,6 +8,11 @@
 }:
 {
 
+  flake-file.inputs.github-graphql-schema = {
+    url = "github:octokit/graphql-schema";
+    flake = false;
+  };
+
   _module.args.fetcher.environmentVariables = lib.mapAttrs (name: v: v // { inherit name; }) {
     PR_TRACKER_FETCHER_DATABASE_URL = {
       description = "${psqlConnectionUriMdLink}.";
