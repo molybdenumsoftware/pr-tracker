@@ -16,10 +16,7 @@
       url = "github:denful/flake-file";
       flake = false;
     };
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
+    flake-parts.url = "github:hercules-ci/flake-parts";
     git-hooks-nix = {
       url = "github:cachix/git-hooks.nix";
       flake = false;
