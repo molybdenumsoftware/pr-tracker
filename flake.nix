@@ -28,7 +28,10 @@
       url = "github:octokit/graphql-schema";
       flake = false;
     };
-    import-tree.url = "github:denful/import-tree";
+    import-tree = {
+      url = "github:denful/import-tree";
+      flake = false;
+    };
     nci = {
       url = "github:yusdacra/nix-cargo-integration";
       inputs = {

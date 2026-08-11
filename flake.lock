@@ -141,6 +141,7 @@
       }
     },
     "import-tree": {
+      "flake": false,
       "locked": {
         "lastModified": 1784254960,
         "narHash": "sha256-iI88R3wHz8wTKQb5orvpc51L/Xr64AJyxid/0MKa/b8=",

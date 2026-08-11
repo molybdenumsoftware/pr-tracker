@@ -9,7 +9,10 @@
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
-    import-tree.url = "github:denful/import-tree";
+    import-tree = {
+      url = "github:denful/import-tree";
+      flake = false;
+    };
   };
 
   imports = [ (import "${inputs.flake-file}/modules").flakeModules.default ];
