@@ -38,30 +38,27 @@
 
   outputs =
     inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } (
-      { inputs, ... }:
-      {
-        systems = import inputs.systems;
-        imports = [
-          ./modules/api
-          ./modules/db-context.nix
-          ./modules/dev-shell.nix
-          ./modules/fetcher
-          ./modules/filter-options.nix
-          ./modules/formatting.nix
-          ./modules/integration-tests
-          ./modules/manual.nix
-          ./modules/prior-art.nix
-          ./modules/introduction.nix
-          ./modules/vision.nix
-          ./modules/nci.nix
-          ./modules/nixos-modules-lib.nix
-          ./modules/private-nixos-modules
-          ./modules/release
-          ./modules/store.nix
-          ./modules/util.nix
-          ./modules/git-hooks.nix
-        ];
-      }
-    );
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [
+        ./modules/api
+        ./modules/db-context.nix
+        ./modules/dev-shell.nix
+        ./modules/fetcher
+        ./modules/filter-options.nix
+        ./modules/formatting.nix
+        ./modules/integration-tests
+        ./modules/manual.nix
+        ./modules/prior-art.nix
+        ./modules/introduction.nix
+        ./modules/vision.nix
+        ./modules/nci.nix
+        ./modules/nixos-modules-lib.nix
+        ./modules/private-nixos-modules
+        ./modules/release
+        ./modules/store.nix
+        ./modules/util.nix
+        ./modules/git-hooks.nix
+        ./modules/systems.nix
+      ];
+    };
 }
