@@ -12,7 +12,10 @@
       url = "github:numtide/devshell";
       flake = false;
     };
-    flake-file.url = "github:denful/flake-file";
+    flake-file = {
+      url = "github:denful/flake-file";
+      flake = false;
+    };
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";

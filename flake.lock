@@ -73,6 +73,7 @@
       }
     },
     "flake-file": {
+      "flake": false,
       "locked": {
         "lastModified": 1785282747,
         "narHash": "sha256-ZwdMXUu0Udb4yzI65+psyJeUF+wexByNEvTUSx1xjVs=",
