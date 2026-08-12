@@ -4,7 +4,7 @@
     { pkgs, ... }:
     {
       treefmt.settings.global.excludes = [ "crates/store/.sqlx/*" ];
-      nci.projects.default.fileset = ../crates/store/.sqlx;
+      fileset = ../crates/store/.sqlx;
 
       devshells.default = {
         env = lib.attrsToList {
