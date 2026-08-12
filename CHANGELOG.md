@@ -1,3 +1,10 @@
+## [7.5.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.4.0...v7.5.0) (2026-08-12)
+
+
+### Features
+
+* **fetcher:** some update_prs logging ([129fdb6](https://github.com/molybdenumsoftware/pr-tracker/commit/129fdb669b340a4a3971b0142ced4e45e4c89b97))
+
 ## [7.4.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.3.1...v7.4.0) (2025-11-02)
 
 
