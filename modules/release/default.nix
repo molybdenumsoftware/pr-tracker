@@ -47,13 +47,15 @@
         };
       };
 
-      apps.bump-version = {
-        type = "app";
-        program = lib.getExe bump-version;
-      };
-      apps.release = {
-        type = "app";
-        program = lib.getExe release;
+      apps = {
+        bump-version = {
+          type = "app";
+          program = lib.getExe bump-version;
+        };
+        release = {
+          type = "app";
+          program = lib.getExe release;
+        };
       };
 
       treefmt.settings.global.excludes = [

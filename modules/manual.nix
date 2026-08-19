@@ -32,7 +32,7 @@
       optionsDocs = pkgs.buildPackages.nixosOptionsDoc {
         inherit options;
         variablelistId = "options";
-        transformOptions = options: builtins.removeAttrs options [ "declarations" ];
+        transformOptions = options: removeAttrs options [ "declarations" ];
       };
 
       optionsMd =
@@ -65,30 +65,28 @@
       mkChapterLink = { title, basename, ... }: "[${title}](${basename}.md)";
     in
     {
-      options = {
-        chapters = lib.mkOption {
-          type = lib.types.lazyAttrsOf (
-            lib.types.submodule (
-              { name, ... }:
-              {
-                options = {
-                  title = lib.mkOption {
-                    type = lib.types.str;
-                  };
-
-                  basename = lib.mkOption {
-                    type = lib.types.str;
-                    default = name;
-                  };
-
-                  drv = lib.mkOption {
-                    type = lib.types.package;
-                  };
+      options.chapters = lib.mkOption {
+        type = lib.types.lazyAttrsOf (
+          lib.types.submodule (
+            { name, ... }:
+            {
+              options = {
+                title = lib.mkOption {
+                  type = lib.types.str;
                 };
-              }
-            )
-          );
-        };
+
+                basename = lib.mkOption {
+                  type = lib.types.str;
+                  default = name;
+                };
+
+                drv = lib.mkOption {
+                  type = lib.types.package;
+                };
+              };
+            }
+          )
+        );
       };
       config = {
         chapters = {
@@ -97,7 +95,6 @@
             drv = optionsMd;
           };
         };
-
         packages.manual =
           pkgs.runCommand "pr-tracker-nixos-manual"
             {
@@ -126,7 +123,6 @@
 
               mdbook build --dest-dir $out
             '';
-
         checks."packages/manual" = self'.packages.manual;
       };
     };

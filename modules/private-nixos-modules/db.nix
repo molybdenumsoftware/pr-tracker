@@ -1,20 +1,12 @@
-{ moduleLocation, ... }:
+{ moduleLocation, lib, ... }:
 {
   _module.args.privateNixosModules.db =
     {
-      lib,
       config,
       options,
       ...
     }:
     let
-      inherit (lib)
-        flatten
-        hasAttr
-        mkIf
-        mkOption
-        types
-        ;
 
       cfg = config.services.pr-tracker;
 
@@ -28,24 +20,25 @@
       key = "${moduleLocation}#db";
       _file = "${moduleLocation}#db";
 
-      options.services.pr-tracker.db.createLocally = mkOption {
-        type = types.bool;
-        description = "Whether to create a local database automatically.";
-        default = false;
+      options.services.pr-tracker.db = {
+        createLocally = lib.mkOption {
+          type = lib.types.bool;
+          description = "Whether to create a local database automatically.";
+          default = false;
+        };
+        name = lib.mkOption {
+          type = lib.types.str;
+          description = "Automatically created local database name.";
+          default = "pr-tracker";
+        };
       };
 
-      options.services.pr-tracker.db.name = mkOption {
-        type = types.str;
-        description = "Automatically created local database name.";
-        default = "pr-tracker";
-      };
-
-      config = mkIf cfg.db.createLocally {
-        assertions = flatten (
+      config = lib.mkIf cfg.db.createLocally {
+        assertions = lib.flatten (
           map (
             program:
             let
-              programEnabled = hasAttr program cfg && programCfg.enable;
+              programEnabled = lib.hasAttr program cfg && programCfg.enable;
               programCfg = cfg.${program};
               urlParams = programCfg.db.urlParams;
               socketHost = "/run/postgresql";
@@ -76,15 +69,19 @@
           ) programs
         );
 
-        services.postgresql.enable = true;
-        services.postgresql.ensureDatabases = [ cfg.db.name ];
-        services.postgresql.ensureUsers = [
-          {
-            name = cfg.db.name;
-            ensureClauses.login = false;
-            ensureDBOwnership = true;
-          }
-        ];
+        services = {
+          postgresql = {
+            enable = true;
+            ensureDatabases = [ cfg.db.name ];
+            ensureUsers = [
+              {
+                name = cfg.db.name;
+                ensureClauses.login = false;
+                ensureDBOwnership = true;
+              }
+            ];
+          };
+        };
       };
 
       imports = map (
@@ -93,7 +90,7 @@
           programCfg = cfg.${program};
         in
         {
-          config = mkIf (cfg.db.createLocally && hasAttr program cfg && programCfg.enable) {
+          config = lib.mkIf (cfg.db.createLocally && lib.hasAttr program cfg && programCfg.enable) {
             services.postgresql.ensureUsers = [ { name = programCfg.user; } ];
             systemd.services.postgresql-setup.postStart = ''
               psql '${cfg.db.name}' -c 'GRANT "${cfg.db.name}" TO "${programCfg.user}"'
