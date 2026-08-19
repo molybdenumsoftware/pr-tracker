@@ -61,13 +61,9 @@
         };
       };
 
-      nci = {
-        crates = {
-          pr-tracker-api.drvConfig = {
-            mkDerivation.meta.mainProgram = "pr-tracker-api";
-            env.api_config_snippet = writeEnvironmentStructFile "api" api.environmentVariables;
-          };
-        };
+      nci.crates.pr-tracker-api.drvConfig = {
+        mkDerivation.meta.mainProgram = "pr-tracker-api";
+        env.api_config_snippet = writeEnvironmentStructFile "api" api.environmentVariables;
       };
       packages.api = psArgs.config.nci.outputs.pr-tracker-api.packages.release;
       checks = {
