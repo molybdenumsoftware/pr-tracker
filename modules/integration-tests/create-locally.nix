@@ -9,7 +9,7 @@ in
       checks."integration/create-locally" = pkgs.testers.nixosTest {
         name = "db.createLocally";
 
-        nodes.pr_tracker =
+        nodes.pr-tracker =
           { pkgs, ... }:
           {
             imports = [

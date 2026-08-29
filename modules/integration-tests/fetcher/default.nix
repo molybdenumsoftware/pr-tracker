@@ -7,7 +7,7 @@
         pkgs.testers.nixosTest {
           inherit name;
 
-          nodes.pr_tracker_fetcher = node;
+          nodes.pr-tracker-fetcher = node;
 
           testScript = ''
             pr_tracker_fetcher.start()
