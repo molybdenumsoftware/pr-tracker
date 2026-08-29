@@ -69,7 +69,11 @@ impl DatabaseContext {
             }
         }
 
-        let status = initdb.arg(&data_dir).status().unwrap();
+        let status = initdb
+            .arg(&data_dir)
+            .args(["--auth", "trust"])
+            .status()
+            .unwrap();
 
         assert!(status.success());
 
