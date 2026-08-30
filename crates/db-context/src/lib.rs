@@ -114,7 +114,7 @@ impl DatabaseContext {
         let host = Self::sockets_dir(self.tmp_dir.path().try_into().unwrap());
         let port = Self::PORT;
 
-        format!("postgresql:///{dbname}?host={host}&port={port}")
+        format!("postgresql://{dbname}?host={host}&port={port}")
     }
 
     pub fn kill_db(&mut self) -> std::io::Result<()> {
