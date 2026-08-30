@@ -22,6 +22,7 @@ impl DatabaseContext {
     // Will not be used as port, but as part of socket filename.
     // See `listen_addresses` below.
     const PORT: &'static str = "1";
+    const USER: &'static str = "postgres";
 
     pub async fn connection(&self) -> Result<PgConnection, sqlx::Error> {
         let url = self.db_url();
@@ -71,7 +72,7 @@ impl DatabaseContext {
 
         let status = initdb
             .arg(&data_dir)
-            .args(["--auth", "trust"])
+            .args(["--auth", "trust", "--username", Self::USER])
             .status()
             .unwrap();
 
@@ -113,8 +114,9 @@ impl DatabaseContext {
         let dbname = "postgres";
         let host = Self::sockets_dir(self.tmp_dir.path().try_into().unwrap());
         let port = Self::PORT;
+        let user = Self::USER;
 
-        format!("postgresql://{dbname}?host={host}&port={port}")
+        format!("postgresql://{dbname}?host={host}&port={port}&user={user}")
     }
 
     pub fn kill_db(&mut self) -> std::io::Result<()> {
