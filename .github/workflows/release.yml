@@ -26,6 +26,6 @@ jobs:
         with:
           app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.PRIVATE_KEY }}
-      - run: nix run .#release
+      - run: nix run --accept-flake-config .#release
         env:
           GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
