@@ -18,11 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@master
-        with:
-          nix_conf: |
-            keep-env-derivations = true
-            keep-outputs = true
+      - uses: NixOS/nix-installer-action@main
       - uses: nix-community/cache-nix-action@main
         with:
           primary-key: a-single-key
