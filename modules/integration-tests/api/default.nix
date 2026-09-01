@@ -7,7 +7,7 @@
         pkgs.testers.nixosTest {
           inherit name;
 
-          nodes.pr-tracker-api = node;
+          containers.pr-tracker-api = node;
 
           testScript = ''
             pr_tracker_api.start()
