@@ -8,8 +8,8 @@ async fn main() {
             let pool = ctx.pool().await.unwrap();
             util::migrate(&pool).await.unwrap();
 
-            let status = Command::new("cargo")
-                .args(["sqlx", "prepare", "--database-url"])
+            let status = Command::new("sqlx")
+                .args(["prepare", "--database-url"])
                 .arg(ctx.db_url())
                 .current_dir(env!("STORE_CRATE_PATH"))
                 .status()
