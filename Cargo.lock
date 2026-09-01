@@ -2385,6 +2385,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b4baf93f58d4425749ca49a51c50ebab072c5df6994d08fed93541c331481dc"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2859,7 +2868,7 @@ dependencies = [
  "derive_more",
  "futures-util",
  "indexmap 2.7.0",
- "itertools",
+ "itertools 0.14.0",
  "mime",
  "num-traits",
  "poem",
@@ -2940,7 +2949,7 @@ dependencies = [
  "serde_with",
  "sqlx",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.9",
  "tokio",
  "tracing-subscriber",
  "util",
@@ -2959,7 +2968,7 @@ dependencies = [
  "env_logger",
  "gix",
  "graphql_client",
- "itertools",
+ "itertools 0.15.0",
  "log",
  "once_cell",
  "pr-tracker-store",
@@ -2980,7 +2989,7 @@ dependencies = [
  "derive_more",
  "getset",
  "sqlx",
- "thiserror 1.0.69",
+ "thiserror 2.0.9",
 ]
 
 [[package]]
