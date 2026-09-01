@@ -26,20 +26,14 @@ in
                   enable = true;
                   port = apiPort;
 
-                  package =
-                    (self.packages.${system}.api.extendModules {
-                      modules = [ { mkDerivation.dontStrip = true; } ];
-                    }).config.public;
+                  package = self.packages.${system}.api;
 
                 };
 
                 fetcher = {
                   enable = true;
 
-                  package =
-                    (self.packages.${system}.fetcher.extendModules {
-                      modules = [ { mkDerivation.dontStrip = true; } ];
-                    }).config.public;
+                  package = self.packages.${system}.fetcher;
 
                   onCalendar = "*:*:*"; # every single second
                   githubApiTokenFile = pkgs.writeText "gh-auth-token" "hunter2";

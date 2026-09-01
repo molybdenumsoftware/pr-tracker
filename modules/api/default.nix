@@ -61,14 +61,13 @@
         };
       };
 
-      nci.crates.pr-tracker-api.drvConfig = {
-        mkDerivation.meta.mainProgram = "pr-tracker-api";
+      defaultCrateOverrides.pr-tracker-api = attrs: {
+        meta.mainProgram = "pr-tracker-api";
         env.api_config_snippet = writeEnvironmentStructFile "api" api.environmentVariables;
       };
-      packages.api = psArgs.config.nci.outputs.pr-tracker-api.packages.release;
+      packages.api = psArgs.config.crate2nix.workspace.workspaceMembers.pr-tracker-api.build;
       checks = {
         "packages/api" = self'.packages.api;
-        "packages/api/clippy" = psArgs.config.nci.outputs.pr-tracker-api.clippy;
       };
     };
 }
