@@ -11,7 +11,7 @@ async fn main() {
             let status = Command::new("sqlx")
                 .args(["prepare", "--database-url"])
                 .arg(ctx.db_url())
-                .current_dir(env!("STORE_CRATE_PATH"))
+                .current_dir(env!("CARGO_MANIFEST_DIR"))
                 .status()
                 .unwrap();
 
