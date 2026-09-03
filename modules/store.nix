@@ -22,7 +22,7 @@
             package = pkgs.writeShellApplication {
               name = "util-sqlx-prepare";
               runtimeInputs = [ pkgs.sqlx-cli ];
-              text = "exec cargo run --package util --bin sqlx-prepare";
+              text = "exec cargo run --package pr-tracker-store --bin sqlx-prepare";
             };
             help = "Update query metadata. See https://github.com/launchbadge/sqlx/blob/v0.8.2/sqlx-cli/README.md#enable-building-in-offline-mode-with-query";
           }
