@@ -69,6 +69,7 @@
         {
           package = pkgs.writeShellApplication {
             name = "util-db-repl";
+            runtimeInputs = [ pkgs.postgresql ];
             text = "exec cargo run --package util --bin db-repl";
           };
           help = "Start a psql repl connected to a database with migrations applied.";
