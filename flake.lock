@@ -141,11 +141,11 @@
     "import-tree": {
       "flake": false,
       "locked": {
-        "lastModified": 1788210572,
-        "narHash": "sha256-iDArQutSbrjtMQLUIc32iSb6tFqjl6IJU3cA8p8isuM=",
+        "lastModified": 1788467110,
+        "narHash": "sha256-ljEMTXP/rH0tOvDzc9gzwww6KcHRPRnEHzd9lK48V7s=",
         "owner": "denful",
         "repo": "import-tree",
-        "rev": "8961e2418a12a71e08943c9f3d8cf6dbbc3cd172",
+        "rev": "eb1b52eaecc57f7c136d07ae8a93e724dfecac46",
         "type": "github"
       },
       "original": {
