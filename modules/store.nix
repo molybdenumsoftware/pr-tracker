@@ -4,7 +4,10 @@
     { pkgs, ... }:
     {
       treefmt.settings.global.excludes = [ ".sqlx/*" ];
-      fileset = ../.sqlx;
+      fileset = lib.fileset.unions [
+        ../.sqlx
+        ../migrations
+      ];
 
       devshells.default = {
         env = lib.attrsToList {
