@@ -3,8 +3,8 @@
   perSystem =
     { pkgs, ... }:
     {
-      treefmt.settings.global.excludes = [ "crates/store/.sqlx/*" ];
-      fileset = ../crates/store/.sqlx;
+      treefmt.settings.global.excludes = [ ".sqlx/*" ];
+      fileset = ../.sqlx;
 
       devshells.default = {
         env = lib.attrsToList {

@@ -9,9 +9,8 @@ async fn main() {
             util::migrate(&pool).await.unwrap();
 
             let status = Command::new("sqlx")
-                .args(["prepare", "--database-url"])
+                .args(["prepare", "--workspace", "--database-url"])
                 .arg(ctx.db_url())
-                .current_dir(env!("STORE_CRATE_PATH"))
                 .status()
                 .unwrap();
 
