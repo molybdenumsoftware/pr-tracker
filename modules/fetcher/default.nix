@@ -84,8 +84,8 @@
         };
       };
 
-      nci.crates.pr-tracker-fetcher.drvConfig = {
-        mkDerivation.meta.mainProgram = "pr-tracker-fetcher";
+      defaultCrateOverrides.pr-tracker-fetcher = attrs: {
+        meta.mainProgram = "pr-tracker-fetcher";
         env = {
           GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
           GIT = lib.getExe pkgs.git;
@@ -93,10 +93,9 @@
         };
       };
 
-      packages.fetcher = psArgs.config.nci.outputs.pr-tracker-fetcher.packages.release;
+      packages.fetcher = psArgs.config.crate2nix.workspace.workspaceMembers.pr-tracker-fetcher.build;
       checks = {
         "packages/fetcher" = self'.packages.fetcher;
-        "packages/fetcher/clippy" = psArgs.config.nci.outputs.pr-tracker-fetcher.clippy;
       };
     };
 }

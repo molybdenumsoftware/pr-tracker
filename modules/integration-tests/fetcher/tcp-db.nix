@@ -48,10 +48,9 @@
               fetcher = {
                 enable = true;
 
-                package =
-                  (self.packages.${system}.fetcher.extendModules {
-                    modules = [ { mkDerivation.dontStrip = true; } ];
-                  }).config.public;
+                package = self.packages.${system}.fetcher.override {
+                  crateOverrides.dontStrip = true;
+                };
 
                 user = user;
 

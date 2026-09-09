@@ -8,6 +8,10 @@
   };
 
   inputs = {
+    crate2nix = {
+      url = "github:nix-community/crate2nix";
+      flake = false;
+    };
     devshell = {
       url = "github:numtide/devshell";
       flake = false;
@@ -28,14 +32,6 @@
     import-tree = {
       url = "github:denful/import-tree";
       flake = false;
-    };
-    nci = {
-      url = "github:yusdacra/nix-cargo-integration";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        parts.follows = "flake-parts";
-        treefmt.follows = "treefmt-nix";
-      };
     };
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     systems = {

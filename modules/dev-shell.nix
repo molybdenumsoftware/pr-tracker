@@ -8,7 +8,6 @@
     "${inputs.devshell}/flake-module.nix"
   ];
   perSystem = psArgs: {
-    nci.projects.default.numtideDevshell = "default";
     checks.devshell = psArgs.config.devShells.default;
   };
 }
