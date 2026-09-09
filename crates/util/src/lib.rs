@@ -7,5 +7,5 @@ where
     A: sqlx::Acquire<'a>,
     <A::Connection as Deref>::Target: Migrate,
 {
-    sqlx::migrate!("./migrations").run(migrator).await
+    sqlx::migrate!("../../migrations").run(migrator).await
 }
