@@ -1,4 +1,9 @@
-{ lib, inputs, ... }:
+{
+  lib,
+  inputs,
+  config,
+  ...
+}:
 {
   perSystem =
     psArgs@{ pkgs, ... }:
@@ -20,9 +25,9 @@
           type = lib.types.package;
           default = pkgs.rustPlatform.buildRustPackage (finalAttrs: {
             pname = "pr-tracker";
-            inherit ((lib.importTOML ../Cargo.toml).workspace.package) version;
+            inherit ((lib.importTOML (config.projectRoot + "/Cargo.toml")).workspace.package) version;
             src = lib.fileset.toSource {
-              root = ../.;
+              root = config.projectRoot;
               fileset = lib.fileset.unions [
                 (lib.fileset.fileFilter (
                   file:
@@ -30,7 +35,7 @@
                     "Cargo.toml"
                     "Cargo.lock"
                   ]
-                ) ../.)
+                ) config.projectRoot)
                 (lib.fileset.fileFilter (
                   file:
                   lib.any file.hasExt [
@@ -38,11 +43,11 @@
                     "graphql"
                     "sql"
                   ]
-                ) ../.)
-                ../.sqlx
+                ) config.projectRoot)
+                (config.projectRoot + "/.sqlx")
               ];
             };
-            cargoLock.lockFile = ../Cargo.lock;
+            cargoLock.lockFile = (config.projectRoot + "/Cargo.lock");
             buildType = "debug";
             env = psArgs.config.env // {
               CARGO_BUILD_WARNINGS = "deny";

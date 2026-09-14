@@ -1,4 +1,4 @@
-{ lib, ... }: {
+{ lib, config, ... }: {
   perSystem =
     {
       pkgs,
@@ -7,7 +7,7 @@
     let
       filterOptionsCheck =
         let
-          subject = import ../filterOptions.nix lib;
+          subject = import (config.projectRoot + "/filterOptions.nix") lib;
 
           tests.testEmpty = {
             expr = subject (p: o: true) { };

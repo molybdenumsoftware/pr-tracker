@@ -4,13 +4,14 @@
   privateNixosModules,
   api,
   lib,
+  config,
   ...
 }:
 {
   flake.nixosModules.api =
     nixosArgs@{ pkgs, ... }:
     let
-      attrsToURLParams = import ../../attrsToURLParams.nix lib;
+      attrsToURLParams = import (config.projectRoot + "/attrsToURLParams.nix") lib;
       nixosModuleLib = mkNixosModuleLib {
         inherit (nixosArgs) options config;
       };
