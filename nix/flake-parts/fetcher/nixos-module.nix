@@ -11,7 +11,7 @@
   flake.nixosModules.fetcher =
     nixosArgs@{ pkgs, ... }:
     let
-      attrsToURLParams = import (config.projectRoot + "/attrsToURLParams.nix") lib;
+      attrsToURLParams = import (config.projectRoot + "/nix/attrsToURLParams.nix") lib;
       nixosModuleLib = mkNixosModuleLib {
         inherit (nixosArgs) options config;
       };

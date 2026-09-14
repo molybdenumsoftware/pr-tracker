@@ -14,7 +14,7 @@
       ...
     }:
     let
-      filterOptions = import (config.projectRoot + "/filterOptions.nix") lib;
+      filterOptions = import (config.projectRoot + "/nix/filterOptions.nix") lib;
 
       configuration = import "${inputs.nixpkgs}/nixos" {
         inherit system;

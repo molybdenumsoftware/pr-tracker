@@ -1,7 +1,7 @@
 # DO-NOT-EDIT. This file was auto-generated using github:vic/flake-file.
 # Use `nix run .#write-flake` to regenerate it.
 {
-  outputs = inputs: import ./outputs.nix inputs;
+  outputs = inputs: import ./nix/outputs.nix inputs;
 
   nixConfig = {
     abort-on-warn = true;

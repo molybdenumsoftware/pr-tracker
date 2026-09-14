@@ -7,7 +7,7 @@
     let
       filterOptionsCheck =
         let
-          subject = import (config.projectRoot + "/filterOptions.nix") lib;
+          subject = import (config.projectRoot + "/nix/filterOptions.nix") lib;
 
           tests.testEmpty = {
             expr = subject (p: o: true) { };
