@@ -19,6 +19,7 @@
           enable = true;
           all = true;
         };
+        rustfmt.enable = true;
       };
     };
   };
