@@ -11,24 +11,9 @@
       };
     };
 
-    config.fileset = lib.fileset.unions (
-      [
-        ../Cargo.toml
-        ../Cargo.lock
-      ]
-      ++ (lib.pipe ../crates [
-        builtins.readDir
-        (lib.filterAttrs (name: type: type == "directory"))
-        (lib.mapAttrsToList (
-          name: type: [
-            (../crates + "/${name}/Cargo.toml")
-            (lib.fileset.maybeMissing (../crates + "/${name}/build.rs"))
-            (../crates + "/${name}/src")
-          ]
-        ))
-        lib.flatten
-      ])
-    );
+    config.fileset = lib.fileset.fileFilter (
+      file: file.name == "Cargo.toml" || file.name == "Cargo.lock" || file.hasExt "rs"
+    ) ../.;
   };
 
 }
