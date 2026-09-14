@@ -1,11 +1,19 @@
-{ lib, ... }:
+{ lib, inputs, ... }:
 {
   perSystem =
     psArgs@{ pkgs, ... }:
     {
       options = {
         env = lib.mkOption {
+          readOnly = true;
           type = lib.types.lazyAttrsOf (lib.types.either lib.types.str lib.types.package);
+          default = {
+            CARGO_BUILD_WARNINGS = "deny";
+            GIT = lib.getExe pkgs.gitMinimal;
+            POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
+            POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
+            GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
+          };
         };
         package = lib.mkOption {
           readOnly = true;
