@@ -86,19 +86,14 @@
         };
       };
 
-      nci.crates.pr-tracker-fetcher.drvConfig = {
-        mkDerivation.meta.mainProgram = "pr-tracker-fetcher";
-        env = {
-          GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
-          GIT = lib.getExe pkgs.git;
-          fetcher_config_snippet = writeEnvironmentStructFile "fetcher" fetcher.environmentVariables;
-        };
+      env = {
+        GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
+        GIT = lib.getExe pkgs.git;
+        fetcher_config_snippet = writeEnvironmentStructFile "fetcher" fetcher.environmentVariables;
       };
 
-      packages.fetcher = psArgs.config.nci.outputs.pr-tracker-fetcher.packages.release;
-      checks = {
-        "packages/fetcher" = self'.packages.fetcher;
-        "packages/fetcher/clippy" = psArgs.config.nci.outputs.pr-tracker-fetcher.clippy;
+      packages.fetcher = lib.recursiveUpdate psArgs.config.package {
+        meta.mainProgram = "pr-tracker-fetcher";
       };
     };
 }

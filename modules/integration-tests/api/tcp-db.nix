@@ -45,12 +45,6 @@
 
             pr-tracker.api = {
               enable = true;
-
-              package =
-                (self.packages.${system}.api.extendModules {
-                  modules = [ { mkDerivation.dontStrip = true; } ];
-                }).config.public;
-
               port = 7000;
               user = user;
 
