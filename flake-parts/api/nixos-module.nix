@@ -3,22 +3,19 @@
   moduleLocation,
   privateNixosModules,
   api,
+  lib,
   ...
 }:
 {
   flake.nixosModules.api =
-    {
-      lib,
-      pkgs,
-      config,
-      options,
-      ...
-    }:
+    nixosArgs@{ pkgs, ... }:
     let
       attrsToURLParams = import ../../attrsToURLParams.nix lib;
-      nixosModuleLib = mkNixosModuleLib { inherit options config; };
+      nixosModuleLib = mkNixosModuleLib {
+        inherit (nixosArgs) options config;
+      };
 
-      cfg = config.services.pr-tracker.api;
+      cfg = nixosArgs.config.services.pr-tracker.api;
     in
     {
       # https://github.com/NixOS/nixpkgs/issues/215496

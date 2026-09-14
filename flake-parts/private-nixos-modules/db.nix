@@ -1,14 +1,10 @@
 { moduleLocation, lib, ... }:
 {
   _module.args.privateNixosModules.db =
-    {
-      config,
-      options,
-      ...
-    }:
+    nixosArgs:
     let
 
-      cfg = config.services.pr-tracker;
+      cfg = nixosArgs.config.services.pr-tracker;
 
       programs = [
         "api"
@@ -42,7 +38,7 @@
               programCfg = cfg.${program};
               urlParams = programCfg.db.urlParams;
               socketHost = "/run/postgresql";
-              msgPrefix = "when `${options.services.pr-tracker.db.createLocally}` then ";
+              msgPrefix = "when `${nixosArgs.options.services.pr-tracker.db.createLocally}` then ";
             in
             [
               {
@@ -53,17 +49,18 @@
               {
                 assertion =
                   (programEnabled && cfg.db.createLocally) -> urlParams ? dbname && urlParams.dbname == cfg.db.name;
-                message = "${msgPrefix}`services.pr-tracker.${program}.db.urlParams.dbname` must equal `${options.services.pr-tracker.db.name}`";
+                message = "${msgPrefix}`services.pr-tracker.${program}.db.urlParams.dbname` must equal `${nixosArgs.options.services.pr-tracker.db.name}`";
               }
               {
                 assertion =
                   (programEnabled && cfg.db.createLocally)
-                  -> urlParams ? port && urlParams.port == toString config.services.postgresql.settings.port;
+                  ->
+                    urlParams ? port && urlParams.port == toString nixosArgs.config.services.postgresql.settings.port;
                 message = "${msgPrefix}`services.pr-tracker.${program}.db.urlParams.port` must be the stringified value of `services.postgresql.settings.port`";
               }
               {
                 assertion = (programEnabled && cfg.db.createLocally) -> programCfg.user != cfg.db.name;
-                message = "${msgPrefix}`services.pr-tracker.${program}.user` must be different from `${options.services.pr-tracker.db.name}`";
+                message = "${msgPrefix}`services.pr-tracker.${program}.user` must be different from `${nixosArgs.options.services.pr-tracker.db.name}`";
               }
             ]
           ) programs
