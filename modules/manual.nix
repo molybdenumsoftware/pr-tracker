@@ -123,7 +123,7 @@
 
               mdbook build --dest-dir $out
             '';
-        checks."packages/manual" = self'.packages.manual;
+        checks.manual = self'.packages.manual;
       };
     };
 }
