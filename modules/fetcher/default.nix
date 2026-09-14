@@ -88,7 +88,7 @@
 
       env = {
         GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
-        GIT = lib.getExe pkgs.git;
+        GIT = lib.getExe pkgs.gitMinimal;
       };
 
       files.file."crates/fetcher/config_snippet.rs".source =
