@@ -65,7 +65,6 @@
       ...
     }:
     {
-      fileset = ../../crates/fetcher/src/graphql;
 
       chapters.fetcher = {
         title = "Fetcher";

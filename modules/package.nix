@@ -23,7 +23,24 @@
             inherit ((lib.importTOML ../Cargo.toml).workspace.package) version;
             src = lib.fileset.toSource {
               root = ../.;
-              inherit (psArgs.config) fileset;
+              fileset = lib.fileset.unions [
+                (lib.fileset.fileFilter (
+                  file:
+                  lib.elem file.name [
+                    "Cargo.toml"
+                    "Cargo.lock"
+                  ]
+                ) ../.)
+                (lib.fileset.fileFilter (
+                  file:
+                  lib.any file.hasExt [
+                    "rs"
+                    "graphql"
+                    "sql"
+                  ]
+                ) ../.)
+                ../.sqlx
+              ];
             };
             cargoLock.lockFile = ../Cargo.lock;
             buildType = "debug";
