@@ -55,8 +55,8 @@
             '';
         };
 
-      fileset = ../migrations;
-      treefmt.settings.global.excludes = [ "migrations/*" ];
+      fileset = ../crates/util/migrations;
+      treefmt.settings.global.excludes = [ "crates/util/migrations/*" ];
       devshells.default.commands = [
         {
           package = pkgs.writeShellApplication {
