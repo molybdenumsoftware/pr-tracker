@@ -89,8 +89,10 @@
       env = {
         GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
         GIT = lib.getExe pkgs.git;
-        fetcher_config_snippet = writeEnvironmentStructFile "fetcher" fetcher.environmentVariables;
       };
+
+      files.file."crates/fetcher/config_snippet.rs".source =
+        writeEnvironmentStructFile "fetcher" fetcher.environmentVariables;
 
       packages.fetcher = lib.recursiveUpdate psArgs.config.package {
         meta.mainProgram = "pr-tracker-fetcher";

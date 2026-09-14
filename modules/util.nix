@@ -47,6 +47,8 @@
           text =
             # rust
             ''
+              // This file is generated
+
               /// See documentation for each field.
               #[derive(::std::fmt::Debug, ::confique::Config)]
               pub struct Environment {

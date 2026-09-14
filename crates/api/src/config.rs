@@ -5,7 +5,7 @@ use serde_with::DisplayFromStr;
 use serde_with::serde_as;
 use tracing_subscriber::EnvFilter;
 
-include!(env!("api_config_snippet"));
+include!("../config_snippet.rs");
 
 #[serde_as]
 #[derive(Deserialize, Debug)]

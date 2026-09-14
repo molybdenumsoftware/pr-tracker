@@ -12,6 +12,10 @@
       url = "github:numtide/devshell";
       flake = false;
     };
+    files = {
+      url = "github:mightyiam/files";
+      flake = false;
+    };
     flake-file = {
       url = "github:denful/flake-file";
       flake = false;

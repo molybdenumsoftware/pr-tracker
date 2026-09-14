@@ -61,7 +61,9 @@
         };
       };
 
-      env.api_config_snippet = writeEnvironmentStructFile "api" api.environmentVariables;
+      files.file."crates/api/config_snippet.rs".source =
+        writeEnvironmentStructFile "api" api.environmentVariables;
+
       packages.api = lib.recursiveUpdate psArgs.config.package { meta.mainProgram = "pr-tracker-api"; };
     };
 }
