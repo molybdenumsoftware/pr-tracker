@@ -21,6 +21,7 @@
         };
         rustfmt.enable = true;
         statix.enable = true;
+        nixf-diagnose.enable = true;
       };
     };
   };

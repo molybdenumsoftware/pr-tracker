@@ -35,7 +35,6 @@
   perSystem =
     psArgs@{
       pkgs,
-      self',
       writeEnvironmentStructFile,
       ...
     }:

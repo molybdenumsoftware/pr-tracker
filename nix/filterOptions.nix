@@ -1,7 +1,6 @@
 {
   concatMapAttrs,
   isOption,
-  traceVal,
   ...
 }:
 predicate: options:

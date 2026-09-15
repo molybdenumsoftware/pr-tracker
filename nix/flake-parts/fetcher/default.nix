@@ -1,6 +1,5 @@
 {
   lib,
-  inputs,
   fetcher,
   psqlConnectionUriMdLink,
   environmentVariablesToMarkdown,
@@ -59,7 +58,6 @@
 
   perSystem =
     psArgs@{
-      self',
       pkgs,
       writeEnvironmentStructFile,
       ...
