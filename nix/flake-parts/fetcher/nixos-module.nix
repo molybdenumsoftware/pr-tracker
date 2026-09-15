@@ -27,7 +27,7 @@
 
       options.services.pr-tracker.fetcher = {
         enable = lib.mkEnableOption "pr-tracker-fetcher";
-        package = nixosModuleLib.mkPackageOption "fetcher";
+        package = lib.mkPackageOption pkgs "pr-tracker-fetcher" { };
 
         user = lib.mkOption {
           type = lib.types.str;

@@ -33,7 +33,7 @@
   };
 
   perSystem =
-    psArgs@{
+    {
       pkgs,
       writeEnvironmentStructFile,
       ...
@@ -63,6 +63,5 @@
       files.file."crates/api/config_snippet.rs".source =
         writeEnvironmentStructFile "api" api.environmentVariables;
 
-      packages.api = lib.recursiveUpdate psArgs.config.package { meta.mainProgram = "pr-tracker-api"; };
     };
 }

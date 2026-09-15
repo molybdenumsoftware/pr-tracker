@@ -57,7 +57,7 @@
   };
 
   perSystem =
-    psArgs@{
+    {
       pkgs,
       writeEnvironmentStructFile,
       ...
@@ -86,8 +86,5 @@
       files.file."crates/fetcher/config_snippet.rs".source =
         writeEnvironmentStructFile "fetcher" fetcher.environmentVariables;
 
-      packages.fetcher = lib.recursiveUpdate psArgs.config.package {
-        meta.mainProgram = "pr-tracker-fetcher";
-      };
     };
 }

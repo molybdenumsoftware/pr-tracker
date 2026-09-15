@@ -27,7 +27,7 @@
 
       options.services.pr-tracker.api = {
         enable = lib.mkEnableOption "pr-tracker-api";
-        package = nixosModuleLib.mkPackageOption "api";
+        package = lib.mkPackageOption pkgs "pr-tracker-api" { };
 
         user = lib.mkOption {
           type = lib.types.str;

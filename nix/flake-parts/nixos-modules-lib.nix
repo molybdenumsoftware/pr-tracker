@@ -1,6 +1,5 @@
 {
   lib,
-  withSystem,
   psqlConnectionUriMdLink,
   ...
 }:
@@ -59,13 +58,5 @@
           default = config.services.pr-tracker.db.createLocally;
         };
       };
-
-      mkPackageOption =
-        packageAttr:
-        lib.mkPackageOption (withSystem config.nixpkgs.hostPlatform.system ({ self', ... }: self'.packages))
-          packageAttr
-          {
-            pkgsText = "pr-tracker.packages";
-          };
     };
 }
