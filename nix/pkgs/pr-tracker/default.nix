@@ -7,7 +7,7 @@
   clippy,
 }:
 let
-  projectRoot = ../../..; # src.origSrc ?
+  projectRoot = ../../..;
 in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "pr-tracker";
