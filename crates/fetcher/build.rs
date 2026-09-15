@@ -5,7 +5,7 @@ fn main() {
 }
 
 fn create_graphql_schema_symlink() {
-    let symlink_target = Path::new(env!("GITHUB_GRAPHQL_SCHEMA"));
+    let symlink_target = Path::new(env!("OCTOKIT_GRAPHQL_SCHEMA"));
 
     let symlink_name = Path::new(concat!(
         env!("CARGO_MANIFEST_DIR"),

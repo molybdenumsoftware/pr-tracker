@@ -8,7 +8,7 @@
 }:
 {
 
-  flake-file.inputs.github-graphql-schema = {
+  flake-file.inputs.octokit-graphql-schema = {
     url = "github:octokit/graphql-schema";
     flake = false;
   };

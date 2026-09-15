@@ -17,7 +17,7 @@
             GIT = lib.getExe pkgs.gitMinimal;
             POSTGRESQL_INITDB = lib.getExe' pkgs.postgresql "initdb";
             POSTGRESQL_POSTGRES = lib.getExe' pkgs.postgresql "postgres";
-            GITHUB_GRAPHQL_SCHEMA = "${inputs.github-graphql-schema}/schema.graphql";
+            OCTOKIT_GRAPHQL_SCHEMA = "${inputs.octokit-graphql-schema}/schema.graphql";
           };
         };
         package = lib.mkOption {

@@ -82,22 +82,6 @@
         "type": "github"
       }
     },
-    "github-graphql-schema": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1784660636,
-        "narHash": "sha256-j97rfx8QKbXGJatd+f3lzhwP3NqHvAoEKx6TaMQEWDU=",
-        "owner": "octokit",
-        "repo": "graphql-schema",
-        "rev": "82ff2d4780080e6929ebb95608cefa22dfa05ac7",
-        "type": "github"
-      },
-      "original": {
-        "owner": "octokit",
-        "repo": "graphql-schema",
-        "type": "github"
-      }
-    },
     "import-tree": {
       "flake": false,
       "locked": {
@@ -145,6 +129,22 @@
         "type": "github"
       }
     },
+    "octokit-graphql-schema": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784660636,
+        "narHash": "sha256-j97rfx8QKbXGJatd+f3lzhwP3NqHvAoEKx6TaMQEWDU=",
+        "owner": "octokit",
+        "repo": "graphql-schema",
+        "rev": "82ff2d4780080e6929ebb95608cefa22dfa05ac7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "octokit",
+        "repo": "graphql-schema",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "devshell": "devshell",
@@ -152,9 +152,9 @@
         "flake-file": "flake-file",
         "flake-parts": "flake-parts",
         "git-hooks-nix": "git-hooks-nix",
-        "github-graphql-schema": "github-graphql-schema",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs",
+        "octokit-graphql-schema": "octokit-graphql-schema",
         "systems": "systems",
         "treefmt-nix": "treefmt-nix"
       }

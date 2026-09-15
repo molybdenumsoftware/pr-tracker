@@ -25,15 +25,15 @@
       url = "github:cachix/git-hooks.nix";
       flake = false;
     };
-    github-graphql-schema = {
-      url = "github:octokit/graphql-schema";
-      flake = false;
-    };
     import-tree = {
       url = "github:denful/import-tree";
       flake = false;
     };
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    octokit-graphql-schema = {
+      url = "github:octokit/graphql-schema";
+      flake = false;
+    };
     systems = {
       url = "github:nix-systems/default";
       flake = false;
