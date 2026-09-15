@@ -12,7 +12,7 @@
     {
       checks.devshell = psArgs.config.devShells.default;
       devshells.default = {
-        env = lib.attrsToList psArgs.config.env;
+        env = lib.attrsToList psArgs.config.package.passthru.env;
         packages = with pkgs; [
           gcc
           cargo
