@@ -20,6 +20,7 @@
           all = true;
         };
         rustfmt.enable = true;
+        statix.enable = true;
       };
     };
   };

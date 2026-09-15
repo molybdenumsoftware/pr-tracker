@@ -47,11 +47,11 @@
             pr-tracker = {
               fetcher = {
                 enable = true;
-                user = user;
+                inherit user;
 
                 db = {
                   urlParams = {
-                    user = user;
+                    inherit user;
                     host = "localhost";
                     port = toString pgPort;
                     dbname = user;

@@ -47,7 +47,7 @@
           example = [ "release-*" ];
         };
 
-        db = nixosModuleLib.db;
+        inherit (nixosModuleLib) db;
 
         githubApiTokenFile = lib.mkOption {
           type = lib.types.path;
@@ -82,7 +82,7 @@
 
           groups.${cfg.group} = { };
           users.${cfg.user} = {
-            group = cfg.group;
+            inherit (cfg) group;
             isSystemUser = true;
           };
         };

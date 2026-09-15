@@ -61,7 +61,7 @@
           {
             groups.${cfg.group} = { };
             users.${cfg.user} = {
-              group = cfg.group;
+              inherit (cfg) group;
               isSystemUser = true;
             };
 

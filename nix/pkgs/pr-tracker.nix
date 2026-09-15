@@ -33,7 +33,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       (projectRoot + "/.sqlx")
     ];
   };
-  cargoLock.lockFile = (projectRoot + "/Cargo.lock");
+  cargoLock.lockFile = projectRoot + "/Cargo.lock";
   buildType = "debug";
   passthru.env = {
     CARGO_BUILD_WARNINGS = "deny";

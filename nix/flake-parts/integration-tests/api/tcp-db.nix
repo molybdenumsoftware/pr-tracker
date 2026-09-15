@@ -46,11 +46,11 @@
             pr-tracker.api = {
               enable = true;
               port = 7000;
-              user = user;
+              inherit user;
 
               db = {
                 urlParams = {
-                  user = user;
+                  inherit user;
                   host = "localhost";
                   port = toString pgPort;
                   dbname = user;
