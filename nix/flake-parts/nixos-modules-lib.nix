@@ -16,8 +16,6 @@
         ;
     in
     {
-      userDescription = "User to run under.";
-      groupDescription = "Group to run under.";
 
       db = {
         urlParams = mkOption {

@@ -31,13 +31,13 @@
 
         user = lib.mkOption {
           type = lib.types.str;
-          description = nixosModuleLib.userDescription;
+          description = "User to run under.";
           default = "pr-tracker-api";
         };
 
         group = lib.mkOption {
           type = lib.types.str;
-          description = nixosModuleLib.groupDescription;
+          description = "Group to run under.";
           default = "pr-tracker-api";
         };
 
