@@ -1,5 +1,4 @@
 {
-  mkNixosModuleLib,
   moduleLocation,
   privateNixosModules,
   api,
@@ -12,9 +11,6 @@
     nixosArgs@{ pkgs, ... }:
     let
       attrsToURLParams = import (config.projectRoot + "/nix/attrsToURLParams.nix") lib;
-      nixosModuleLib = mkNixosModuleLib {
-        inherit (nixosArgs) options config;
-      };
 
       cfg = nixosArgs.config.services.pr-tracker.api;
     in
@@ -52,7 +48,7 @@
           default = null;
         };
 
-        inherit (nixosModuleLib) db;
+        db = nixosArgs.config.services.pr-tracker.db.clientOptions;
       };
 
       config = lib.mkIf cfg.enable {

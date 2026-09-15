@@ -1,4 +1,9 @@
-{ moduleLocation, lib, ... }:
+{
+  moduleLocation,
+  lib,
+  psqlConnectionUriMdLink,
+  ...
+}:
 {
   _module.args.privateNixosModules.db =
     nixosArgs:
@@ -26,6 +31,51 @@
           type = lib.types.str;
           description = "Automatically created local database name.";
           default = "pr-tracker";
+        };
+
+        clientOptions = lib.mkOption {
+          internal = true;
+          type = lib.types.lazyAttrsOf lib.types.optionDeclaration;
+          readOnly = true;
+          default = {
+            urlParams = lib.mkOption {
+              type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
+              description = ''
+                URL parameters from which to compose the ${psqlConnectionUriMdLink}.
+
+                Required unless {option}`${nixosArgs.options.services.pr-tracker.db.createLocally}` is true.
+              '';
+              example = {
+                user = "pr-tracker";
+                host = "localhost";
+                port = "5432";
+                dbname = "pr-tracker";
+              };
+              default =
+                if nixosArgs.config.services.pr-tracker.db.createLocally then
+                  {
+                    host = "/run/postgresql";
+                    port = toString nixosArgs.config.services.postgresql.settings.port;
+                    dbname = nixosArgs.config.services.pr-tracker.db.name;
+                  }
+                else
+                  null;
+            };
+            passwordFile = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              description = ''
+                Path to a file containing the database password.
+                Contents will be appended to the database URL as a parameter.
+              '';
+              example = "/run/secrets/db-password";
+              default = null;
+            };
+            isLocal = lib.mkOption {
+              type = lib.types.bool;
+              description = "Whether database is local.";
+              default = nixosArgs.config.services.pr-tracker.db.createLocally;
+            };
+          };
         };
       };
 

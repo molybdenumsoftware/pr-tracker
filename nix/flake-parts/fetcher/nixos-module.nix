@@ -1,5 +1,4 @@
 {
-  mkNixosModuleLib,
   moduleLocation,
   privateNixosModules,
   fetcher,
@@ -12,9 +11,6 @@
     nixosArgs@{ pkgs, ... }:
     let
       attrsToURLParams = import (config.projectRoot + "/nix/attrsToURLParams.nix") lib;
-      nixosModuleLib = mkNixosModuleLib {
-        inherit (nixosArgs) options config;
-      };
 
       cfg = nixosArgs.config.services.pr-tracker.fetcher;
     in
@@ -47,7 +43,7 @@
           example = [ "release-*" ];
         };
 
-        inherit (nixosModuleLib) db;
+        db = nixosArgs.config.services.pr-tracker.db.clientOptions;
 
         githubApiTokenFile = lib.mkOption {
           type = lib.types.path;
