@@ -21,6 +21,6 @@
           };
         };
       };
-      config.checks = { inherit (psArgs.config) package; };
+      config.checks = { inherit (psArgs.config) octokit-graphql-schema package; };
     };
 }
