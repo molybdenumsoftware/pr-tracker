@@ -2,8 +2,9 @@
 
 /// See documentation for each field.
 #[derive(::std::fmt::Debug, ::confique::Config)]
+#[allow(clippy::doc_markdown)]
 pub struct Environment {
-  /// [PostgreSQL connection URI](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING-URIS).
+  /// PostgreSQL connection URI
   #[config(env = "PR_TRACKER_API_DATABASE_URL")]
   pub PR_TRACKER_API_DATABASE_URL: ::std::string::String,
   /// Port to listen on.

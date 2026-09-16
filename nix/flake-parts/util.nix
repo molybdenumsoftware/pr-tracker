@@ -1,9 +1,6 @@
 { lib, prefixLines, ... }:
 {
   _module.args = {
-    psqlConnectionUriMdLink =
-      # markdown
-      "[PostgreSQL connection URI](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING-URIS)";
 
     prefixLines =
       prefix: lines:
@@ -51,6 +48,7 @@
 
               /// See documentation for each field.
               #[derive(::std::fmt::Debug, ::confique::Config)]
+              #[allow(clippy::doc_markdown)]
               pub struct Environment {
               ${prefixLines "  " fields}
               }

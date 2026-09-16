@@ -1,7 +1,6 @@
 {
   moduleLocation,
   lib,
-  psqlConnectionUriMdLink,
   ...
 }:
 {
@@ -41,7 +40,7 @@
             urlParams = lib.mkOption {
               type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
               description = ''
-                URL parameters from which to compose the ${psqlConnectionUriMdLink}.
+                URL parameters from which to compose the PostgreSQL connection URI.
 
                 Required unless {option}`${nixosArgs.options.services.pr-tracker.db.createLocally}` is true.
               '';

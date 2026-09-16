@@ -2,6 +2,7 @@
 
 /// See documentation for each field.
 #[derive(::std::fmt::Debug, ::confique::Config)]
+#[allow(clippy::doc_markdown)]
 pub struct Environment {
   /// JSON array of strings representing branch patterns to track.
   /// 
@@ -15,7 +16,7 @@ pub struct Environment {
   /// Cache directory (for repository clone).
   #[config(env = "PR_TRACKER_FETCHER_CACHE_DIR")]
   pub PR_TRACKER_FETCHER_CACHE_DIR: ::camino::Utf8PathBuf,
-  /// [PostgreSQL connection URI](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING-URIS).
+  /// PostgreSQL connection URI
   #[config(env = "PR_TRACKER_FETCHER_DATABASE_URL")]
   pub PR_TRACKER_FETCHER_DATABASE_URL: ::std::string::String,
   /// GitHub repository name.

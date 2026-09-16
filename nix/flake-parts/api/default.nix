@@ -1,7 +1,6 @@
 {
   lib,
   api,
-  psqlConnectionUriMdLink,
   environmentVariablesToMarkdown,
   ...
 }:
@@ -10,7 +9,7 @@
   _module.args.api.environmentVariables = lib.mapAttrs (name: v: v // { inherit name; }) {
     PR_TRACKER_API_DATABASE_URL = {
       description = # markdown
-        "${psqlConnectionUriMdLink}.";
+        "PostgreSQL connection URI";
       rustType = "::std::string::String";
     };
     PR_TRACKER_API_PORT = {
