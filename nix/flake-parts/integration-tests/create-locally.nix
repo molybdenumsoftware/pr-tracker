@@ -12,6 +12,8 @@ in
         containers.pr-tracker =
           { pkgs, ... }:
           {
+            system.stateVersion = "26.11";
+
             imports = [
               (config.projectRoot + "/nix/nixos/api")
               (config.projectRoot + "/nix/nixos/fetcher")

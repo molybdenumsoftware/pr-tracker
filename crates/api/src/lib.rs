@@ -15,11 +15,18 @@ use sqlx::{
 
 use pr_tracker_store::{ForPrError, Landing, PrNumberNonPositiveError};
 
+pub use index_mod::index;
+
 const DOCS_PATH: &str = "/api-docs";
 
-#[poem::handler]
-fn index() -> Redirect {
-    Redirect::see_other(DOCS_PATH)
+#[allow(clippy::unused_async_trait_impl)]
+mod index_mod {
+    use super::{DOCS_PATH, Redirect};
+
+    #[poem::handler]
+    pub fn index() -> Redirect {
+        Redirect::see_other(DOCS_PATH)
+    }
 }
 
 /// # Panics
@@ -67,7 +74,7 @@ struct Api;
 
 #[OpenApi]
 impl Api {
-    #[allow(clippy::unused_async)]
+    #[allow(clippy::unused_async, clippy::unused_async_trait_impl)]
     #[oai(path = "/v1/:_", method = "get")]
     async fn v1(&self) -> V1Response {
         V1Response::NotSupported(payload::PlainText("API v1 not supported"))
@@ -90,7 +97,7 @@ impl Api {
     }
 
     #[oai(path = "/v2/healthcheck", method = "get")]
-    #[allow(clippy::unused_async)]
+    #[allow(clippy::unused_async, clippy::unused_async_trait_impl)]
     async fn health_check(
         &self,
         DbConnection(_conn): DbConnection,

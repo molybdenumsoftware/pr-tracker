@@ -7,7 +7,10 @@
         pkgs.testers.nixosTest {
           inherit name;
 
-          containers.pr-tracker-api = node;
+          containers.pr-tracker-api = {
+            system.stateVersion = "26.11";
+            imports = [ node ];
+          };
 
           testScript = ''
             pr_tracker_api.start()

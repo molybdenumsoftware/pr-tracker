@@ -250,10 +250,10 @@ impl TestContext {
 }
 
 impl GithubClient for &mut TestContext {
-    async fn query_pull_requests(
+    fn query_pull_requests(
         &mut self,
         cursor: Option<GithubPrQueryCursor>,
-    ) -> anyhow::Result<(Vec<Pr>, Option<GithubPrQueryCursor>)> {
+    ) -> impl Future<Output = anyhow::Result<(Vec<Pr>, Option<GithubPrQueryCursor>)>> {
         self.queried_cursors.push(cursor.clone());
 
         let cursor_mtime: u32 = cursor
@@ -276,7 +276,7 @@ impl GithubClient for &mut TestContext {
 
         let cursor = pull_requests_since.next().map(MockPr::cursor);
 
-        Ok((page, cursor))
+        std::future::ready(Ok((page, cursor)))
     }
 
     fn remote(&self) -> String {

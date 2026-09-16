@@ -19,6 +19,7 @@
       configuration = import "${inputs.nixpkgs}/nixos" {
         inherit system;
         configuration = {
+          system.stateVersion = "26.11";
           nixpkgs = { inherit pkgs; };
           imports = [
             (config.projectRoot + "/nix/nixos/api")
