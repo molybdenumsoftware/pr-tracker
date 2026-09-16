@@ -1,35 +1,8 @@
 {
-  lib,
-  api,
   environmentVariablesToMarkdown,
   ...
 }:
 {
-
-  _module.args.api.environmentVariables = lib.mapAttrs (name: v: v // { inherit name; }) {
-    PR_TRACKER_API_DATABASE_URL = {
-      description = # markdown
-        "PostgreSQL connection URI";
-      rustType = "::std::string::String";
-    };
-    PR_TRACKER_API_PORT = {
-      description =
-        # markdown
-        "Port to listen on.";
-      rustType = "::core::primitive::u16";
-    };
-    PR_TRACKER_TRACING_FILTER = {
-      description =
-        # markdown
-        ''
-          Optional.
-          Expected to deserialize into an [`EnvFilter`](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html).
-        '';
-      # Note: ideally we'd use `::core::option::Option`, but cannot because
-      # confique's derive macro seems not to support it.
-      rustType = "Option<TracingFilter>";
-    };
-  };
 
   perSystem =
     {
@@ -54,13 +27,13 @@
 
               Reads the following environment variables.
 
-              ${environmentVariablesToMarkdown api.environmentVariables}
+              ${environmentVariablesToMarkdown pkgs.pr-tracker.passthru.configVars.api}
             '';
         };
       };
 
       files.file."crates/api/config_snippet.rs".source =
-        writeEnvironmentStructFile "api" api.environmentVariables;
+        writeEnvironmentStructFile "api" pkgs.pr-tracker.passthru.configVars.api;
 
     };
 }

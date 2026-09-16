@@ -1,7 +1,6 @@
 {
   moduleLocation,
   privateNixosModules,
-  fetcher,
   lib,
   config,
   ...
@@ -39,7 +38,7 @@
 
         branchPatterns = lib.mkOption {
           type = lib.types.listOf lib.types.str;
-          inherit (fetcher.environmentVariables.PR_TRACKER_FETCHER_BRANCH_PATTERNS) description;
+          inherit (cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_BRANCH_PATTERNS) description;
           example = [ "release-*" ];
         };
 
@@ -47,19 +46,19 @@
 
         githubApiTokenFile = lib.mkOption {
           type = lib.types.path;
-          description = "Path to a file containing a ${fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_TOKEN.description}";
+          description = "Path to a file containing a ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_TOKEN.description}";
           example = "/run/secrets/github-api.token";
         };
 
         repo.owner = lib.mkOption {
           type = lib.types.str;
-          inherit (fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_REPO_OWNER) description;
+          inherit (cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_REPO_OWNER) description;
           example = "NixOS";
         };
 
         repo.name = lib.mkOption {
           type = lib.types.str;
-          inherit (fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_REPO_NAME) description;
+          inherit (cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_REPO_NAME) description;
           example = "nixpkgs";
         };
 
@@ -97,18 +96,18 @@
             requires = lib.optional cfg.db.isLocal "postgresql.target";
             script = lib.concatLines (
               [
-                "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_DATABASE_URL.name}=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
-                "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_REPO_OWNER.name}=${lib.escapeShellArg cfg.repo.owner}"
-                "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_REPO_NAME.name}=${lib.escapeShellArg cfg.repo.name}"
-                "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_BRANCH_PATTERNS.name}=${lib.escapeShellArg (builtins.toJSON cfg.branchPatterns)}"
-                "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_GITHUB_TOKEN.name}=$(< ${cfg.githubApiTokenFile})"
+                "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_DATABASE_URL.name}=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
+                "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_REPO_OWNER.name}=${lib.escapeShellArg cfg.repo.owner}"
+                "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_REPO_NAME.name}=${lib.escapeShellArg cfg.repo.name}"
+                "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_BRANCH_PATTERNS.name}=${lib.escapeShellArg (builtins.toJSON cfg.branchPatterns)}"
+                "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_TOKEN.name}=$(< ${cfg.githubApiTokenFile})"
                 # CACHE_DIRECTORY is set by systemd based on the CacheDirectory setting.
                 # See https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
-                "export ${fetcher.environmentVariables.PR_TRACKER_FETCHER_CACHE_DIR.name}=$CACHE_DIRECTORY"
+                "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_CACHE_DIR.name}=$CACHE_DIRECTORY"
               ]
               ++ lib.optional (cfg.db.passwordFile != null) ''
                 PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < ${cfg.db.passwordFile})
-                ${fetcher.environmentVariables.PR_TRACKER_FETCHER_DATABASE_URL.name}+="&password=$PASSWORD"
+                ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_DATABASE_URL.name}+="&password=$PASSWORD"
               ''
               ++ [ "exec ${lib.getExe cfg.package}" ]
             );

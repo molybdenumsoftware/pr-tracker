@@ -19,6 +19,7 @@
       configuration = import "${inputs.nixpkgs}/nixos" {
         inherit system;
         configuration = {
+          nixpkgs = { inherit pkgs; };
           imports = [
             self.nixosModules.api
             self.nixosModules.fetcher

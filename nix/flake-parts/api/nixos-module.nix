@@ -1,7 +1,6 @@
 {
   moduleLocation,
   privateNixosModules,
-  api,
   lib,
   config,
   ...
@@ -39,12 +38,12 @@
 
         port = lib.mkOption {
           type = lib.types.port;
-          inherit (api.environmentVariables.PR_TRACKER_API_PORT) description;
+          inherit (cfg.package.passthru.configVars.api.PR_TRACKER_API_PORT) description;
         };
 
         tracingFilter = lib.mkOption {
           type = lib.types.nullOr lib.types.str;
-          inherit (api.environmentVariables.PR_TRACKER_TRACING_FILTER) description;
+          inherit (cfg.package.passthru.configVars.api.PR_TRACKER_TRACING_FILTER) description;
           default = null;
         };
 
@@ -71,15 +70,15 @@
 
           script = lib.concatLines (
             [
-              "export ${api.environmentVariables.PR_TRACKER_API_DATABASE_URL.name}=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
-              "export ${api.environmentVariables.PR_TRACKER_API_PORT.name}=${lib.escapeShellArg (toString cfg.port)}"
+              "export ${cfg.package.passthru.configVars.api.PR_TRACKER_API_DATABASE_URL.name}=${lib.escapeShellArg "postgresql://?${attrsToURLParams cfg.db.urlParams}"}"
+              "export ${cfg.package.passthru.configVars.api.PR_TRACKER_API_PORT.name}=${lib.escapeShellArg (toString cfg.port)}"
             ]
             ++ (lib.optional (cfg.tracingFilter != null)
-              "export ${api.environmentVariables.PR_TRACKER_TRACING_FILTER.name}=${lib.escapeShellArg cfg.tracingFilter}"
+              "export ${cfg.package.passthru.configVars.api.PR_TRACKER_TRACING_FILTER.name}=${lib.escapeShellArg cfg.tracingFilter}"
             )
             ++ lib.optional (cfg.db.passwordFile != null) ''
               PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < ${cfg.db.passwordFile})
-              ${api.environmentVariables.PR_TRACKER_API_DATABASE_URL.name}+="&password=$PASSWORD"
+              ${cfg.package.passthru.configVars.api.PR_TRACKER_API_DATABASE_URL.name}+="&password=$PASSWORD"
             ''
             ++ [ "exec ${lib.getExe cfg.package}" ]
           );
