@@ -1,4 +1,4 @@
-{ self, ... }:
+{ config, ... }:
 {
   perSystem =
     {
@@ -16,7 +16,7 @@
           dbPass = "fetcher-db-secret";
         in
         {
-          imports = [ self.nixosModules.fetcher ];
+          imports = [ (config.projectRoot + "/nix/nixos/fetcher") ];
 
           nixpkgs.hostPlatform = system;
 

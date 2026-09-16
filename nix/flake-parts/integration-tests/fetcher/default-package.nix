@@ -1,4 +1,4 @@
-{ self, ... }:
+{ config, ... }:
 {
   perSystem =
     {
@@ -9,7 +9,7 @@
     }:
     {
       checks."integration/fetcher/default-package" = nodeToFetcherTest "fetcher with default package" {
-        imports = [ self.nixosModules.fetcher ];
+        imports = [ (config.projectRoot + "/nix/nixos/fetcher") ];
 
         nixpkgs.hostPlatform = system;
 

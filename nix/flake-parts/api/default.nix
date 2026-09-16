@@ -1,6 +1,5 @@
 {
   environmentVariablesToMarkdown,
-  config,
   ...
 }:
 {
@@ -37,6 +36,4 @@
         writeEnvironmentStructFile "api" pkgs.pr-tracker.passthru.configVars.api;
 
     };
-
-  flake.nixosModules.api = config.projectRoot + "/nix/nixos/api";
 }

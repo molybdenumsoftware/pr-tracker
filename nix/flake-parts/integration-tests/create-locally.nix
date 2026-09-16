@@ -1,4 +1,4 @@
-{ self, ... }:
+{ config, ... }:
 let
   apiPort = 7000;
 in
@@ -13,8 +13,8 @@ in
           { pkgs, ... }:
           {
             imports = [
-              self.nixosModules.api
-              self.nixosModules.fetcher
+              (config.projectRoot + "/nix/nixos/api")
+              (config.projectRoot + "/nix/nixos/fetcher")
             ];
 
             nixpkgs.hostPlatform = system;

@@ -21,8 +21,8 @@
         configuration = {
           nixpkgs = { inherit pkgs; };
           imports = [
-            self.nixosModules.api
-            self.nixosModules.fetcher
+            (config.projectRoot + "/nix/nixos/api")
+            (config.projectRoot + "/nix/nixos/fetcher")
           ];
         };
       };

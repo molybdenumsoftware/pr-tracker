@@ -1,4 +1,4 @@
-{ self, ... }:
+{ config, ... }:
 {
   perSystem =
     {
@@ -15,7 +15,7 @@
           user = "pr-tracker";
         in
         {
-          imports = [ self.nixosModules.api ];
+          imports = [ (config.projectRoot + "/nix/nixos/api") ];
 
           nixpkgs.hostPlatform = system;
 

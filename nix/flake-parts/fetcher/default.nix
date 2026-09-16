@@ -1,6 +1,5 @@
 {
   environmentVariablesToMarkdown,
-  config,
   ...
 }:
 {
@@ -42,5 +41,4 @@
 
     };
 
-  flake.nixosModules.fetcher = config.projectRoot + "/nix/nixos/fetcher";
 }

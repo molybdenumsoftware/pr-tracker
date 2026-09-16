@@ -1,4 +1,4 @@
-{ self, ... }:
+{ config, ... }:
 {
   perSystem =
     {
@@ -8,7 +8,7 @@
     }:
     {
       checks."integration/api/default-package" = nodeToApiTest "api with default pacakge" {
-        imports = [ self.nixosModules.api ];
+        imports = [ (config.projectRoot + "/nix/nixos/api") ];
 
         nixpkgs.hostPlatform = { inherit system; };
 
