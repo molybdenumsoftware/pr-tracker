@@ -1,5 +1,6 @@
 {
   environmentVariablesToMarkdown,
+  config,
   ...
 }:
 {
@@ -40,4 +41,6 @@
         writeEnvironmentStructFile "fetcher" pkgs.pr-tracker.passthru.configVars.fetcher;
 
     };
+
+  flake.nixosModules.fetcher = config.projectRoot + "/nix/nixos/fetcher";
 }
