@@ -31,4 +31,4 @@ jobs:
         with:
           path: result
       - if: github.ref == 'refs/heads/main'
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
