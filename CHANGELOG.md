@@ -1,3 +1,10 @@
+## [7.6.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.5.0...v7.6.0) (2026-09-17)
+
+
+### Features
+
+* **fetcher/nixos:** failure hard reading github token file ([c35c573](https://github.com/molybdenumsoftware/pr-tracker/commit/c35c573ddcd3c2fbbaf4e44df41d9c36833a097b))
+
 ## [7.5.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.4.0...v7.5.0) (2026-08-12)
 
 
