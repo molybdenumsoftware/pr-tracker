@@ -70,7 +70,7 @@ in
           "export ${cfg.package.passthru.configVars.api.PR_TRACKER_TRACING_FILTER.name}=${lib.escapeShellArg cfg.tracingFilter}"
         )
         ++ lib.optional (cfg.db.passwordFile != null) ''
-          PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < ${cfg.db.passwordFile})
+          PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < $CREDENTIALS_DIRECTORY/db_password)
           ${cfg.package.passthru.configVars.api.PR_TRACKER_API_DATABASE_URL.name}+="&password=$PASSWORD"
         ''
         ++ [ "exec ${lib.getExe cfg.package}" ]
@@ -81,6 +81,9 @@ in
         Group = cfg.group;
         Type = "notify";
         Restart = "always";
+        LoadCredential = lib.optionals (cfg.db.passwordFile != null) [
+          "db_password:${cfg.db.passwordFile}"
+        ];
       };
     };
   };

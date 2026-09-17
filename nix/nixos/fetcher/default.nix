@@ -40,7 +40,7 @@ in
     githubApiTokenFile = lib.mkOption {
       type = lib.types.path;
       description = "Path to a file containing a ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_TOKEN.description}";
-      example = "/run/secrets/github-api.token";
+      example = "/etc/credstore/github-api.token";
     };
 
     repo.owner = lib.mkOption {
@@ -93,14 +93,14 @@ in
             "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_REPO_OWNER.name}=${lib.escapeShellArg cfg.repo.owner}"
             "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_REPO_NAME.name}=${lib.escapeShellArg cfg.repo.name}"
             "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_BRANCH_PATTERNS.name}=${lib.escapeShellArg (builtins.toJSON cfg.branchPatterns)}"
-            "${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_TOKEN.name}=$(< ${cfg.githubApiTokenFile})"
+            "${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_TOKEN.name}=$(< $CREDENTIALS_DIRECTORY/github_token)"
             "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_GITHUB_TOKEN.name}"
             # CACHE_DIRECTORY is set by systemd based on the CacheDirectory setting.
             # See https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#RuntimeDirectory=
             "export ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_CACHE_DIR.name}=$CACHE_DIRECTORY"
           ]
           ++ lib.optional (cfg.db.passwordFile != null) ''
-            PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < ${cfg.db.passwordFile})
+            PASSWORD=$(${lib.getExe pkgs.urlencode} --encode-set component < $CREDENTIALS_DIRECTORY/db_password)
             ${cfg.package.passthru.configVars.fetcher.PR_TRACKER_FETCHER_DATABASE_URL.name}+="&password=$PASSWORD"
           ''
           ++ [ "exec ${lib.getExe cfg.package}" ]
@@ -112,6 +112,12 @@ in
           Type = "oneshot";
           Restart = "on-failure";
           CacheDirectory = "pr-tracker-fetcher";
+          LoadCredential = [
+            "github_token:${cfg.githubApiTokenFile}"
+          ]
+          ++ lib.optionals (cfg.db.passwordFile != null) [
+            "db_password:${cfg.db.passwordFile}"
+          ];
         };
       };
     };
