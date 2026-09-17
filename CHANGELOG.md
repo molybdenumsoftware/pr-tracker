@@ -1,3 +1,10 @@
+## [7.8.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.7.0...v7.8.0) (2026-09-17)
+
+
+### Features
+
+* **pkg:** default buildRustPackage buildType ([57921d6](https://github.com/molybdenumsoftware/pr-tracker/commit/57921d627b480f99fa412fa2ed371a33423056cc))
+
 ## [7.7.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.6.0...v7.7.0) (2026-09-17)
 
 
