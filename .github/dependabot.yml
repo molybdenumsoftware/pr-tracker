@@ -1,18 +1,15 @@
-{
-  "updates":
-    [
-      {
-        "commit-message": { "include": "scope", "prefix": "chore" },
-        "package-ecosystem": "cargo",
-        "directory": "/",
-        "schedule": { "interval": "daily" },
-      },
-      {
-        "commit-message": { "prefix": "chore" },
-        "package-ecosystem": "nix",
-        "directory": "/",
-        "schedule": { "interval": "daily" },
-      },
-    ],
-  "version": 2,
-}
+updates:
+  - commit-message:
+      include: scope
+      prefix: chore
+    package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: daily
+  - commit-message:
+      prefix: chore
+    package-ecosystem: nix
+    directory: /
+    schedule:
+      interval: daily
+version: 2
