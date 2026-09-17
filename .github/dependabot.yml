@@ -1,5 +1,11 @@
 updates:
   - commit-message:
+      prefix: ci
+    package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+  - commit-message:
       include: scope
       prefix: chore
     package-ecosystem: cargo
