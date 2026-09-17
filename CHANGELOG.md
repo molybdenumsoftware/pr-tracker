@@ -1,3 +1,10 @@
+## [7.7.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.6.0...v7.7.0) (2026-09-17)
+
+
+### Features
+
+* **nixos:** use LoadCredential ([fcafa18](https://github.com/molybdenumsoftware/pr-tracker/commit/fcafa181ca40357b51b77a5759fb7758b7fe9648))
+
 ## [7.6.0](https://github.com/molybdenumsoftware/pr-tracker/compare/v7.5.0...v7.6.0) (2026-09-17)
 
 

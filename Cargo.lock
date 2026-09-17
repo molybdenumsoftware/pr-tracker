@@ -562,7 +562,7 @@ dependencies = [
 
 [[package]]
 name = "db-context"
-version = "7.6.0"
+version = "7.7.0"
 dependencies = [
  "camino",
  "fragile-child",
@@ -804,7 +804,7 @@ dependencies = [
 
 [[package]]
 name = "fragile-child"
-version = "7.6.0"
+version = "7.7.0"
 
 [[package]]
 name = "futures"
@@ -2426,15 +2426,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "itertools"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b4baf93f58d4425749ca49a51c50ebab072c5df6994d08fed93541c331481dc"
-dependencies = [
- "either",
-]
-
-[[package]]
 name = "itoa"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2908,7 +2899,7 @@ dependencies = [
  "derive_more",
  "futures-util",
  "indexmap 2.7.0",
- "itertools 0.14.0",
+ "itertools",
  "mime",
  "num-traits",
  "poem",
@@ -2973,7 +2964,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-api"
-version = "7.6.0"
+version = "7.7.0"
 dependencies = [
  "anyhow",
  "camino",
@@ -2989,7 +2980,7 @@ dependencies = [
  "serde_with",
  "sqlx",
  "tempfile",
- "thiserror 2.0.9",
+ "thiserror 1.0.69",
  "tokio",
  "tracing-subscriber",
  "util",
@@ -2997,7 +2988,7 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-fetcher"
-version = "7.6.0"
+version = "7.7.0"
 dependencies = [
  "anyhow",
  "camino",
@@ -3008,7 +2999,7 @@ dependencies = [
  "env_logger",
  "gix",
  "graphql_client",
- "itertools 0.15.0",
+ "itertools",
  "log",
  "once_cell",
  "pr-tracker-store",
@@ -3024,12 +3015,12 @@ dependencies = [
 
 [[package]]
 name = "pr-tracker-store"
-version = "7.6.0"
+version = "7.7.0"
 dependencies = [
  "derive_more",
  "getset",
  "sqlx",
- "thiserror 2.0.9",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -4313,7 +4304,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 
 [[package]]
 name = "util"
-version = "7.6.0"
+version = "7.7.0"
 dependencies = [
  "clap",
  "db-context",
