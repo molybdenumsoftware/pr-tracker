@@ -105,7 +105,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ];
   };
   cargoLock.lockFile = projectRoot + "/Cargo.lock";
-  buildType = "debug";
   passthru = {
     env = {
       CARGO_BUILD_WARNINGS = "deny";
