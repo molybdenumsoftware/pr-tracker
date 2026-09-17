@@ -27,7 +27,7 @@ jobs:
         with:
           primary-key: a-single-key
       - run: nix build --accept-flake-config .#manual
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: result
       - if: github.ref == 'refs/heads/main'
