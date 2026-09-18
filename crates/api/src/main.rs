@@ -36,7 +36,7 @@ async fn main() {
         .with_context(|| format!("failed to bind on {addr}"))
         .unwrap();
 
-    sd_notify::notify(true, &[sd_notify::NotifyState::Ready])
+    sd_notify::notify(&[sd_notify::NotifyState::Ready])
         .context("failed to notify systemd that this service is ready")
         .unwrap();
 
